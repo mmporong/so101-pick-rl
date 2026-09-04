@@ -10,10 +10,10 @@
 | G1 | PASS | 공식 `Isaac-Lift-Cube-Franka-v0`, 1환경 20 physics step, simulator error 0건 |
 | 의미 계약 | PASS | raw action 10을 0.05rad로 clip, 실제 previous action 일치, 부분 reset, 양쪽 contact sensor, 15-step success hold 확인 |
 | G2 | PASS | SO-101 1환경 1,000 physics step, NaN/Inf·관절 limit·테이블 관통·simulator error 0건 |
-| G3 | PASS | SO-101 64환경 10,000 physics step, timeout reset 512회, 비정상 종료 0건 |
+| G3 | PASS | SO-101 64환경 10,000 physics step, 고유 timeout reset 512회, reset 후 상태 실패·비정상 종료 0건 |
 | G4 | PASS | 64환경 PPO 10 iteration, 15,360 transitions, 필수 scalar 각 10개, checkpoint 3개 |
 | 재시작 | PASS | `model_9.pt`에서 optimizer와 policy를 읽어 iteration 10의 `model_10.pt` 생성 |
-| 256~2,048환경 | NOT RUN | 공유 자원 보호를 위해 실행하지 않음 |
+| 256~2,048환경 | NOT RUN | 사용자 지정 저부하 경계를 지키기 위해 실행하지 않음 |
 | 수렴 학습·성공률 | NOT RUN | G4는 실행 경로 smoke이며 정책 수렴 판정이 아님 |
 
 ## 실행 환경
@@ -35,17 +35,17 @@
 | --- | ---: | ---: |
 | 환경 수 | 1 | 64 |
 | physics step | 1,000 | 10,000 |
-| wall clock | 12.98초 | 144.26초 |
-| physics frame/s | 77.03 | 69.32 |
-| aggregate sim step/s | 77.03 | 4,436.50 |
-| 최대 VRAM | 2,809MiB | 2,826MiB |
-| 평균/최대 GPU | 23.23% / 38% | 33.14% / 41% |
-| 평균/최대 system CPU | 37.34% / 54.3% | 49.99% / 80.1% |
+| wall clock | 12.98초 | 129.01초 |
+| physics frame/s | 77.03 | 77.51 |
+| aggregate sim step/s | 77.03 | 4,960.91 |
+| 최대 VRAM | 2,809MiB | 2,902MiB |
+| 평균/최대 GPU | 23.23% / 38% | 31.52% / 41% |
+| 평균/최대 system CPU | 37.34% / 54.3% | 38.01% / 68.2% |
 | simulator warning/error | 18 / 0 | 18 / 0 |
 
 18개 warning은 crash reporter 부재, repo의 선택적 `rendering_modes` 설정 부재, MaterialX/OmniHub, Isaac Sim 4.5 deprecated dynamic control, USD PreviewSurface discovery 메시지입니다. 보고서의 Kit log 경로와 warning sample에 보존했으며 태스크·PhysX error는 없었습니다.
 
-64환경 G3의 평균 부하는 제한 범위였지만 system CPU가 순간 80.1%까지 올라갔습니다. 이 때문에 이번 작업에서는 256환경 이상 scale ladder를 실행하지 않았고, 검증된 최대 안정 병렬 환경 수는 64입니다.
+64환경 G3는 다른 Isaac 작업이 완전히 끝난 뒤 다시 측정했습니다. 최대 GPU 41%, 최대 system CPU 68.2%로 제한 범위 안이었지만, 사용자의 저부하 조건을 지키기 위해 256환경 이상 scale ladder는 실행하지 않았습니다. 검증된 최대 안정 병렬 환경 수는 64입니다.
 
 ## PPO smoke와 산출물
 
@@ -77,7 +77,7 @@ checkpoint와 TensorBoard 파일은 로컬 경로에 있으며 Git에서는 제�
 
 각 JSON 옆의 `_manifest.json`은 `isaaclab/scripts/validate_run_manifest.py`로 검증합니다. 정본 실행은 모두 `git_dirty=false`인 source commit에서 시작했습니다.
 
-정본 실행 후 검증 하네스를 추가로 강화했습니다. 최신 코드는 G3가 `non_finite=0`, `workspace_exit=0`, 중복 제거한 자동 reset 100회 이상을 만족해야만 PASS로 판정합니다. 실제 reset 환경마다 반환 관측, episode length, 로봇·큐브 상태, 에피소드 초기 높이를 검사해 실패 수와 사유도 기록합니다. resource sample이나 이번 명령에 결합된 Kit log가 없으면 성공을 허용하지 않습니다. 판정식과 종료 플래그 중복 제거는 순수 회귀 테스트에 포함했습니다. 기존 G3 정본은 timeout 512회를 기록했지만 reset 후 상태 검사가 도입되기 전 측정이므로, 다른 GPU 작업 종료 후 최신 하네스로 다시 측정합니다.
+정본 실행 후 검증 하네스를 추가로 강화했습니다. 최신 코드는 G3가 `non_finite=0`, `workspace_exit=0`, 중복 제거한 자동 reset 100회 이상을 만족해야만 PASS로 판정합니다. 실제 reset 환경마다 반환 관측, episode length, 로봇·큐브 상태, 에피소드 초기 높이를 검사해 실패 수와 사유도 기록합니다. resource sample이나 이번 명령에 결합된 Kit log가 없으면 성공을 허용하지 않습니다. 판정식과 종료 플래그 중복 제거는 순수 회귀 테스트에 포함했으며, 최신 G3 정본을 clean source commit `6e0bb59ea2e40ed328963948764b09975a2e2f71`에서 다시 실행해 고유 reset 512회와 reset 실패 0회를 확인했습니다.
 
 ## 재현 명령
 
