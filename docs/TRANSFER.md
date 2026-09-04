@@ -2,9 +2,13 @@
 
 ## 현재 상태
 
-이 저장소는 로컬 Git 저장소입니다. 외부 GitHub 저장소와 remote는 아직 만들지 않았습니다.
+공개 GitHub 저장소와 로컬 `origin`이 연결되어 있습니다.
 
-장기 작업은 private GitHub remote를 연결하는 방식이 편합니다. 외부 remote를 만들기 전에도 Git bundle 파일 하나로 Windows에 전달할 수 있습니다.
+- GitHub: https://github.com/mmporong/so101-pick-rl
+- 기본 브랜치: `main`
+- SSH remote: `git@github.com:mmporong/so101-pick-rl.git`
+
+일상적인 동기화는 GitHub를 사용합니다. Git bundle은 네트워크 없이 전달하거나 복구할 때 쓰는 보조 수단입니다.
 
 ## Git bundle로 전달
 
@@ -24,25 +28,26 @@ python -m unittest discover -s tests -v
 
 bundle은 생성 시점의 commit까지만 포함합니다. Ubuntu에서 새 commit을 만든 뒤에는 bundle도 다시 생성해야 합니다.
 
-## private GitHub remote를 연결한 뒤
+## GitHub에서 Windows로 전달
 
-외부 저장소 생성과 push가 허용된 세션에서 remote를 연결합니다.
-
-```bash
-cd "$HOME/so101-pick-rl"
-git remote add origin <PRIVATE_GITHUB_REPOSITORY_URL>
-git push -u origin main
-```
-
-Windows에서는 remote에서 clone하고 작업 브랜치를 만듭니다.
+Windows에서는 공개 원격 저장소를 복제하고 작업 브랜치를 만듭니다.
 
 ```powershell
-git clone <PRIVATE_GITHUB_REPOSITORY_URL> "$HOME\so101-pick-rl"
+git clone https://github.com/mmporong/so101-pick-rl.git "$HOME\so101-pick-rl"
 Set-Location "$HOME\so101-pick-rl"
 git switch -c feat/isaaclab-windows
+python scripts\validate_contract.py
+python -m unittest discover -s tests -v
 ```
 
 Ubuntu는 `feat/mujoco-linux` 브랜치를 사용합니다. 공통 계약은 한쪽에서만 변경한 뒤 main에 반영합니다.
+
+각 PC에서 작업을 시작하기 전에는 다음 명령으로 최신 `main`을 확인합니다.
+
+```bash
+git fetch origin
+git status --short --branch
+```
 
 ## Git으로 보내지 않는 파일
 
