@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "g1_franka_smoke",
+  "git_commit": "75581bf24a188072eb26066ebff153d55bc27837",
+  "git_dirty": false,
+  "task_contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "platform": "windows",
+  "simulator": "isaac_sim_physx",
+  "algorithm": "scripted",
+  "seed": 0,
+  "num_envs": 1,
+  "status": "completed",
+  "started_at_utc": "2026-09-04T07:33:58.956381+00:00",
+  "finished_at_utc": "2026-09-04T07:34:13.040848+00:00",
+  "config_sha256": "e8ae6f5250ad50b4a3934a106ed188cddcca769896f2fb7c6b71aa6a545753c1",
+  "checkpoint_uri": null,
+  "checkpoint_sha256": null,
+  "metrics_path": "reports/windows/g1_franka_smoke.json",
+  "notes": "bounded smoke; requested_physics_steps=20; classification=runtime_validated"
+}
