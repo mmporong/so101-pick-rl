@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "task_semantics_final",
+  "git_commit": "5bb0ed44266792045b31a4814f99105d91a6ad26",
+  "git_dirty": false,
+  "task_contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "platform": "windows",
+  "simulator": "isaac_sim_physx",
+  "algorithm": "scripted",
+  "seed": 0,
+  "num_envs": 2,
+  "status": "completed",
+  "started_at_utc": "2026-09-04T07:34:30.399148+00:00",
+  "finished_at_utc": "2026-09-04T07:34:44.774657+00:00",
+  "config_sha256": "cb3fb4f19d4efc8849ab1eaf6ae471e21cbe348b259e8991996c2362c4702b01",
+  "checkpoint_uri": null,
+  "checkpoint_sha256": null,
+  "metrics_path": "reports/windows/task_semantics_final.json",
+  "notes": "task semantics validation; classification=runtime_validated"
+}
