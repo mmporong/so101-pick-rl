@@ -183,7 +183,9 @@ def main() -> int:
         tabletop_penetration_steps = 0
         minimum_cube_height = float(cube.data.root_pos_w[:, 2].min().item()) if cube is not None else None
         maximum_cube_height = float(cube.data.root_pos_w[:, 2].max().item()) if cube is not None else None
-        peak_filtered_contact_force_n = {"fixed_finger_contact": 0.0, "moving_finger_contact": 0.0}
+        peak_filtered_contact_force_n = (
+            {"fixed_finger_contact": 0.0, "moving_finger_contact": 0.0} if is_so101_task else {}
+        )
         loop_started = time.perf_counter()
         for _ in range(policy_steps):
             if args.action_mode == "zero":
@@ -227,14 +229,15 @@ def main() -> int:
             if cube is not None:
                 minimum_cube_height = min(minimum_cube_height, float(cube.data.root_pos_w[:, 2].min().item()))
                 maximum_cube_height = max(maximum_cube_height, float(cube.data.root_pos_w[:, 2].max().item()))
-                relative_cube_positions = cube.data.root_pos_w - unwrapped.scene.env_origins
-                on_table_xy = (
-                    (torch.abs(relative_cube_positions[:, 0]) <= 0.30)
-                    & (relative_cube_positions[:, 1] >= -0.08)
-                    & (relative_cube_positions[:, 1] <= 0.52)
-                )
-                penetrated_table = on_table_xy & (relative_cube_positions[:, 2] < 0.015)
-                tabletop_penetration_steps += int(torch.any(penetrated_table).item())
+                if is_so101_task:
+                    relative_cube_positions = cube.data.root_pos_w - unwrapped.scene.env_origins
+                    on_table_xy = (
+                        (torch.abs(relative_cube_positions[:, 0]) <= 0.30)
+                        & (relative_cube_positions[:, 1] >= -0.08)
+                        & (relative_cube_positions[:, 1] <= 0.52)
+                    )
+                    penetrated_table = on_table_xy & (relative_cube_positions[:, 2] < 0.015)
+                    tabletop_penetration_steps += int(torch.any(penetrated_table).item())
                 for sensor_name in peak_filtered_contact_force_n:
                     sensor = unwrapped.scene.sensors[sensor_name]
                     if sensor.data.force_matrix_w is None or not bool(
@@ -296,9 +299,9 @@ def main() -> int:
                 }
             )
         passed = all(runtime_checks.values())
-        if args.num_envs == 1 and args.physics_steps >= 1000:
+        if is_so101_task and args.num_envs == 1 and args.physics_steps >= 1000:
             gate_evaluation = {"gate": "G2", "eligible": True, "passed": passed}
-        elif args.num_envs == 64 and args.physics_steps >= 10000:
+        elif is_so101_task and args.num_envs == 64 and args.physics_steps >= 10000:
             gate_evaluation = {"gate": "G3", "eligible": True, "passed": passed}
         else:
             gate_evaluation = {"gate": None, "eligible": False, "passed": None, "reason": "bounded diagnostic"}
