@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+
+# IDE and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Training artifacts
+artifacts/
+checkpoints/
+datasets/
+logs/
+runs/
+videos/
+wandb/
+*.ckpt
+*.onnx
+*.pt
+*.pth
+*.hdf5
+*.mp4
+
+# Isaac Sim and MuJoCo generated files
+_build/
+kit/cache/
+kit/data/
+kit/logs/
+mujoco/rendered/

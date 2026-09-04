@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "run_manifest.schema.json",
+  "title": "SO-101 training run manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "git_commit",
+    "git_dirty",
+    "task_contract_sha256",
+    "platform",
+    "simulator",
+    "algorithm",
+    "seed",
+    "num_envs",
+    "status",
+    "started_at_utc",
+    "config_sha256",
+    "metrics_path"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "run_id": {"type": "string", "minLength": 1},
+    "git_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "git_dirty": {"type": "boolean"},
+    "task_contract_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "platform": {"enum": ["windows", "linux"]},
+    "simulator": {"enum": ["isaac_sim_physx", "mujoco"]},
+    "algorithm": {"enum": ["random", "scripted", "ppo"]},
+    "seed": {"type": "integer", "minimum": 0},
+    "num_envs": {"type": "integer", "minimum": 1},
+    "status": {"enum": ["completed", "failed", "interrupted"]},
+    "started_at_utc": {"type": "string", "format": "date-time"},
+    "finished_at_utc": {"type": ["string", "null"], "format": "date-time"},
+    "config_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "checkpoint_uri": {"type": ["string", "null"]},
+    "checkpoint_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "metrics_path": {"type": "string", "minLength": 1},
+    "notes": {"type": "string"}
+  }
+}

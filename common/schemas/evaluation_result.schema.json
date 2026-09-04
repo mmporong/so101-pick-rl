@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evaluation_result.schema.json",
+  "title": "SO-101 policy evaluation result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "evaluation_id",
+    "policy_run_id",
+    "git_commit",
+    "task_contract_sha256",
+    "simulator",
+    "condition",
+    "seed",
+    "episodes",
+    "successes",
+    "success_rate",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "evaluation_id": {"type": "string", "minLength": 1},
+    "policy_run_id": {"type": "string", "minLength": 1},
+    "git_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "task_contract_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "simulator": {"enum": ["isaac_sim_physx", "mujoco"]},
+    "condition": {"enum": ["id", "held_out", "cross_sim"]},
+    "seed": {"type": "integer", "minimum": 0},
+    "episodes": {"type": "integer", "minimum": 1},
+    "successes": {"type": "integer", "minimum": 0},
+    "success_rate": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "mean_time_to_success_s": {"type": ["number", "null"], "minimum": 0.0},
+    "mean_episode_return": {"type": ["number", "null"]},
+    "status": {"enum": ["completed", "failed", "interrupted"]},
+    "notes": {"type": "string"}
+  }
+}

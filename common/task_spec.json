@@ -1,0 +1,61 @@
+{
+  "schema_version": "0.1.0",
+  "status": "design_default_requires_runtime_validation",
+  "task": {
+    "id": "SO101-LiftCube-v0",
+    "scope": "simulation_only",
+    "episode_seconds": 10.0,
+    "success": {
+      "reference": "cube_initial_z",
+      "minimum_delta_z_m": 0.08,
+      "minimum_hold_seconds": 0.5
+    },
+    "failure": {
+      "terminate_on_non_finite_state": true,
+      "terminate_on_workspace_exit": true
+    }
+  },
+  "robot": {
+    "name": "so101_follower",
+    "joint_order": [
+      "shoulder_pan",
+      "shoulder_lift",
+      "elbow_flex",
+      "wrist_flex",
+      "wrist_roll",
+      "gripper"
+    ]
+  },
+  "control": {
+    "physics_hz": 120,
+    "policy_hz": 30,
+    "action": {
+      "type": "joint_position_delta",
+      "dimension": 6,
+      "unit": "radian",
+      "clip_abs_rad": 0.05
+    }
+  },
+  "observation": {
+    "mode": "privileged_state",
+    "terms": [
+      "joint_position_rad",
+      "joint_velocity_rad_s",
+      "previous_action_rad",
+      "end_effector_to_cube_position_m",
+      "cube_height_relative_to_initial_m"
+    ],
+    "real_robot_deployable": false
+  },
+  "evaluation": {
+    "seeds": [0, 1, 2],
+    "episodes_per_seed": 200,
+    "environment_scale_ladder": [1, 64, 256, 512, 1024, 2048],
+    "simulators": ["isaac_sim_physx", "mujoco"]
+  },
+  "provenance": {
+    "kind": "design_default",
+    "runtime_measurements_present": false,
+    "notes": "Control rate, action clip and lift threshold are pre-registered starting values, not measured SO-101 results."
+  }
+}
