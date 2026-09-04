@@ -2,7 +2,7 @@
 
 SO-101이 큐브를 집어 들어 올리는 정책을 Isaac Lab의 병렬 PPO로 학습하고, 같은 성공 조건을 MuJoCo에서 다시 평가하는 프로젝트입니다. 학습 속도만 비교하지 않고 보상 설계, 접촉 물리, 환경 수, 시뮬레이터 차이가 결과에 어떤 영향을 줬는지 실행 기록으로 남깁니다.
 
-현재 상태는 프로젝트 계약과 실행 문서를 만든 단계입니다. SO-101 PPO 학습과 MuJoCo 교차평가는 아직 실행하지 않았습니다.
+Windows의 `SO101-LiftCube-v0` 구현과 G0~G4 검증은 완료했습니다. 64환경 10,000 physics-step과 RSL-RL PPO 10-iteration smoke 및 checkpoint 재시작까지 실행했으며, 상세 증거는 `reports/windows/STATUS.md`에 있습니다. 이는 학습 경로 검증이며 파지 정책 수렴이나 MuJoCo 교차평가는 아직 완료하지 않았습니다.
 
 ## 풀려는 문제
 

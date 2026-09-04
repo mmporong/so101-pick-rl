@@ -22,7 +22,8 @@ REPOSITORY_ROOT = ISAACLAB_PROJECT_DIR.parent
 sys.path.insert(0, str(ISAACLAB_PROJECT_DIR))
 sys.path.insert(0, str(SCRIPT_DIR))
 
-from runtime_metrics import ResourceSampler, enforce_resource_guard, summarize_latest_kit_log, write_json
+from runtime_metrics import ResourceSampler, enforce_resource_guard, write_json
+from so101_pick_rl.kit_log import bind_kit_log, summarize_kit_log
 from so101_pick_rl.task_contract import TASK_ID
 
 
@@ -80,8 +81,32 @@ except Exception as exc:
     raise SystemExit(3)
 sampler = ResourceSampler(interval_seconds=1.0)
 sampler.start()
-app_launcher = AppLauncher(args)
-simulation_app = app_launcher.app
+simulation_app = None
+kit_log_binding: dict[str, object] = {"path": None, "binding": None, "reason": "launcher not started"}
+try:
+    app_launcher = AppLauncher(args)
+    simulation_app = app_launcher.app
+    kit_log_binding = bind_kit_log(started_at.timestamp(), output_path.name)
+except Exception as exc:
+    kit_log_binding = bind_kit_log(started_at.timestamp(), output_path.name)
+    write_json(
+        output_path,
+        {
+            "schema": "so101_pick_rl.windows_ppo.v1",
+            "status": "failed",
+            "classification": "not_run",
+            "command": command,
+            "started_at_utc": started_at.isoformat(),
+            "finished_at_utc": datetime.now(timezone.utc).isoformat(),
+            "error": f"AppLauncher failed: {type(exc).__name__}: {exc}",
+            "resources": sampler.stop(),
+            "simulator_log": summarize_kit_log(kit_log_binding),
+        },
+    )
+    if simulation_app is not None:
+        simulation_app.close()
+    print(f"PPO_REPORT={output_path}", flush=True)
+    raise SystemExit(4)
 
 import gymnasium as gym  # noqa: E402
 import torch  # noqa: E402
@@ -306,16 +331,22 @@ def main() -> int:
         non_finite_termination_max = tensorboard["scalar_ranges"].get(
             "Episode_Termination/non_finite", {}
         ).get("maximum")
-        passed = bool(checkpoint_rows) and bool(tensorboard["event_files"])
-        passed &= checkpoints_finite and tensorboard["non_finite_scalar_count"] == 0
-        passed &= required_scalar_tags_present and required_scalar_event_counts_ok
-        passed &= non_finite_termination_max == 0.0
-        passed &= final_iteration == expected_final_iteration
+        validation_checks = {
+            "checkpoints_present": bool(checkpoint_rows),
+            "tensorboard_event_present": bool(tensorboard["event_files"]),
+            "checkpoint_tensors_finite": checkpoints_finite,
+            "tensorboard_scalars_finite": tensorboard["non_finite_scalar_count"] == 0,
+            "required_scalar_tags_present": required_scalar_tags_present,
+            "required_scalar_event_counts": required_scalar_event_counts_ok,
+            "no_non_finite_termination": non_finite_termination_max == 0.0,
+            "expected_final_iteration": final_iteration == expected_final_iteration,
+        }
+        preliminary_passed = all(validation_checks.values())
         gate_eligible = args.task == TASK_ID and args.num_envs == 64 and args.max_iterations >= 10
         payload.update(
             {
-                "status": "passed" if passed else "failed",
-                "classification": "measured" if passed else "failed",
+                "status": "pending_evidence" if preliminary_passed else "failed",
+                "classification": "not_run" if preliminary_passed else "failed",
                 "training_wall_clock_seconds": training_seconds,
                 "transitions": args.num_envs * agent_cfg.num_steps_per_env * args.max_iterations,
                 "num_steps_per_env": agent_cfg.num_steps_per_env,
@@ -331,15 +362,16 @@ def main() -> int:
                 "completed_iterations": (
                     final_iteration - start_iteration + 1 if final_iteration is not None else 0
                 ),
+                "validation_checks": validation_checks,
                 "gate_evaluation": {
                     "gate": "G4" if gate_eligible else None,
                     "eligible": gate_eligible,
-                    "passed": passed if gate_eligible else None,
+                    "passed": None,
                     "reason": None if gate_eligible else "bounded diagnostic",
                 },
             }
         )
-        exit_code = 0 if passed else 2
+        exit_code = 0 if preliminary_passed else 2
     except Exception as exc:
         payload["classification"] = "failed"
         payload["error"] = f"{type(exc).__name__}: {exc}"
@@ -352,17 +384,26 @@ def main() -> int:
             env.close()
         payload["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
         payload["resources"] = sampler.stop()
-        payload["simulator_log"] = summarize_latest_kit_log(started_at.timestamp())
-        if payload["resources"].get("sample_count", 0) == 0:
-            payload["status"] = "failed"
-            payload["classification"] = "failed"
-            payload["error"] = "resource sampler produced no measurements"
-            exit_code = 2
-        if payload["simulator_log"].get("error_count") not in (0, None):
-            payload["status"] = "failed"
-            payload["classification"] = "failed"
-            payload["error"] = "Isaac Sim log contains error-level messages"
-            exit_code = 2
+        payload["simulator_log"] = summarize_kit_log(kit_log_binding)
+        if "validation_checks" in payload:
+            validation_checks = dict(payload["validation_checks"])
+            validation_checks.update(
+                {
+                    "resource_samples_present": payload["resources"].get("sample_count", 0) > 0,
+                    "simulator_log_captured": bool(payload["simulator_log"].get("path")),
+                    "simulator_error_free": payload["simulator_log"].get("error_count") == 0,
+                }
+            )
+            passed = all(validation_checks.values())
+            payload["validation_checks"] = validation_checks
+            payload["status"] = "passed" if passed else "failed"
+            payload["classification"] = "measured" if passed else "failed"
+            if payload["gate_evaluation"]["eligible"]:
+                payload["gate_evaluation"]["passed"] = passed
+            if not passed:
+                failed_checks = [name for name, value in validation_checks.items() if not value]
+                payload.setdefault("error", f"training validation failed: {failed_checks}")
+            exit_code = 0 if passed else 2
         write_json(output_path, payload)
         checkpoints = payload.get("checkpoints", [])
         final_checkpoint = checkpoints[-1] if checkpoints else None
@@ -397,4 +438,5 @@ def main() -> int:
 try:
     raise SystemExit(main())
 finally:
-    simulation_app.close()
+    if simulation_app is not None:
+        simulation_app.close()

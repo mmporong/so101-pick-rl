@@ -17,7 +17,8 @@ REPOSITORY_ROOT = ISAACLAB_PROJECT_DIR.parent
 sys.path.insert(0, str(ISAACLAB_PROJECT_DIR))
 sys.path.insert(0, str(SCRIPT_DIR))
 
-from runtime_metrics import ResourceSampler, enforce_resource_guard, summarize_latest_kit_log, write_json
+from runtime_metrics import ResourceSampler, enforce_resource_guard, write_json
+from so101_pick_rl.kit_log import bind_kit_log, summarize_kit_log
 from so101_pick_rl.task_contract import ACTION_SCALE_RAD, POLICY_HZ, SUCCESS_HOLD_SECONDS, TASK_ID
 
 
@@ -60,8 +61,32 @@ except Exception as exc:
 
 sampler = ResourceSampler(interval_seconds=1.0)
 sampler.start()
-app_launcher = AppLauncher(args)
-simulation_app = app_launcher.app
+simulation_app = None
+kit_log_binding: dict[str, object] = {"path": None, "binding": None, "reason": "launcher not started"}
+try:
+    app_launcher = AppLauncher(args)
+    simulation_app = app_launcher.app
+    kit_log_binding = bind_kit_log(started_at.timestamp(), output_path.name)
+except Exception as exc:
+    kit_log_binding = bind_kit_log(started_at.timestamp(), output_path.name)
+    write_json(
+        output_path,
+        {
+            "schema": "so101_pick_rl.windows_semantics.v1",
+            "status": "failed",
+            "classification": "not_run",
+            "command": command,
+            "started_at_utc": started_at.isoformat(),
+            "finished_at_utc": datetime.now(timezone.utc).isoformat(),
+            "error": f"AppLauncher failed: {type(exc).__name__}: {exc}",
+            "resources": sampler.stop(),
+            "simulator_log": summarize_kit_log(kit_log_binding),
+        },
+    )
+    if simulation_app is not None:
+        simulation_app.close()
+    print(f"SEMANTICS_REPORT={output_path}", flush=True)
+    raise SystemExit(4)
 
 import gymnasium as gym  # noqa: E402
 import torch  # noqa: E402
@@ -204,11 +229,11 @@ def main() -> int:
             "both_filtered_contact_sensors_positive": contact_sensor_check,
             "success_hold_boundary_and_reset": success_hold_check,
         }
-        passed = all(checks.values())
+        preliminary_passed = all(checks.values())
         payload.update(
             {
-                "status": "passed" if passed else "failed",
-                "classification": "runtime_validated" if passed else "failed",
+                "status": "pending_evidence" if preliminary_passed else "failed",
+                "classification": "not_run" if preliminary_passed else "failed",
                 "checks": checks,
                 "raw_action_value": 10.0,
                 "maximum_processed_action_delta_rad": float(torch.abs(processed).max().item()),
@@ -220,7 +245,7 @@ def main() -> int:
                 "observed_success_termination_steps": termination_steps,
             }
         )
-        exit_code = 0 if passed else 2
+        exit_code = 0 if preliminary_passed else 2
     except Exception as exc:
         payload["classification"] = "failed"
         payload["error"] = f"{type(exc).__name__}: {exc}"
@@ -231,17 +256,24 @@ def main() -> int:
             env.close()
         payload["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
         payload["resources"] = sampler.stop()
-        payload["simulator_log"] = summarize_latest_kit_log(started_at.timestamp())
-        if payload["resources"].get("sample_count", 0) == 0:
-            payload["status"] = "failed"
-            payload["classification"] = "failed"
-            payload["error"] = "resource sampler produced no measurements"
-            exit_code = 2
-        if payload["simulator_log"].get("error_count") not in (0, None):
-            payload["status"] = "failed"
-            payload["classification"] = "failed"
-            payload["error"] = "Isaac Sim log contains error-level messages"
-            exit_code = 2
+        payload["simulator_log"] = summarize_kit_log(kit_log_binding)
+        if "checks" in payload:
+            checks = dict(payload["checks"])
+            checks.update(
+                {
+                    "resource_samples_present": payload["resources"].get("sample_count", 0) > 0,
+                    "simulator_log_captured": bool(payload["simulator_log"].get("path")),
+                    "simulator_error_free": payload["simulator_log"].get("error_count") == 0,
+                }
+            )
+            passed = all(checks.values())
+            payload["checks"] = checks
+            payload["status"] = "passed" if passed else "failed"
+            payload["classification"] = "runtime_validated" if passed else "failed"
+            if not passed:
+                failed_checks = [name for name, value in checks.items() if not value]
+                payload.setdefault("error", f"semantic validation failed: {failed_checks}")
+            exit_code = 0 if passed else 2
         write_json(output_path, payload)
         manifest_path = output_path.with_name(output_path.stem + "_manifest.json")
         manifest = {
@@ -273,4 +305,5 @@ def main() -> int:
 try:
     raise SystemExit(main())
 finally:
-    simulation_app.close()
+    if simulation_app is not None:
+        simulation_app.close()

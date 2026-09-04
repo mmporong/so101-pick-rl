@@ -1,5 +1,7 @@
 # Windows 인계서: Isaac Lab PPO
 
+2026-09-04 기준 G0~G4와 checkpoint 재시작을 통과했습니다. 실제 수치, source commit, checkpoint SHA-256, 남은 범위는 `reports/windows/STATUS.md`에 있습니다. 256환경 이상과 수렴 학습은 공유 자원 제한 때문에 실행하지 않았습니다.
+
 ## 맡은 결과
 
 Windows에서는 SO-101 큐브 파지 환경을 Isaac Lab 외부 extension으로 만들고 RSL-RL PPO를 실행합니다. 첫 인계의 종료점은 64환경 PPO smoke까지입니다. 장시간 본 학습은 G4 결과를 검토한 뒤 시작합니다.

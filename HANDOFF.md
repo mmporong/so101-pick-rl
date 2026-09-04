@@ -2,7 +2,7 @@
 
 ## 프로젝트 상태
 
-저장소 계약과 실행 계획은 작성됐습니다. PPO 학습, SO-101 Isaac task, MuJoCo 교차평가는 아직 실행하지 않았습니다.
+Windows의 SO-101 Isaac task와 64환경 PPO smoke는 G0~G4를 통과했습니다. `reports/windows/STATUS.md`의 측정값과 재현 명령을 정본으로 사용합니다. 256환경 이상 확장, 수렴 학습, MuJoCo 교차평가는 아직 실행하지 않았습니다.
 
 현재 contract SHA-256은 각 PC에서 `python scripts/validate_contract.py`로 다시 계산합니다. 문서에 복사된 과거 SHA를 신뢰하지 않습니다.
 

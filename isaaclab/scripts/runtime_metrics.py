@@ -32,35 +32,6 @@ def query_gpu() -> dict[str, float | str]:
     }
 
 
-def summarize_latest_kit_log(started_at_epoch: float) -> dict[str, Any]:
-    """Summarize warning/error lines from the Kit log created for this invocation."""
-    isaac_root = os.environ.get("ISAAC_PATH")
-    if not isaac_root:
-        return {"path": None, "warning_count": None, "error_count": None, "reason": "ISAAC_PATH is unset"}
-    log_dir = Path(isaac_root) / "kit" / "logs" / "Kit" / "Isaac-Sim" / "4.5"
-    candidates = [
-        path for path in log_dir.glob("kit_*.log") if path.stat().st_mtime >= started_at_epoch - 2.0
-    ]
-    if not candidates:
-        return {"path": None, "warning_count": None, "error_count": None, "reason": "run log not found"}
-    log_path = max(candidates, key=lambda path: path.stat().st_mtime)
-    warning_lines: list[str] = []
-    error_lines: list[str] = []
-    for line in log_path.read_text(encoding="utf-8", errors="replace").splitlines():
-        normalized = line.strip()
-        if "[Warning]" in normalized:
-            warning_lines.append(normalized)
-        if "[Error]" in normalized or "[Fatal]" in normalized:
-            error_lines.append(normalized)
-    return {
-        "path": str(log_path),
-        "warning_count": len(warning_lines),
-        "error_count": len(error_lines),
-        "warning_samples": list(dict.fromkeys(warning_lines))[:20],
-        "error_samples": list(dict.fromkeys(error_lines))[:20],
-    }
-
-
 def enforce_resource_guard(
     max_gpu_util_percent: float,
     minimum_free_vram_mib: float,

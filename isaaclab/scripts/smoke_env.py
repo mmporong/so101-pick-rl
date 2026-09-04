@@ -19,8 +19,10 @@ REPOSITORY_ROOT = ISAACLAB_PROJECT_DIR.parent
 sys.path.insert(0, str(ISAACLAB_PROJECT_DIR))
 sys.path.insert(0, str(SCRIPT_DIR))
 
-from runtime_metrics import ResourceSampler, enforce_resource_guard, summarize_latest_kit_log, write_json
+from runtime_metrics import ResourceSampler, enforce_resource_guard, write_json
+from so101_pick_rl.kit_log import bind_kit_log, summarize_kit_log
 from so101_pick_rl.task_contract import ACTION_SCALE_RAD, DECIMATION, JOINT_ORDER, PHYSICS_HZ, POLICY_HZ, TASK_ID
+from so101_pick_rl.validation import count_reset_events, finalize_smoke_checks, summarize_reset_failures
 
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -66,8 +68,32 @@ except Exception as exc:
     raise SystemExit(3)
 sampler = ResourceSampler(interval_seconds=1.0)
 sampler.start()
-app_launcher = AppLauncher(args)
-simulation_app = app_launcher.app
+simulation_app = None
+kit_log_binding: dict[str, object] = {"path": None, "binding": None, "reason": "launcher not started"}
+try:
+    app_launcher = AppLauncher(args)
+    simulation_app = app_launcher.app
+    kit_log_binding = bind_kit_log(started_at.timestamp(), output_path.name)
+except Exception as exc:
+    kit_log_binding = bind_kit_log(started_at.timestamp(), output_path.name)
+    write_json(
+        output_path,
+        {
+            "schema": "so101_pick_rl.windows_smoke.v1",
+            "status": "failed",
+            "classification": "not_run",
+            "command": command,
+            "started_at_utc": started_at.isoformat(),
+            "finished_at_utc": datetime.now(timezone.utc).isoformat(),
+            "error": f"AppLauncher failed: {type(exc).__name__}: {exc}",
+            "resources": sampler.stop(),
+            "simulator_log": summarize_kit_log(kit_log_binding),
+        },
+    )
+    if simulation_app is not None:
+        simulation_app.close()
+    print(f"SMOKE_REPORT={output_path}", flush=True)
+    raise SystemExit(4)
 
 import gymnasium as gym  # noqa: E402
 import torch  # noqa: E402
@@ -130,6 +156,22 @@ def tensor_is_finite(value) -> bool:
     return True
 
 
+def per_environment_finite_mask(value, num_envs: int, device) -> torch.Tensor:
+    """Return one finite-state flag per environment for nested observations."""
+    result = torch.ones(num_envs, dtype=torch.bool, device=device)
+    if isinstance(value, torch.Tensor):
+        if value.ndim == 0 or value.shape[0] != num_envs:
+            return torch.zeros(num_envs, dtype=torch.bool, device=device)
+        finite = torch.isfinite(value)
+        if finite.ndim > 1:
+            finite = finite.reshape(num_envs, -1).all(dim=1)
+        return finite
+    if isinstance(value, dict):
+        for item in value.values():
+            result &= per_environment_finite_mask(item, num_envs, device)
+    return result
+
+
 def main() -> int:
     git = git_metadata()
     task_contract_sha = contract_sha256()
@@ -172,6 +214,16 @@ def main() -> int:
         reward_non_finite_steps = 0
         terminated_count = 0
         truncated_count = 0
+        automatic_reset_count = 0
+        reset_failure_count = 0
+        reset_failure_reason_counts = {
+            "returned_observation_non_finite": 0,
+            "episode_length_not_zero": 0,
+            "robot_state_non_finite": 0,
+            "cube_state_non_finite": 0,
+            "cube_initial_height_non_finite": 0,
+            "cube_initial_height_mismatch": 0,
+        }
         termination_term_counts = {name: 0 for name in unwrapped.termination_manager.active_terms}
         max_abs_joint_position = float(torch.abs(robot.data.joint_pos).max().item())
         max_abs_joint_velocity = float(torch.abs(robot.data.joint_vel).max().item())
@@ -195,6 +247,53 @@ def main() -> int:
                     2.0 * torch.rand(action_shape, device=unwrapped.device) - 1.0
                 ) * args.random_action_amplitude
             observations, rewards, terminated, truncated, _ = env.step(actions)
+            terminated_flags = terminated.detach().cpu().tolist()
+            truncated_flags = truncated.detach().cpu().tolist()
+            reset_mask = torch.logical_or(terminated, truncated)
+            step_reset_count = count_reset_events(terminated_flags, truncated_flags)
+            terminated_count += sum(bool(flag) for flag in terminated_flags)
+            truncated_count += sum(bool(flag) for flag in truncated_flags)
+            automatic_reset_count += step_reset_count
+            if step_reset_count:
+                reset_env_ids = torch.nonzero(reset_mask, as_tuple=False).squeeze(-1)
+                observation_finite = per_environment_finite_mask(
+                    observations,
+                    unwrapped.num_envs,
+                    unwrapped.device,
+                )
+                robot_state_finite = torch.isfinite(robot.data.joint_pos).all(dim=1) & torch.isfinite(
+                    robot.data.joint_vel
+                ).all(dim=1)
+                reason_masks = {
+                    "returned_observation_non_finite": ~observation_finite[reset_env_ids],
+                    "episode_length_not_zero": unwrapped.episode_length_buf[reset_env_ids] != 0,
+                    "robot_state_non_finite": ~robot_state_finite[reset_env_ids],
+                }
+                if is_so101_task and cube is not None:
+                    cube_state_finite = torch.isfinite(cube.data.root_state_w).all(dim=1)
+                    cube_initial_height = unwrapped._so101_cube_initial_z
+                    initial_height_finite = torch.isfinite(cube_initial_height)
+                    reason_masks.update(
+                        {
+                            "cube_state_non_finite": ~cube_state_finite[reset_env_ids],
+                            "cube_initial_height_non_finite": ~initial_height_finite[reset_env_ids],
+                            "cube_initial_height_mismatch": ~torch.isclose(
+                                cube.data.root_pos_w[reset_env_ids, 2],
+                                cube_initial_height[reset_env_ids],
+                                atol=1.0e-5,
+                                rtol=0.0,
+                            ),
+                        }
+                    )
+                step_reset_failures = summarize_reset_failures(
+                    {
+                        reason: flags.detach().cpu().tolist()
+                        for reason, flags in reason_masks.items()
+                    }
+                )
+                reset_failure_count += int(step_reset_failures["failure_count"])
+                for reason, count in step_reset_failures["reason_counts"].items():
+                    reset_failure_reason_counts[reason] += int(count)
             if is_so101_task:
                 processed_actions = unwrapped.action_manager.get_term("joint_position_delta").processed_actions
                 max_abs_processed_action_delta = max(
@@ -205,8 +304,6 @@ def main() -> int:
                 non_finite_steps += 1
             if not tensor_is_finite(rewards):
                 reward_non_finite_steps += 1
-            terminated_count += int(torch.count_nonzero(terminated).item())
-            truncated_count += int(torch.count_nonzero(truncated).item())
             for term_name in termination_term_counts:
                 termination_term_counts[term_name] += int(
                     torch.count_nonzero(unwrapped.termination_manager.get_term(term_name)).item()
@@ -298,17 +395,17 @@ def main() -> int:
                     "independent_initial_cube_randomization": unique_cube_xy == args.num_envs,
                 }
             )
-        passed = all(runtime_checks.values())
+        preliminary_passed = all(runtime_checks.values())
         if is_so101_task and args.num_envs == 1 and args.physics_steps >= 1000:
-            gate_evaluation = {"gate": "G2", "eligible": True, "passed": passed}
+            gate_evaluation = {"gate": "G2", "eligible": True, "passed": None}
         elif is_so101_task and args.num_envs == 64 and args.physics_steps >= 10000:
-            gate_evaluation = {"gate": "G3", "eligible": True, "passed": passed}
+            gate_evaluation = {"gate": "G3", "eligible": True, "passed": None}
         else:
             gate_evaluation = {"gate": None, "eligible": False, "passed": None, "reason": "bounded diagnostic"}
         payload.update(
             {
-                "status": "passed" if passed else "failed",
-                "classification": "runtime_validated" if passed else "failed",
+                "status": "pending_evidence" if preliminary_passed else "failed",
+                "classification": "not_run" if preliminary_passed else "failed",
                 "actual_num_envs": unwrapped.num_envs,
                 "device": unwrapped.device,
                 "physics_dt_seconds": float(unwrapped.physics_dt),
@@ -329,6 +426,9 @@ def main() -> int:
                 "non_finite_reward_steps": reward_non_finite_steps,
                 "terminated_count": terminated_count,
                 "truncated_count": truncated_count,
+                "automatic_reset_count": automatic_reset_count,
+                "reset_failure_count": reset_failure_count,
+                "reset_failure_reason_counts": reset_failure_reason_counts,
                 "termination_term_counts": termination_term_counts,
                 "max_abs_joint_position_rad": max_abs_joint_position,
                 "max_abs_joint_velocity_rad_s": max_abs_joint_velocity,
@@ -348,7 +448,7 @@ def main() -> int:
                 "gate_evaluation": gate_evaluation,
             }
         )
-        exit_code = 0 if passed else 2
+        exit_code = 0 if preliminary_passed else 2
     except Exception as exc:
         payload["classification"] = "failed"
         payload["error"] = f"{type(exc).__name__}: {exc}"
@@ -359,17 +459,30 @@ def main() -> int:
             env.close()
         payload["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
         payload["resources"] = sampler.stop()
-        payload["simulator_log"] = summarize_latest_kit_log(started_at.timestamp())
-        if payload["resources"].get("sample_count", 0) == 0:
-            payload["status"] = "failed"
-            payload["classification"] = "failed"
-            payload["error"] = "resource sampler produced no measurements"
-            exit_code = 2
-        if payload["simulator_log"].get("error_count") not in (0, None):
-            payload["status"] = "failed"
-            payload["classification"] = "failed"
-            payload["error"] = "Isaac Sim log contains error-level messages"
-            exit_code = 2
+        payload["simulator_log"] = summarize_kit_log(kit_log_binding)
+        if "runtime_checks" in payload:
+            is_g3_run = args.task == TASK_ID and args.num_envs == 64 and args.physics_steps >= 10000
+            final_checks = finalize_smoke_checks(
+                payload["runtime_checks"],
+                payload["termination_term_counts"],
+                is_so101_task=args.task == TASK_ID,
+                is_g3_run=is_g3_run,
+                automatic_reset_count=payload["automatic_reset_count"],
+                reset_failure_count=payload["reset_failure_count"],
+                resource_sample_count=payload["resources"].get("sample_count", 0),
+                simulator_log_path=payload["simulator_log"].get("path"),
+                simulator_error_count=payload["simulator_log"].get("error_count"),
+            )
+            passed = all(final_checks.values())
+            payload["runtime_checks"] = final_checks
+            payload["status"] = "passed" if passed else "failed"
+            payload["classification"] = "runtime_validated" if passed else "failed"
+            if payload["gate_evaluation"]["eligible"]:
+                payload["gate_evaluation"]["passed"] = passed
+            if not passed:
+                failed_checks = [name for name, value in final_checks.items() if not value]
+                payload.setdefault("error", f"runtime checks failed: {failed_checks}")
+            exit_code = 0 if passed else 2
         write_json(output_path, payload)
         manifest_path = output_path.with_name(output_path.stem + "_manifest.json")
         manifest = {
@@ -401,4 +514,5 @@ def main() -> int:
 try:
     raise SystemExit(main())
 finally:
-    simulation_app.close()
+    if simulation_app is not None:
+        simulation_app.close()

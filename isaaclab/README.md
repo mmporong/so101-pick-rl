@@ -33,9 +33,13 @@ $python = "E:\IsaacSim\isaac-sim-4.5.0\python.bat"
 
 & $python .\isaaclab\scripts\smoke_env.py --task SO101-LiftCube-v0 --num_envs 1 --physics_steps 1000 --action_mode zero --seed 0 --headless --output .\reports\windows\g2_so101_1env_1000.json
 
+& $python .\isaaclab\scripts\validate_task_semantics.py --seed 0 --headless --output .\reports\windows\task_semantics.json
+
 & $python .\isaaclab\scripts\smoke_env.py --task SO101-LiftCube-v0 --num_envs 64 --physics_steps 10000 --action_mode random --random_action_amplitude 0.1 --seed 0 --headless --output .\reports\windows\g3_so101_64env_10000.json
 
 & $python .\isaaclab\scripts\train_rsl_rl.py --task SO101-LiftCube-v0 --num_envs 64 --max_iterations 10 --save_interval 5 --run_name g4_smoke --seed 0 --headless --output .\reports\windows\g4_so101_64env_10iter.json
 ```
 
 학습 로그와 checkpoint는 `isaaclab/logs/`에 남고 Git에서는 제외됩니다. 작은 JSON 보고서만 `reports/windows/`에 커밋합니다.
+
+현재 Windows G0~G4 결과와 checkpoint SHA-256은 `reports/windows/STATUS.md`를 봅니다.
