@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "g4_so101_64env_10iter_final",
+  "git_commit": "6ad83c7c64bc79d8d710d367ab8c9af052f7e3f2",
+  "git_dirty": false,
+  "task_contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "platform": "windows",
+  "simulator": "isaac_sim_physx",
+  "algorithm": "ppo",
+  "seed": 0,
+  "num_envs": 64,
+  "status": "completed",
+  "started_at_utc": "2026-09-04T07:39:23.702882+00:00",
+  "finished_at_utc": "2026-09-04T07:39:55.134216+00:00",
+  "config_sha256": "35e9f65fbc51b9fd20785a9d486b52543221344de8223f56b99e726154ddfe0d",
+  "checkpoint_uri": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-39-32_g4_final\\model_9.pt",
+  "checkpoint_sha256": "54f4a74124a5b34e44d77e43b9e01dd39f63cb7baa6a36edaeabfaf765544aa5",
+  "metrics_path": "reports/windows/g4_so101_64env_10iter_final.json",
+  "notes": "RSL-RL PPO; iterations=10; classification=measured"
+}
