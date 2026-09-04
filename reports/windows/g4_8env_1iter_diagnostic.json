@@ -1,0 +1,47 @@
+{
+  "schema": "so101_pick_rl.windows_ppo.v1",
+  "status": "failed",
+  "classification": "not_run",
+  "command": ".\\isaaclab\\scripts\\train_rsl_rl.py --task SO101-LiftCube-v0 --num_envs 8 --max_iterations 1 --save_interval 1 --run_name low_resource_diagnostic --seed 0 --headless --output .\\reports\\windows\\g4_8env_1iter_diagnostic.json",
+  "started_at_utc": "2026-09-04T07:05:58.392046+00:00",
+  "task": "SO101-LiftCube-v0",
+  "seed": 0,
+  "num_envs": 8,
+  "max_iterations": 1,
+  "preflight_gpu": {
+    "name": "NVIDIA GeForce RTX 3060",
+    "driver_version": "610.62",
+    "memory_total_mib": 12288.0,
+    "memory_used_mib": 1493.0,
+    "utilization_gpu_percent": 5.0,
+    "utilization_memory_percent": 1.0,
+    "memory_free_mib": 10795.0
+  },
+  "git": {
+    "commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+    "branch": "feat/isaaclab-windows",
+    "dirty": true,
+    "dirty_paths": [
+      "?? isaaclab/.gitignore",
+      "?? isaaclab/scripts/",
+      "?? isaaclab/so101_pick_rl/",
+      "?? reports/windows/"
+    ]
+  },
+  "contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "log_dir": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-06-06_low_resource_diagnostic",
+  "error": "IndexError: shape mismatch: indexing tensors could not be broadcast together with shapes [8], [6]",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\scripts\\train_rsl_rl.py\", line 182, in main\n    wrapped_env = RslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)\n  File \"c:/users/limmm/isaaclab/source/isaaclab_rl/isaaclab_rl/rsl_rl/vecenv_wrapper.py\", line 85, in __init__\n    self.env.reset()\n  File \"E:\\IsaacSim\\isaac-sim-4.5.0\\kit\\python\\lib\\site-packages\\gymnasium\\wrappers\\common.py\", line 400, in reset\n    return super().reset(seed=seed, options=options)\n  File \"E:\\IsaacSim\\isaac-sim-4.5.0\\kit\\python\\lib\\site-packages\\gymnasium\\core.py\", line 333, in reset\n    return self.env.reset(seed=seed, options=options)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/envs/manager_based_env.py\", line 295, in reset\n    self._reset_idx(env_ids)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/envs/manager_based_rl_env.py\", line 374, in _reset_idx\n    info = self.action_manager.reset(env_ids)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/managers/action_manager.py\", line 314, in reset\n    term.reset(env_ids=env_ids)\n  File \"C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\so101_pick_rl\\tasks\\lift_cube\\mdp\\actions.py\", line 26, in reset\n    self._target[env_ids] = self._asset.data.joint_pos[env_ids, self._joint_ids]\nIndexError: shape mismatch: indexing tensors could not be broadcast together with shapes [8], [6]\n",
+  "finished_at_utc": "2026-09-04T07:06:10.459996+00:00",
+  "resources": {
+    "sample_count": 9,
+    "peak_vram_mib": 2736.0,
+    "mean_gpu_utilization_percent": 5.0,
+    "peak_gpu_utilization_percent": 6.0,
+    "mean_system_cpu_percent": 23.944444444444443,
+    "peak_system_cpu_percent": 52.4,
+    "mean_process_cpu_percent": 159.16666666666666,
+    "peak_process_cpu_percent": 619.9,
+    "peak_process_rss_mib": 1988.671875
+  }
+}

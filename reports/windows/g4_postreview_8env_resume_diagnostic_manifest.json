@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "g4_postreview_8env_resume_diagnostic",
+  "git_commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+  "git_dirty": true,
+  "task_contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "platform": "windows",
+  "simulator": "isaac_sim_physx",
+  "algorithm": "ppo",
+  "seed": 0,
+  "num_envs": 8,
+  "status": "completed",
+  "started_at_utc": "2026-09-04T07:30:29.150854+00:00",
+  "finished_at_utc": "2026-09-04T07:30:44.074696+00:00",
+  "config_sha256": "474edf1bb5eb3b70a0cb6c7eb128cd493a76e3f90b4e1d4cfd06e2f4c988923a",
+  "checkpoint_uri": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-30-39_postreview_resume_diagnostic\\model_1.pt",
+  "checkpoint_sha256": "b7a1e059bf80c0971e59e7494504c75b1f9a0d010b1e18807d0a0aa53bf267e7",
+  "metrics_path": "reports/windows/g4_postreview_8env_resume_diagnostic.json",
+  "notes": "RSL-RL PPO; iterations=1; classification=measured"
+}

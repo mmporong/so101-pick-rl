@@ -84,6 +84,13 @@ isaaclab/
 - 복사한 파일
 - 수정한 값
 
+현재 구현은 설치형 extension 대신 저장소 내부 외부 Python 프로젝트로 동작합니다. 실행 스크립트가 `%USERPROFILE%\so101-pick-rl\isaaclab`을 `sys.path`에 추가하므로 Isaac Lab 원본이나 site-packages를 수정하지 않습니다.
+
+```powershell
+Set-Location "$HOME\so101-pick-rl"
+python .\isaaclab\scripts\prepare_assets.py
+```
+
 ## W3. 1환경과 64환경
 
 태스크 ID는 `SO101-LiftCube-v0`을 사용합니다.
@@ -104,6 +111,14 @@ isaaclab/
 - reset 실패 0건
 - peak VRAM과 steps/s
 
+재현 명령은 다음과 같습니다.
+
+```powershell
+$python = "E:\IsaacSim\isaac-sim-4.5.0\python.bat"
+& $python .\isaaclab\scripts\smoke_env.py --task SO101-LiftCube-v0 --num_envs 1 --physics_steps 1000 --action_mode zero --seed 0 --headless --output .\reports\windows\g2_so101_1env_1000.json
+& $python .\isaaclab\scripts\smoke_env.py --task SO101-LiftCube-v0 --num_envs 64 --physics_steps 10000 --action_mode random --random_action_amplitude 0.1 --seed 0 --headless --output .\reports\windows\g3_so101_64env_10000.json
+```
+
 ## W4. PPO smoke
 
 보상은 한 번에 많이 넣지 않습니다.
@@ -118,6 +133,12 @@ action-rate penalty
 ```
 
 64환경, 10 iteration으로 학습 경로만 확인합니다. 성공률 목표는 이 단계에 두지 않습니다. loss, reward, action std가 유한하고 checkpoint가 생성되면 G4를 통과합니다.
+
+```powershell
+& $python .\isaaclab\scripts\train_rsl_rl.py --task SO101-LiftCube-v0 --num_envs 64 --max_iterations 10 --save_interval 5 --run_name g4_smoke --seed 0 --headless --output .\reports\windows\g4_so101_64env_10iter.json
+```
+
+두 실행 스크립트는 시작 시 다른 작업과 겹치지 않도록 baseline GPU 사용률 40% 이하, 여유 VRAM 4GiB 이상, 시스템 CPU 사용률 70% 이하를 기본 조건으로 검사합니다. 조건을 넘으면 Isaac Sim을 띄우지 않고 `blocked_resource_guard` 보고서를 남깁니다.
 
 ## Windows가 커밋할 범위
 

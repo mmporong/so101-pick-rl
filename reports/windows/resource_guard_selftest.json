@@ -1,0 +1,9 @@
+{
+  "schema": "so101_pick_rl.windows_smoke.v1",
+  "status": "blocked_resource_guard",
+  "classification": "not_run",
+  "command": ".\\isaaclab\\scripts\\smoke_env.py --task SO101-LiftCube-v0 --num_envs 1 --physics_steps 4 --action_mode zero --seed 0 --headless --max_baseline_gpu_util 0 --output .\\reports\\windows\\resource_guard_selftest.json",
+  "started_at_utc": "2026-09-04T07:24:14.284917+00:00",
+  "finished_at_utc": "2026-09-04T07:24:14.595216+00:00",
+  "error": "RuntimeError: RESOURCE_GUARD: baseline GPU utilization 9.0% exceeds 0.0%"
+}

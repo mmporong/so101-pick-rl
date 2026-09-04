@@ -1,0 +1,117 @@
+{
+  "schema": "so101_pick_rl.windows_ppo.v1",
+  "status": "passed",
+  "classification": "measured",
+  "command": ".\\isaaclab\\scripts\\train_rsl_rl.py --task SO101-LiftCube-v0 --num_envs 8 --max_iterations 1 --save_interval 1 --run_name low_resource_resume --seed 0 --headless --resume_checkpoint C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-06-45_low_resource_diagnostic_retry1\\model_0.pt --output .\\reports\\windows\\g4_8env_resume_diagnostic.json",
+  "started_at_utc": "2026-09-04T07:07:09.541646+00:00",
+  "task": "SO101-LiftCube-v0",
+  "seed": 0,
+  "num_envs": 8,
+  "max_iterations": 1,
+  "preflight_gpu": {
+    "name": "NVIDIA GeForce RTX 3060",
+    "driver_version": "610.62",
+    "memory_total_mib": 12288.0,
+    "memory_used_mib": 1480.0,
+    "utilization_gpu_percent": 5.0,
+    "utilization_memory_percent": 1.0,
+    "memory_free_mib": 10808.0
+  },
+  "git": {
+    "commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+    "branch": "feat/isaaclab-windows",
+    "dirty": true,
+    "dirty_paths": [
+      "?? isaaclab/.gitignore",
+      "?? isaaclab/scripts/",
+      "?? isaaclab/so101_pick_rl/",
+      "?? reports/windows/"
+    ]
+  },
+  "contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "log_dir": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-07-17_low_resource_resume",
+  "resume_checkpoint": {
+    "path": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-06-45_low_resource_diagnostic_retry1\\model_0.pt",
+    "sha256": "49a2b10ab5820c530aa4385a5fee3e78cd385d4e84af0b86f5d080e4845e73b5"
+  },
+  "training_wall_clock_seconds": 1.898791200015694,
+  "transitions": 192,
+  "num_steps_per_env": 24,
+  "checkpoints": [
+    {
+      "path": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-07-17_low_resource_resume\\model_0.pt",
+      "sha256": "f73dd0559a0ee3c5bb0872a0a0f4b1444468bdfe28bd906f7fc6b721a1f0b8ab",
+      "size_bytes": 493255,
+      "all_tensors_finite": true
+    }
+  ],
+  "tensorboard": {
+    "event_files": [
+      "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-07-17_low_resource_resume\\events.out.tfevents.1788505639.DESKTOP-991BNBV.58544.0"
+    ],
+    "scalar_tags": [
+      "Episode_Reward/reaching_cube",
+      "Episode_Reward/gripper_alignment",
+      "Episode_Reward/finger_contact",
+      "Episode_Reward/lift_progress",
+      "Episode_Reward/lifted",
+      "Episode_Reward/action_rate",
+      "Episode_Reward/joint_velocity",
+      "Episode_Termination/time_out",
+      "Episode_Termination/lift_held",
+      "Episode_Termination/non_finite",
+      "Episode_Termination/workspace_exit",
+      "Loss/value_function",
+      "Loss/surrogate",
+      "Loss/entropy",
+      "Loss/learning_rate",
+      "Policy/mean_noise_std",
+      "Perf/total_fps",
+      "Perf/collection time",
+      "Perf/learning_time",
+      "Train/mean_reward",
+      "Train/mean_episode_length",
+      "Train/mean_reward/time",
+      "Train/mean_episode_length/time"
+    ],
+    "non_finite_scalar_count": 0,
+    "last_scalars": {
+      "Episode_Reward/reaching_cube": 0.0042753578163683414,
+      "Episode_Reward/gripper_alignment": 0.001332355197519064,
+      "Episode_Reward/finger_contact": 0.0,
+      "Episode_Reward/lift_progress": 0.0,
+      "Episode_Reward/lifted": 0.0,
+      "Episode_Reward/action_rate": -0.001047956058755517,
+      "Episode_Reward/joint_velocity": -3.1396336908073863e-06,
+      "Episode_Termination/time_out": 0.375,
+      "Episode_Termination/lift_held": 0.0,
+      "Episode_Termination/non_finite": 0.0,
+      "Episode_Termination/workspace_exit": 0.0,
+      "Loss/value_function": 0.009920407086610794,
+      "Loss/surrogate": -0.04796167463064194,
+      "Loss/entropy": 6.330441474914551,
+      "Loss/learning_rate": 9.999999747378752e-06,
+      "Policy/mean_noise_std": 0.6941195726394653,
+      "Perf/total_fps": 126.0,
+      "Perf/collection time": 1.2608163356781006,
+      "Perf/learning_time": 0.2510678768157959,
+      "Train/mean_reward": 0.12150979042053223,
+      "Train/mean_episode_length": 16.0,
+      "Train/mean_reward/time": 0.12150979042053223,
+      "Train/mean_episode_length/time": 16.0
+    }
+  },
+  "checkpoint_tensors_finite": true,
+  "finished_at_utc": "2026-09-04T07:07:21.286384+00:00",
+  "resources": {
+    "sample_count": 10,
+    "peak_vram_mib": 2802.0,
+    "mean_gpu_utilization_percent": 4.5,
+    "peak_gpu_utilization_percent": 6.0,
+    "mean_system_cpu_percent": 15.509999999999996,
+    "peak_system_cpu_percent": 23.5,
+    "mean_process_cpu_percent": 102.50999999999999,
+    "peak_process_cpu_percent": 125.1,
+    "peak_process_rss_mib": 2539.703125
+  }
+}

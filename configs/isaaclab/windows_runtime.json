@@ -1,0 +1,40 @@
+{
+  "task": "SO101-LiftCube-v0",
+  "seed": 0,
+  "physics_hz": 120,
+  "policy_hz": 30,
+  "episode_seconds": 10.0,
+  "action": {
+    "type": "joint_position_delta",
+    "dimension": 6,
+    "unit": "radian",
+    "clip_abs_rad": 0.05
+  },
+  "success": {
+    "minimum_delta_z_m": 0.08,
+    "minimum_hold_seconds": 0.5
+  },
+  "resource_guard": {
+    "maximum_baseline_gpu_utilization_percent": 40.0,
+    "minimum_free_vram_mib": 4096.0,
+    "maximum_baseline_system_cpu_percent": 70.0
+  },
+  "gates": {
+    "g2": {
+      "num_envs": 1,
+      "physics_steps": 1000,
+      "action_mode": "zero"
+    },
+    "g3": {
+      "num_envs": 64,
+      "physics_steps": 10000,
+      "action_mode": "random",
+      "random_action_amplitude": 0.1
+    },
+    "g4": {
+      "num_envs": 64,
+      "max_iterations": 10,
+      "save_interval": 5
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "g2_contract_source_diagnostic",
+  "git_commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+  "git_dirty": true,
+  "task_contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "platform": "windows",
+  "simulator": "isaac_sim_physx",
+  "algorithm": "scripted",
+  "seed": 0,
+  "num_envs": 1,
+  "status": "completed",
+  "started_at_utc": "2026-09-04T07:14:38.713780+00:00",
+  "finished_at_utc": "2026-09-04T07:14:48.937277+00:00",
+  "config_sha256": "a8ea3e8cc8d0b7c609a1d76355e5dabfc34bcee470f93f541a6ad884006ff5e7",
+  "checkpoint_uri": null,
+  "checkpoint_sha256": null,
+  "metrics_path": "reports/windows/g2_contract_source_diagnostic.json",
+  "notes": "bounded smoke; requested_physics_steps=40; classification=runtime_validated"
+}

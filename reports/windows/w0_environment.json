@@ -1,0 +1,69 @@
+{
+  "schema": "so101_pick_rl.windows_environment.v1",
+  "status": "passed",
+  "classification": "runtime_validated",
+  "collected_at_utc": "2026-09-04T07:09:54.381885+00:00",
+  "os": {
+    "platform": "Windows-10-10.0.26200-SP0",
+    "windows_version": [
+      "10",
+      "10.0.26200",
+      "SP0",
+      "Multiprocessor Free"
+    ],
+    "processor": "AMD64 Family 25 Model 33 Stepping 0, AuthenticAMD",
+    "physical_cpu_cores": 8,
+    "logical_cpu_cores": 16,
+    "memory_total_mib": 81835.09765625
+  },
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 3060",
+    "driver_version": "610.62",
+    "memory_total_mib": 12288.0,
+    "memory_used_mib": 1483.0,
+    "utilization_gpu_percent": 5.0,
+    "utilization_memory_percent": 1.0
+  },
+  "python": {
+    "version": "3.10.15",
+    "executable": "E:\\IsaacSim\\isaac-sim-4.5.0\\kit\\python\\kit.exe"
+  },
+  "pytorch": {
+    "version": "2.7.0+cu128",
+    "cuda_runtime": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 3060"
+  },
+  "isaac_sim": {
+    "root": "E:\\IsaacSim\\isaac-sim-4.5.0",
+    "version": "4.5.0-rc.36+release.19112.f59b3005.gl"
+  },
+  "isaac_lab": {
+    "root": "C:\\Users\\LIMMM\\IsaacLab",
+    "commit": "90b79bb2d44feb8d833f260f2bf37da3487180ba",
+    "describe": "v2.1.1",
+    "status": "## HEAD (no branch)"
+  },
+  "rsl_rl": {
+    "version": "2.3.3"
+  },
+  "repository": {
+    "commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+    "branch": "feat/isaaclab-windows",
+    "dirty": true,
+    "dirty_paths": [
+      "M docs/HANDOFF_WINDOWS.md",
+      " M docs/THIRD_PARTY.md",
+      " M isaaclab/README.md",
+      "?? configs/isaaclab/",
+      "?? isaaclab/.gitignore",
+      "?? isaaclab/scripts/",
+      "?? isaaclab/so101_pick_rl/",
+      "?? reports/windows/"
+    ]
+  },
+  "contract": {
+    "status": "passed",
+    "sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750"
+  }
+}

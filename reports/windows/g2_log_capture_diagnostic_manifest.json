@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "g2_log_capture_diagnostic",
+  "git_commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+  "git_dirty": true,
+  "task_contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "platform": "windows",
+  "simulator": "isaac_sim_physx",
+  "algorithm": "scripted",
+  "seed": 0,
+  "num_envs": 1,
+  "status": "completed",
+  "started_at_utc": "2026-09-04T07:31:53.713158+00:00",
+  "finished_at_utc": "2026-09-04T07:32:04.923189+00:00",
+  "config_sha256": "c80af71b88dd1692ed025067570f57b3b60fa9c58ef9a36fb22bc137491e6f7d",
+  "checkpoint_uri": null,
+  "checkpoint_sha256": null,
+  "metrics_path": "reports/windows/g2_log_capture_diagnostic.json",
+  "notes": "bounded smoke; requested_physics_steps=4; classification=runtime_validated"
+}

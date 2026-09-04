@@ -1,0 +1,267 @@
+{
+  "schema": "so101_pick_rl.windows_ppo.v1",
+  "status": "passed",
+  "classification": "measured",
+  "command": ".\\isaaclab\\scripts\\train_rsl_rl.py --task SO101-LiftCube-v0 --num_envs 8 --max_iterations 1 --save_interval 1 --run_name postreview_resume_diagnostic --seed 0 --headless --resume_checkpoint C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-30-07_postreview_diagnostic\\model_0.pt --output .\\reports\\windows\\g4_postreview_8env_resume_diagnostic.json",
+  "started_at_utc": "2026-09-04T07:30:29.150854+00:00",
+  "task": "SO101-LiftCube-v0",
+  "seed": 0,
+  "num_envs": 8,
+  "max_iterations": 1,
+  "preflight_resources": {
+    "name": "NVIDIA GeForce RTX 3060",
+    "driver_version": "610.62",
+    "memory_total_mib": 12288.0,
+    "memory_used_mib": 1488.0,
+    "utilization_gpu_percent": 10.0,
+    "utilization_memory_percent": 2.0,
+    "memory_free_mib": 10800.0,
+    "system_cpu_percent": 26.8
+  },
+  "git": {
+    "commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+    "branch": "feat/isaaclab-windows",
+    "dirty": true,
+    "dirty_paths": [
+      "M docs/HANDOFF_WINDOWS.md",
+      " M docs/THIRD_PARTY.md",
+      " M isaaclab/README.md",
+      "?? configs/isaaclab/",
+      "?? isaaclab/.gitignore",
+      "?? isaaclab/scripts/",
+      "?? isaaclab/so101_pick_rl/",
+      "?? reports/windows/",
+      "?? tests/test_isaaclab_contract_alignment.py"
+    ]
+  },
+  "contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "log_dir": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-30-39_postreview_resume_diagnostic",
+  "resume_checkpoint": {
+    "path": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-30-07_postreview_diagnostic\\model_0.pt",
+    "sha256": "6a0c1a0e823085aa0109422fb4faa522e4ce3c522b000f344b84fd6652c3ed1e",
+    "iteration": 0
+  },
+  "start_iteration": 1,
+  "config_sha256": "474edf1bb5eb3b70a0cb6c7eb128cd493a76e3f90b4e1d4cfd06e2f4c988923a",
+  "training_wall_clock_seconds": 2.3678536999505013,
+  "transitions": 192,
+  "num_steps_per_env": 24,
+  "checkpoints": [
+    {
+      "path": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-30-39_postreview_resume_diagnostic\\model_1.pt",
+      "sha256": "b7a1e059bf80c0971e59e7494504c75b1f9a0d010b1e18807d0a0aa53bf267e7",
+      "size_bytes": 493255,
+      "all_tensors_finite": true,
+      "iteration": 1
+    }
+  ],
+  "tensorboard": {
+    "event_files": [
+      "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-30-39_postreview_resume_diagnostic\\events.out.tfevents.1788507041.DESKTOP-991BNBV.62496.0"
+    ],
+    "scalar_tags": [
+      "Episode_Reward/reaching_cube",
+      "Episode_Reward/gripper_alignment",
+      "Episode_Reward/finger_contact",
+      "Episode_Reward/lift_progress",
+      "Episode_Reward/lifted",
+      "Episode_Reward/action_rate",
+      "Episode_Reward/joint_velocity",
+      "Episode_Termination/time_out",
+      "Episode_Termination/lift_held",
+      "Episode_Termination/non_finite",
+      "Episode_Termination/workspace_exit",
+      "Loss/value_function",
+      "Loss/surrogate",
+      "Loss/entropy",
+      "Loss/learning_rate",
+      "Policy/mean_noise_std",
+      "Perf/total_fps",
+      "Perf/collection time",
+      "Perf/learning_time",
+      "Train/mean_reward",
+      "Train/mean_episode_length",
+      "Train/mean_reward/time",
+      "Train/mean_episode_length/time"
+    ],
+    "scalar_event_counts": {
+      "Episode_Reward/reaching_cube": 1,
+      "Episode_Reward/gripper_alignment": 1,
+      "Episode_Reward/finger_contact": 1,
+      "Episode_Reward/lift_progress": 1,
+      "Episode_Reward/lifted": 1,
+      "Episode_Reward/action_rate": 1,
+      "Episode_Reward/joint_velocity": 1,
+      "Episode_Termination/time_out": 1,
+      "Episode_Termination/lift_held": 1,
+      "Episode_Termination/non_finite": 1,
+      "Episode_Termination/workspace_exit": 1,
+      "Loss/value_function": 1,
+      "Loss/surrogate": 1,
+      "Loss/entropy": 1,
+      "Loss/learning_rate": 1,
+      "Policy/mean_noise_std": 1,
+      "Perf/total_fps": 1,
+      "Perf/collection time": 1,
+      "Perf/learning_time": 1,
+      "Train/mean_reward": 1,
+      "Train/mean_episode_length": 1,
+      "Train/mean_reward/time": 1,
+      "Train/mean_episode_length/time": 1
+    },
+    "non_finite_scalar_count": 0,
+    "last_scalars": {
+      "Episode_Reward/reaching_cube": 0.004274566192179918,
+      "Episode_Reward/gripper_alignment": 0.0013317158445715904,
+      "Episode_Reward/finger_contact": 0.0,
+      "Episode_Reward/lift_progress": 0.0,
+      "Episode_Reward/lifted": 0.0,
+      "Episode_Reward/action_rate": -0.0010478212498128414,
+      "Episode_Reward/joint_velocity": -3.1397200928040547e-06,
+      "Episode_Termination/time_out": 0.375,
+      "Episode_Termination/lift_held": 0.0,
+      "Episode_Termination/non_finite": 0.0,
+      "Episode_Termination/workspace_exit": 0.0,
+      "Loss/value_function": 0.009898416697978973,
+      "Loss/surrogate": -0.04784752056002617,
+      "Loss/entropy": 6.3304548263549805,
+      "Loss/learning_rate": 9.999999747378752e-06,
+      "Policy/mean_noise_std": 0.6941254138946533,
+      "Perf/total_fps": 99.0,
+      "Perf/collection time": 1.5897719860076904,
+      "Perf/learning_time": 0.3351271152496338,
+      "Train/mean_reward": 0.1214752197265625,
+      "Train/mean_episode_length": 16.0,
+      "Train/mean_reward/time": 0.1214752197265625,
+      "Train/mean_episode_length/time": 16.0
+    },
+    "scalar_ranges": {
+      "Episode_Reward/reaching_cube": {
+        "minimum": 0.004274566192179918,
+        "maximum": 0.004274566192179918
+      },
+      "Episode_Reward/gripper_alignment": {
+        "minimum": 0.0013317158445715904,
+        "maximum": 0.0013317158445715904
+      },
+      "Episode_Reward/finger_contact": {
+        "minimum": 0.0,
+        "maximum": 0.0
+      },
+      "Episode_Reward/lift_progress": {
+        "minimum": 0.0,
+        "maximum": 0.0
+      },
+      "Episode_Reward/lifted": {
+        "minimum": 0.0,
+        "maximum": 0.0
+      },
+      "Episode_Reward/action_rate": {
+        "minimum": -0.0010478212498128414,
+        "maximum": -0.0010478212498128414
+      },
+      "Episode_Reward/joint_velocity": {
+        "minimum": -3.1397200928040547e-06,
+        "maximum": -3.1397200928040547e-06
+      },
+      "Episode_Termination/time_out": {
+        "minimum": 0.375,
+        "maximum": 0.375
+      },
+      "Episode_Termination/lift_held": {
+        "minimum": 0.0,
+        "maximum": 0.0
+      },
+      "Episode_Termination/non_finite": {
+        "minimum": 0.0,
+        "maximum": 0.0
+      },
+      "Episode_Termination/workspace_exit": {
+        "minimum": 0.0,
+        "maximum": 0.0
+      },
+      "Loss/value_function": {
+        "minimum": 0.009898416697978973,
+        "maximum": 0.009898416697978973
+      },
+      "Loss/surrogate": {
+        "minimum": -0.04784752056002617,
+        "maximum": -0.04784752056002617
+      },
+      "Loss/entropy": {
+        "minimum": 6.3304548263549805,
+        "maximum": 6.3304548263549805
+      },
+      "Loss/learning_rate": {
+        "minimum": 9.999999747378752e-06,
+        "maximum": 9.999999747378752e-06
+      },
+      "Policy/mean_noise_std": {
+        "minimum": 0.6941254138946533,
+        "maximum": 0.6941254138946533
+      },
+      "Perf/total_fps": {
+        "minimum": 99.0,
+        "maximum": 99.0
+      },
+      "Perf/collection time": {
+        "minimum": 1.5897719860076904,
+        "maximum": 1.5897719860076904
+      },
+      "Perf/learning_time": {
+        "minimum": 0.3351271152496338,
+        "maximum": 0.3351271152496338
+      },
+      "Train/mean_reward": {
+        "minimum": 0.1214752197265625,
+        "maximum": 0.1214752197265625
+      },
+      "Train/mean_episode_length": {
+        "minimum": 16.0,
+        "maximum": 16.0
+      },
+      "Train/mean_reward/time": {
+        "minimum": 0.1214752197265625,
+        "maximum": 0.1214752197265625
+      },
+      "Train/mean_episode_length/time": {
+        "minimum": 16.0,
+        "maximum": 16.0
+      }
+    }
+  },
+  "checkpoint_tensors_finite": true,
+  "required_scalar_tags": [
+    "Loss/value_function",
+    "Loss/surrogate",
+    "Policy/mean_noise_std",
+    "Train/mean_reward",
+    "Episode_Termination/non_finite"
+  ],
+  "required_scalar_tags_present": true,
+  "required_scalar_event_counts_ok": true,
+  "non_finite_termination_max": 0.0,
+  "expected_final_iteration": 1,
+  "final_iteration": 1,
+  "completed_iterations": 1,
+  "gate_evaluation": {
+    "gate": null,
+    "eligible": false,
+    "passed": null,
+    "reason": "bounded diagnostic"
+  },
+  "finished_at_utc": "2026-09-04T07:30:44.074696+00:00",
+  "resources": {
+    "sample_count": 13,
+    "error_count": 0,
+    "last_error": null,
+    "peak_vram_mib": 2820.0,
+    "mean_gpu_utilization_percent": 13.076923076923077,
+    "peak_gpu_utilization_percent": 36.0,
+    "mean_system_cpu_percent": 36.53846153846154,
+    "peak_system_cpu_percent": 57.4,
+    "mean_process_cpu_percent": 104.10769230769232,
+    "peak_process_cpu_percent": 135.8,
+    "peak_process_rss_mib": 2793.32421875
+  }
+}

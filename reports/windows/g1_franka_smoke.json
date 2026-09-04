@@ -1,0 +1,125 @@
+{
+  "schema": "so101_pick_rl.windows_smoke.v1",
+  "status": "passed",
+  "classification": "runtime_validated",
+  "command": ".\\isaaclab\\scripts\\smoke_env.py --task Isaac-Lift-Cube-Franka-v0 --num_envs 1 --physics_steps 20 --action_mode random --random_action_amplitude 0.1 --seed 0 --headless --output .\\reports\\windows\\g1_franka_smoke.json",
+  "started_at_utc": "2026-09-04T07:00:59.368005+00:00",
+  "task": "Isaac-Lift-Cube-Franka-v0",
+  "seed": 0,
+  "requested_num_envs": 1,
+  "requested_physics_steps": 20,
+  "action_mode": "random",
+  "preflight_gpu": {
+    "name": "NVIDIA GeForce RTX 3060",
+    "driver_version": "610.62",
+    "memory_total_mib": 12288.0,
+    "memory_used_mib": 1482.0,
+    "utilization_gpu_percent": 4.0,
+    "utilization_memory_percent": 1.0,
+    "memory_free_mib": 10806.0
+  },
+  "git": {
+    "commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+    "branch": "feat/isaaclab-windows",
+    "dirty": true,
+    "dirty_paths": [
+      "?? isaaclab/scripts/",
+      "?? isaaclab/so101_pick_rl/"
+    ]
+  },
+  "actual_num_envs": 1,
+  "device": "cuda:0",
+  "physics_dt_seconds": 0.01,
+  "policy_dt_seconds": 0.02,
+  "decimation": 2,
+  "policy_steps": 10,
+  "completed_physics_steps": 20,
+  "wall_clock_seconds": 0.5169930999400094,
+  "physics_frames_per_second": 38.68523584225931,
+  "aggregate_sim_steps_per_second": 38.68523584225931,
+  "observation_space": "Dict('policy': Box(-inf, inf, (1, 36), float32))",
+  "action_space": "Box(-inf, inf, (1, 8), float32)",
+  "joint_names": [
+    "panda_joint1",
+    "panda_joint2",
+    "panda_joint3",
+    "panda_joint4",
+    "panda_joint5",
+    "panda_joint6",
+    "panda_joint7",
+    "panda_finger_joint1",
+    "panda_finger_joint2"
+  ],
+  "body_names": [
+    "panda_link0",
+    "panda_link1",
+    "panda_link2",
+    "panda_link3",
+    "panda_link4",
+    "panda_link5",
+    "panda_link6",
+    "panda_link7",
+    "panda_hand",
+    "panda_leftfinger",
+    "panda_rightfinger"
+  ],
+  "soft_joint_position_limits_rad": [
+    [
+      -2.8973000049591064,
+      2.8973000049591064
+    ],
+    [
+      -1.7627999782562256,
+      1.7627999782562256
+    ],
+    [
+      -2.8973000049591064,
+      2.8973000049591064
+    ],
+    [
+      -3.0717999935150146,
+      -0.06979990005493164
+    ],
+    [
+      -2.8973000049591064,
+      2.8973000049591064
+    ],
+    [
+      -0.017499923706054688,
+      3.752500057220459
+    ],
+    [
+      -2.8973000049591064,
+      2.8973000049591064
+    ],
+    [
+      0.0,
+      0.03999999910593033
+    ],
+    [
+      0.0,
+      0.03999999910593033
+    ]
+  ],
+  "non_finite_observation_steps": 0,
+  "non_finite_reward_steps": 0,
+  "terminated_count": 0,
+  "truncated_count": 0,
+  "max_abs_joint_position_rad": 3.038522958755493,
+  "max_abs_joint_velocity_rad_s": 1.5127995014190674,
+  "unique_initial_cube_xy_count": null,
+  "initial_cube_position_range_m": null,
+  "contact_force_matrix_shapes": {},
+  "finished_at_utc": "2026-09-04T07:01:14.660276+00:00",
+  "resources": {
+    "sample_count": 14,
+    "peak_vram_mib": 2986.0,
+    "mean_gpu_utilization_percent": 6.142857142857143,
+    "peak_gpu_utilization_percent": 7.0,
+    "mean_system_cpu_percent": 35.96428571428571,
+    "peak_system_cpu_percent": 52.2,
+    "mean_process_cpu_percent": 107.55714285714285,
+    "peak_process_cpu_percent": 241.3,
+    "peak_process_rss_mib": 2333.953125
+  }
+}

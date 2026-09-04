@@ -1,0 +1,53 @@
+{
+  "schema": "so101_pick_rl.windows_semantics.v1",
+  "status": "failed",
+  "classification": "failed",
+  "command": ".\\isaaclab\\scripts\\validate_task_semantics.py --seed 0 --headless --output .\\reports\\windows\\task_semantics_diagnostic.json",
+  "started_at_utc": "2026-09-04T07:26:19.509722+00:00",
+  "task": "SO101-LiftCube-v0",
+  "seed": 0,
+  "num_envs": 2,
+  "preflight_resources": {
+    "name": "NVIDIA GeForce RTX 3060",
+    "driver_version": "610.62",
+    "memory_total_mib": 12288.0,
+    "memory_used_mib": 1489.0,
+    "utilization_gpu_percent": 9.0,
+    "utilization_memory_percent": 2.0,
+    "memory_free_mib": 10799.0,
+    "system_cpu_percent": 30.3
+  },
+  "git": {
+    "commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+    "branch": "feat/isaaclab-windows",
+    "dirty": true,
+    "dirty_paths": [
+      "M docs/HANDOFF_WINDOWS.md",
+      " M docs/THIRD_PARTY.md",
+      " M isaaclab/README.md",
+      "?? configs/isaaclab/",
+      "?? isaaclab/.gitignore",
+      "?? isaaclab/scripts/",
+      "?? isaaclab/so101_pick_rl/",
+      "?? reports/windows/",
+      "?? tests/test_isaaclab_contract_alignment.py"
+    ]
+  },
+  "contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "error": "RuntimeError: cube initial height is unavailable; reset_cube_pose did not run",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\scripts\\validate_task_semantics.py\", line 132, in main\n    env = gym.make(TASK_ID, cfg=env_cfg)\n  File \"E:\\IsaacSim\\isaac-sim-4.5.0\\kit\\python\\lib\\site-packages\\gymnasium\\envs\\registration.py\", line 734, in make\n    env = env_creator(**env_spec_kwargs)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/envs/manager_based_rl_env.py\", line 82, in __init__\n    super().__init__(cfg=cfg)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/envs/manager_based_env.py\", line 163, in __init__\n    self.load_managers()\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/envs/manager_based_rl_env.py\", line 118, in load_managers\n    super().load_managers()\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/envs/manager_based_env.py\", line 243, in load_managers\n    self.observation_manager = ObservationManager(self.cfg.observations, self)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/managers/observation_manager.py\", line 82, in __init__\n    super().__init__(cfg, env)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/managers/manager_base.py\", line 173, in __init__\n    self._prepare_terms()\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/managers/observation_manager.py\", line 485, in _prepare_terms\n    obs_dims = tuple(term_cfg.func(self._env, **term_cfg.params).shape)\n  File \"C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\so101_pick_rl\\tasks\\lift_cube\\mdp\\observations.py\", line 43, in cube_height_relative_to_initial_m\n    initial_z = cube_initial_height(env)\n  File \"C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\so101_pick_rl\\tasks\\lift_cube\\mdp\\state.py\", line 11, in cube_initial_height\n    raise RuntimeError(\"cube initial height is unavailable; reset_cube_pose did not run\")\nRuntimeError: cube initial height is unavailable; reset_cube_pose did not run\n",
+  "finished_at_utc": "2026-09-04T07:26:31.604256+00:00",
+  "resources": {
+    "sample_count": 9,
+    "error_count": 0,
+    "last_error": null,
+    "peak_vram_mib": 2745.0,
+    "mean_gpu_utilization_percent": 9.666666666666666,
+    "peak_gpu_utilization_percent": 12.0,
+    "mean_system_cpu_percent": 23.600000000000005,
+    "peak_system_cpu_percent": 46.7,
+    "mean_process_cpu_percent": 138.63333333333333,
+    "peak_process_cpu_percent": 458.7,
+    "peak_process_rss_mib": 1973.43359375
+  }
+}

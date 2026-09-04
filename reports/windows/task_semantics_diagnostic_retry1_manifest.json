@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "task_semantics_diagnostic_retry1",
+  "git_commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+  "git_dirty": true,
+  "task_contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "platform": "windows",
+  "simulator": "isaac_sim_physx",
+  "algorithm": "scripted",
+  "seed": 0,
+  "num_envs": 2,
+  "status": "failed",
+  "started_at_utc": "2026-09-04T07:27:40.904541+00:00",
+  "finished_at_utc": "2026-09-04T07:27:53.934089+00:00",
+  "config_sha256": "1e81dbe5232d970d151df22db4f873518ebb3b8a3f1f64f66b1b8d345f8d8d4a",
+  "checkpoint_uri": null,
+  "checkpoint_sha256": null,
+  "metrics_path": "reports/windows/task_semantics_diagnostic_retry1.json",
+  "notes": "task semantics validation; classification=failed"
+}

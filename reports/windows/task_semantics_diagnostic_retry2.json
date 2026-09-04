@@ -1,0 +1,77 @@
+{
+  "schema": "so101_pick_rl.windows_semantics.v1",
+  "status": "passed",
+  "classification": "runtime_validated",
+  "command": ".\\isaaclab\\scripts\\validate_task_semantics.py --seed 0 --headless --output .\\reports\\windows\\task_semantics_diagnostic_retry2.json",
+  "started_at_utc": "2026-09-04T07:28:31.878139+00:00",
+  "task": "SO101-LiftCube-v0",
+  "seed": 0,
+  "num_envs": 2,
+  "preflight_resources": {
+    "name": "NVIDIA GeForce RTX 3060",
+    "driver_version": "610.62",
+    "memory_total_mib": 12288.0,
+    "memory_used_mib": 2414.0,
+    "utilization_gpu_percent": 14.0,
+    "utilization_memory_percent": 2.0,
+    "memory_free_mib": 9874.0,
+    "system_cpu_percent": 19.1
+  },
+  "git": {
+    "commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+    "branch": "feat/isaaclab-windows",
+    "dirty": true,
+    "dirty_paths": [
+      "M docs/HANDOFF_WINDOWS.md",
+      " M docs/THIRD_PARTY.md",
+      " M isaaclab/README.md",
+      "?? configs/isaaclab/",
+      "?? isaaclab/.gitignore",
+      "?? isaaclab/scripts/",
+      "?? isaaclab/so101_pick_rl/",
+      "?? reports/windows/",
+      "?? tests/test_isaaclab_contract_alignment.py"
+    ]
+  },
+  "contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "checks": {
+    "raw_action_is_clipped_to_contract_delta": true,
+    "previous_action_matches_applied_delta": true,
+    "partial_reset_repairs_only_selected_baseline": true,
+    "both_filtered_contact_sensors_positive": true,
+    "success_hold_boundary_and_reset": true
+  },
+  "raw_action_value": 10.0,
+  "maximum_processed_action_delta_rad": 0.05000000074505806,
+  "previous_action_observation_matches": true,
+  "partial_reset_baseline_before_m": [
+    0.02199999988079071,
+    0.02199999988079071
+  ],
+  "partial_reset_baseline_after_m": [
+    0.02199999988079071,
+    0.02199999988079071
+  ],
+  "peak_filtered_contact_force_n": {
+    "fixed_finger_contact": 30.731107711791992,
+    "moving_finger_contact": 23.984848022460938
+  },
+  "required_success_hold_steps": 15,
+  "observed_success_termination_steps": [
+    15
+  ],
+  "finished_at_utc": "2026-09-04T07:28:46.971665+00:00",
+  "resources": {
+    "sample_count": 13,
+    "error_count": 0,
+    "last_error": null,
+    "peak_vram_mib": 3684.0,
+    "mean_gpu_utilization_percent": 11.538461538461538,
+    "peak_gpu_utilization_percent": 32.0,
+    "mean_system_cpu_percent": 27.74615384615385,
+    "peak_system_cpu_percent": 40.4,
+    "mean_process_cpu_percent": 98.48461538461538,
+    "peak_process_cpu_percent": 133.8,
+    "peak_process_rss_mib": 2310.76171875
+  }
+}

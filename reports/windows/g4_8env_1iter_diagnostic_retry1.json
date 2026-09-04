@@ -1,0 +1,113 @@
+{
+  "schema": "so101_pick_rl.windows_ppo.v1",
+  "status": "passed",
+  "classification": "measured",
+  "command": ".\\isaaclab\\scripts\\train_rsl_rl.py --task SO101-LiftCube-v0 --num_envs 8 --max_iterations 1 --save_interval 1 --run_name low_resource_diagnostic_retry1 --seed 0 --headless --output .\\reports\\windows\\g4_8env_1iter_diagnostic_retry1.json",
+  "started_at_utc": "2026-09-04T07:06:37.891202+00:00",
+  "task": "SO101-LiftCube-v0",
+  "seed": 0,
+  "num_envs": 8,
+  "max_iterations": 1,
+  "preflight_gpu": {
+    "name": "NVIDIA GeForce RTX 3060",
+    "driver_version": "610.62",
+    "memory_total_mib": 12288.0,
+    "memory_used_mib": 1478.0,
+    "utilization_gpu_percent": 5.0,
+    "utilization_memory_percent": 1.0,
+    "memory_free_mib": 10810.0
+  },
+  "git": {
+    "commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+    "branch": "feat/isaaclab-windows",
+    "dirty": true,
+    "dirty_paths": [
+      "?? isaaclab/.gitignore",
+      "?? isaaclab/scripts/",
+      "?? isaaclab/so101_pick_rl/",
+      "?? reports/windows/"
+    ]
+  },
+  "contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "log_dir": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-06-45_low_resource_diagnostic_retry1",
+  "training_wall_clock_seconds": 2.039507500012405,
+  "transitions": 192,
+  "num_steps_per_env": 24,
+  "checkpoints": [
+    {
+      "path": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-06-45_low_resource_diagnostic_retry1\\model_0.pt",
+      "sha256": "49a2b10ab5820c530aa4385a5fee3e78cd385d4e84af0b86f5d080e4845e73b5",
+      "size_bytes": 493255,
+      "all_tensors_finite": true
+    }
+  ],
+  "tensorboard": {
+    "event_files": [
+      "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_lift_cube\\2026-09-04_16-06-45_low_resource_diagnostic_retry1\\events.out.tfevents.1788505607.DESKTOP-991BNBV.75828.0"
+    ],
+    "scalar_tags": [
+      "Episode_Reward/reaching_cube",
+      "Episode_Reward/gripper_alignment",
+      "Episode_Reward/finger_contact",
+      "Episode_Reward/lift_progress",
+      "Episode_Reward/lifted",
+      "Episode_Reward/action_rate",
+      "Episode_Reward/joint_velocity",
+      "Episode_Termination/time_out",
+      "Episode_Termination/lift_held",
+      "Episode_Termination/non_finite",
+      "Episode_Termination/workspace_exit",
+      "Loss/value_function",
+      "Loss/surrogate",
+      "Loss/entropy",
+      "Loss/learning_rate",
+      "Policy/mean_noise_std",
+      "Perf/total_fps",
+      "Perf/collection time",
+      "Perf/learning_time",
+      "Train/mean_reward",
+      "Train/mean_episode_length",
+      "Train/mean_reward/time",
+      "Train/mean_episode_length/time"
+    ],
+    "non_finite_scalar_count": 0,
+    "last_scalars": {
+      "Episode_Reward/reaching_cube": 0.0031725827138870955,
+      "Episode_Reward/gripper_alignment": 0.0008309381082653999,
+      "Episode_Reward/finger_contact": 0.0,
+      "Episode_Reward/lift_progress": 0.0,
+      "Episode_Reward/lifted": 0.0,
+      "Episode_Reward/action_rate": -0.0010720918653532863,
+      "Episode_Reward/joint_velocity": -3.010668251590687e-06,
+      "Episode_Termination/time_out": 0.375,
+      "Episode_Termination/lift_held": 0.0,
+      "Episode_Termination/non_finite": 0.0,
+      "Episode_Termination/workspace_exit": 0.0,
+      "Loss/value_function": 0.004612967371940613,
+      "Loss/surrogate": -0.05380857363343239,
+      "Loss/entropy": 6.356678485870361,
+      "Loss/learning_rate": 9.999999747378752e-06,
+      "Policy/mean_noise_std": 0.6975027322769165,
+      "Perf/total_fps": 117.0,
+      "Perf/collection time": 1.3483195304870605,
+      "Perf/learning_time": 0.28143811225891113,
+      "Train/mean_reward": 0.07809115946292877,
+      "Train/mean_episode_length": 16.0,
+      "Train/mean_reward/time": 0.07809115946292877,
+      "Train/mean_episode_length/time": 16.0
+    }
+  },
+  "checkpoint_tensors_finite": true,
+  "finished_at_utc": "2026-09-04T07:06:50.004179+00:00",
+  "resources": {
+    "sample_count": 11,
+    "peak_vram_mib": 2810.0,
+    "mean_gpu_utilization_percent": 5.909090909090909,
+    "peak_gpu_utilization_percent": 9.0,
+    "mean_system_cpu_percent": 20.172727272727272,
+    "peak_system_cpu_percent": 32.9,
+    "mean_process_cpu_percent": 99.36363636363636,
+    "peak_process_cpu_percent": 162.3,
+    "peak_process_rss_mib": 2782.12109375
+  }
+}

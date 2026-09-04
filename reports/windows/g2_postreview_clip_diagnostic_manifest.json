@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "g2_postreview_clip_diagnostic",
+  "git_commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+  "git_dirty": true,
+  "task_contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "platform": "windows",
+  "simulator": "isaac_sim_physx",
+  "algorithm": "random",
+  "seed": 0,
+  "num_envs": 1,
+  "status": "completed",
+  "started_at_utc": "2026-09-04T07:29:27.626075+00:00",
+  "finished_at_utc": "2026-09-04T07:29:39.643657+00:00",
+  "config_sha256": "2205d13e5bf12db4e33d2baadccf2ec8e2011be4ef2d900f309ad902822ad536",
+  "checkpoint_uri": null,
+  "checkpoint_sha256": null,
+  "metrics_path": "reports/windows/g2_postreview_clip_diagnostic.json",
+  "notes": "bounded smoke; requested_physics_steps=40; classification=runtime_validated"
+}

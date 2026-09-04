@@ -1,0 +1,53 @@
+{
+  "schema": "so101_pick_rl.windows_semantics.v1",
+  "status": "failed",
+  "classification": "failed",
+  "command": ".\\isaaclab\\scripts\\validate_task_semantics.py --seed 0 --headless --output .\\reports\\windows\\task_semantics_diagnostic_retry1.json",
+  "started_at_utc": "2026-09-04T07:27:40.904541+00:00",
+  "task": "SO101-LiftCube-v0",
+  "seed": 0,
+  "num_envs": 2,
+  "preflight_resources": {
+    "name": "NVIDIA GeForce RTX 3060",
+    "driver_version": "610.62",
+    "memory_total_mib": 12288.0,
+    "memory_used_mib": 2361.0,
+    "utilization_gpu_percent": 8.0,
+    "utilization_memory_percent": 2.0,
+    "memory_free_mib": 9927.0,
+    "system_cpu_percent": 17.3
+  },
+  "git": {
+    "commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+    "branch": "feat/isaaclab-windows",
+    "dirty": true,
+    "dirty_paths": [
+      "M docs/HANDOFF_WINDOWS.md",
+      " M docs/THIRD_PARTY.md",
+      " M isaaclab/README.md",
+      "?? configs/isaaclab/",
+      "?? isaaclab/.gitignore",
+      "?? isaaclab/scripts/",
+      "?? isaaclab/so101_pick_rl/",
+      "?? reports/windows/",
+      "?? tests/test_isaaclab_contract_alignment.py"
+    ]
+  },
+  "contract_sha256": "61795eb3e46695a8ef837266003d92665db0fc424ed29dc976b1d14f22bf6750",
+  "error": "RuntimeError: Inplace update to inference tensor outside InferenceMode is not allowed.You can make a clone to get a normal tensor before doing inplace update.See https://github.com/pytorch/rfcs/pull/17 for more details.",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\scripts\\validate_task_semantics.py\", line 150, in main\n    env.reset(seed=args.seed)\n  File \"E:\\IsaacSim\\isaac-sim-4.5.0\\kit\\python\\lib\\site-packages\\gymnasium\\wrappers\\common.py\", line 400, in reset\n    return super().reset(seed=seed, options=options)\n  File \"E:\\IsaacSim\\isaac-sim-4.5.0\\kit\\python\\lib\\site-packages\\gymnasium\\core.py\", line 333, in reset\n    return self.env.reset(seed=seed, options=options)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/envs/manager_based_env.py\", line 295, in reset\n    self._reset_idx(env_ids)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/envs/manager_based_rl_env.py\", line 364, in _reset_idx\n    self.event_manager.apply(mode=\"reset\", env_ids=env_ids, global_env_step_count=env_step_count)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/managers/event_manager.py\", line 244, in apply\n    term_cfg.func(self._env, env_ids, **term_cfg.params)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/envs/mdp/events.py\", line 1161, in reset_scene_to_default\n    rigid_object.write_root_pose_to_sim(default_root_state[:, :7], env_ids=env_ids)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/assets/rigid_object/rigid_object.py\", line 208, in write_root_pose_to_sim\n    self.write_root_link_pose_to_sim(root_pose, env_ids=env_ids)\n  File \"c:/users/limmm/isaaclab/source/isaaclab/isaaclab/assets/rigid_object/rigid_object.py\", line 227, in write_root_link_pose_to_sim\n    self._data.root_link_pose_w[env_ids] = root_pose.clone()\nRuntimeError: Inplace update to inference tensor outside InferenceMode is not allowed.You can make a clone to get a normal tensor before doing inplace update.See https://github.com/pytorch/rfcs/pull/17 for more details.\n",
+  "finished_at_utc": "2026-09-04T07:27:53.934089+00:00",
+  "resources": {
+    "sample_count": 11,
+    "error_count": 0,
+    "last_error": null,
+    "peak_vram_mib": 3681.0,
+    "mean_gpu_utilization_percent": 10.181818181818182,
+    "peak_gpu_utilization_percent": 12.0,
+    "mean_system_cpu_percent": 29.099999999999998,
+    "peak_system_cpu_percent": 50.5,
+    "mean_process_cpu_percent": 96.20909090909093,
+    "peak_process_cpu_percent": 126.4,
+    "peak_process_rss_mib": 2257.0390625
+  }
+}
