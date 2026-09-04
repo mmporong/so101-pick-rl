@@ -2,9 +2,12 @@
   "schema": "so101_pick_rl.windows_environment.v1",
   "status": "passed",
   "classification": "runtime_validated",
-  "collected_at_utc": "2026-09-04T07:09:54.381885+00:00",
+  "collected_at_utc": "2026-09-04T07:33:50.244624+00:00",
   "os": {
     "platform": "Windows-10-10.0.26200-SP0",
+    "caption": "Microsoft Windows 11 Pro",
+    "version": "10.0.26200",
+    "build_number": "26200",
     "windows_version": [
       "10",
       "10.0.26200",
@@ -20,9 +23,9 @@
     "name": "NVIDIA GeForce RTX 3060",
     "driver_version": "610.62",
     "memory_total_mib": 12288.0,
-    "memory_used_mib": 1483.0,
-    "utilization_gpu_percent": 5.0,
-    "utilization_memory_percent": 1.0
+    "memory_used_mib": 1490.0,
+    "utilization_gpu_percent": 9.0,
+    "utilization_memory_percent": 2.0
   },
   "python": {
     "version": "3.10.15",
@@ -48,19 +51,10 @@
     "version": "2.3.3"
   },
   "repository": {
-    "commit": "0b4ad970b232d9c9ec3d99834cbee82df6eaffa2",
+    "commit": "2ec7303fb1f06c73df2a775cbe1764c8c69919d5",
     "branch": "feat/isaaclab-windows",
-    "dirty": true,
-    "dirty_paths": [
-      "M docs/HANDOFF_WINDOWS.md",
-      " M docs/THIRD_PARTY.md",
-      " M isaaclab/README.md",
-      "?? configs/isaaclab/",
-      "?? isaaclab/.gitignore",
-      "?? isaaclab/scripts/",
-      "?? isaaclab/so101_pick_rl/",
-      "?? reports/windows/"
-    ]
+    "dirty": false,
+    "dirty_paths": []
   },
   "contract": {
     "status": "passed",
