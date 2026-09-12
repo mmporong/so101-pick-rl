@@ -1,0 +1,91 @@
+{
+  "schema": "so101_pick_rl.cinematic_video_evidence.v1",
+  "status": "passed",
+  "purpose": "local_portfolio_video_of_actual_ppo_updates_not_policy_success_evaluation",
+  "source_commit": "9d3003275d5a3f3638c0253ba0f63e4ab46d64ca",
+  "source_dirty": false,
+  "contract_sha256": "f4af446ce9644e558653da595d34b0c752dde974e3951051dee7d8d672dc52d3",
+  "training_report": "artifacts/cinematic_20260913_live1024_report.json",
+  "video_manifest": "artifacts/cinematic_20260913_live1024/manifest.json",
+  "video": {
+    "path": "artifacts/cinematic_20260913_live1024/parallel_training.mp4",
+    "sha256": "135365a83e09d6e61462f3b92cb99793a5ee34cc46489856df7a366eadaf5d41",
+    "bytes": 32589989,
+    "codec": "h264",
+    "resolution": [1920, 1080],
+    "fps": 30,
+    "frames": 1200,
+    "duration_seconds": 40,
+    "storage": "local_only_git_ignored_not_uploaded"
+  },
+  "frame_metadata": {
+    "path": "artifacts/cinematic_20260913_live1024/frames.jsonl",
+    "sha256": "d7f416298a902caf44160a2c9a9e11c982160ece67e94feef8596e0770b78d78"
+  },
+  "training": {
+    "task": "SO101-PickPlace-v0",
+    "num_envs": 1024,
+    "seed": 0,
+    "device": "cuda:0",
+    "updates": 50,
+    "start_iteration": 340,
+    "end_iteration": 389,
+    "transitions": 1228800,
+    "wall_seconds_including_capture": 350.26830090000294,
+    "peak_vram_mib_including_desktop": 5899,
+    "changed_model_parameter_tensors": 17,
+    "full_success_terminations": 0,
+    "id_evaluation": "not_run",
+    "held_out_evaluation": "not_run"
+  },
+  "resume_checkpoint": {
+    "path": "isaaclab/logs/rsl_rl/so101_pick_place/2026-09-13_01-54-27_pp_portfolio_live1024/model_339.pt",
+    "sha256": "f069ccae383db816d2edf3b2b24beac93a525aa39774ab82ddd663e8109e7448",
+    "preserved_hash_verified": true
+  },
+  "new_checkpoint": {
+    "path": "isaaclab/logs/rsl_rl/so101_pick_place/2026-09-13_02-28-52_pp_cinematic_live1024/model_389.pt",
+    "sha256": "1c742432db9935047fdc5d678dbb524aad6cf3979928f167ef893fb3466f435f",
+    "iteration": 389,
+    "all_model_tensors_finite": true
+  },
+  "camera": {
+    "style": "cinematic",
+    "elevation_degrees_approx": 37,
+    "actual_focal_length_mm": 35,
+    "establishing_seconds": 4,
+    "dolly_seconds": 10,
+    "detail": "compact 4x4 region, approximately 12 complete arms and 5-6 partial edge arms visually verified",
+    "subsequent_motion": "small smooth orbit",
+    "selection_policy_step": 120,
+    "selected_environment_ids": [467, 468, 469, 470, 499, 500, 501, 502, 531, 532, 533, 534, 563, 564, 565, 566],
+    "hero_environment_id": 563,
+    "qualified_lift_seen_count_at_selection": 15,
+    "full_success_seen_count_at_selection": 0,
+    "selection_audit": "weights, per-environment score components and scores are recorded in the video manifest and recomputed successfully"
+  },
+  "verification": {
+    "cpu_tests_passed": 75,
+    "contract": "passed_unchanged",
+    "compile": "passed",
+    "training_report_checks": "all_passed",
+    "ffprobe_specs": "passed",
+    "full_ffmpeg_decode": "passed_no_errors",
+    "frame_sequence_and_iteration_alignment": "passed_1200_rows",
+    "artifact_hashes": "passed",
+    "parent_report_dynamic_camera_metadata_matches_video_manifest": true,
+    "visual_checks_simulation_seconds": [0, 14, 24, 39.966],
+    "code_review": "COMMENT_no_blocking_findings_standalone_static_analysis_has_Isaac_SDK_environment_limitations",
+    "architecture_review": "CLEAR",
+    "independent_oblique_detail_visual_review": "CLEAR"
+  },
+  "limitations": [
+    "Selected region is biased toward early qualified lift history, not a formal success-rate sample.",
+    "No complete pick-and-place success was observed; do not present this as a successful full-task demonstration.",
+    "All 1024 environments continue training while the camera shows a selected subset.",
+    "Video uses simulation time and omits optimizer wall-clock pauses.",
+    "Frames are post-step after automatic resets; this is not a terminal-aligned expert or transition dataset.",
+    "No reward, curriculum, cube geometry, or task-contract change was made for this capture.",
+    "MP4, checkpoints and raw logs remain local; only code and small evidence records are pushed."
+  ]
+}
