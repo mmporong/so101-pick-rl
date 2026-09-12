@@ -1,0 +1,39 @@
+{
+  "schema": "so101_pick_rl.parallel_video_handoff.v1",
+  "status": "passed",
+  "purpose": "actual_ppo_continuation_video_not_policy_success_evaluation",
+  "source_commit": "e40bc5c069e012b7aed1eafd1aca774b1433bbb6",
+  "source_dirty": false,
+  "task": "SO101-PickPlace-v0",
+  "contract_sha256": "f4af446ce9644e558653da595d34b0c752dde974e3951051dee7d8d672dc52d3",
+  "runtime": {"simulator": "Isaac Sim 4.5.0 PhysX", "isaac_lab": "2.1.1", "rsl_rl": "2.3.3", "graphics_api": "D3D12", "device": "cuda:0", "gpu": "NVIDIA GeForce RTX 3060"},
+  "training": {"seed": 0, "num_envs": 1024, "start_iteration": 300, "final_iteration": 339, "completed_updates": 40, "transitions": 983040, "wall_clock_seconds_including_capture": 220.32063860000926, "peak_vram_mib_including_desktop": 5473},
+  "video": {
+    "path": "artifacts/parallel_training_20260913_live1024/parallel_training.mp4",
+    "sha256": "73d29438e4f65922a10756e272aa3caefd7ec4e62fe616bf3434bc0ee166f70b",
+    "codec": "h264", "resolution": [1280, 720], "fps": 30, "frames": 960, "duration_seconds": 32, "size_bytes": 10308052,
+    "clock": "simulation time; optimizer wall-clock pauses omitted",
+    "camera": "full 1024-env grid for 5 seconds, smooth 2-second zoom toward central region; all 1024 environments train throughout",
+    "git_tracked": false
+  },
+  "frame_metadata": {"path": "artifacts/parallel_training_20260913_live1024/frames.jsonl", "sha256": "eab85dfb73f507db1bf015e5325456a56416c3ced81d9be4dcb9946e2363d4fa"},
+  "source_checkpoint": {"path": "isaaclab/logs/rsl_rl/so101_pick_place/2026-09-12_13-48-21_pp_r2_baseline300/model_299.pt", "sha256_before_and_after": "d8d87329b4eeb3f2b45997aa3b61fc5eff6e411e9d2500b2711927ab4d26b35e"},
+  "new_checkpoint": {"path": "isaaclab/logs/rsl_rl/so101_pick_place/2026-09-13_01-54-27_pp_portfolio_live1024/model_339.pt", "sha256": "f069ccae383db816d2edf3b2b24beac93a525aa39774ab82ddd663e8109e7448"},
+  "local_evidence": {
+    "training_report": "artifacts/parallel_training_20260913_live1024_report.json",
+    "training_manifest": "artifacts/parallel_training_20260913_live1024_report_manifest.json",
+    "video_manifest": "artifacts/parallel_training_20260913_live1024/manifest.json",
+    "diagnostic_terminal_capture": "artifacts/policy_capture_20260913_terminal_check/manifest.json"
+  },
+  "validation": {"cpu_tests_passed": 71, "contract": "PASS", "compile": "PASS", "diff_check": "PASS", "full_video_decode": "PASS", "frame_iteration_alignment": "PASS", "hashes": "PASS", "visual_samples_seconds": [0, 10, 31], "original_checkpoint_preserved": true},
+  "review": {"code_review": "COMMENT", "architecture": "CLEAR", "unresolved_code_blockers": 0, "gap": "LSP/Pyright/Ruff/Mypy unavailable; no static type/lint approval claimed"},
+  "limitations": [
+    "No new formal ID or held-out evaluation; original model_299 result remains 0/600, not a measured result for model_339",
+    "Training reported zero pick_place_success terminations; this is not a fixed-protocol success rate",
+    "Parallel frames are post-auto-reset visualization, not terminal-aligned expert demonstration data",
+    "Single-env 600-transition/601-frame diagnostic preserves terminal state but used dirty development source and is not portfolio source evidence",
+    "Rendering/encoding overhead makes this throughput unsuitable for comparison to physics-only training",
+    "No cube-size, reward, action, physics or success-contract changes; 3cm and policy improvements remain pending",
+    "MP4, NPZ, TensorBoard and checkpoints are local ignored artifacts; Git clone does not restore them; no video upload or portfolio deployment"
+  ]
+}

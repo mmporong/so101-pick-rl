@@ -4,6 +4,12 @@
 
 ## 구현 검증
 
+2026-09-13 추가: 실제 PPO 1,024환경·40 update 재개 촬영을 완료했다.
+clean source `e40bc5c`에서 1280×720·30fps·32초 MP4를 생성하고 원본 모델을 보존했다.
+[촬영 보고서](pp_parallel_video_20260913.json)에 실행·파일 해시를 기록했다.
+MP4는 로컬 Git 비추적 자료이며 업로드하지 않는다. 최신 CPU 테스트는 71개 PASS다.
+정책 개선 및 새 모델의 정식 성공률 평가는 이번 촬영 범위에 포함하지 않았다.
+
 - 계약 검증 PASS. 기존 LiftCube SHA는 변경하지 않았다.
 - revision 2 CPU 단위 테스트 58개 PASS. Isaac Sim bundled Python의 `SO101_TEST_DEVICE=cuda` 상태·계약 테스트 33개 PASS. 부분 reset 단독 테스트는 CPU에서도 별도로 수행하고 실제 CUDA 환경 fixture로 격리를 검증한다.
 - 목표 밖 한 손가락 밀기, 고속·고각속도 해제, 목표 높이 오류, 샘플 사이 던지기/정착, 해제 후 튀기기, 파지 이력 없는 배치를 성공으로 세지 않는다.
@@ -17,12 +23,12 @@
 - `pp_fixture_diagnostic2_20260912.json`, `pp_geometry_proxies_20260912.json`의 임의 probe는 실제 손가락 끝을 대표하지 못했다.
 - `pp_geometry_headless_20260912.json`에서는 instance proxy 메시를 아직 읽지 못했다.
 - `pp_geometry_mesh_20260912.json`부터 실제 메시 끝부분의 body-local 좌표를 사용한다. 닫힘/열림 끝부분 간격은 약 0.01049m/0.13726m로 측정됐다.
-- `--capture --enable_cameras` 진단은 Isaac viewport 초기화의 access violation으로 JSON 생성 전에 종료됐다. 배치 exit code만으로 성공을 판단하지 않았다. 화면 없는 물리 경로는 정상 동작했으며, 영상 증거는 아직 없다.
+- 당시 `--capture --enable_cameras` 진단은 Isaac viewport 초기화의 access violation으로 JSON 생성 전에 종료됐다. 배치 exit code만으로 성공을 판단하지 않았다. 2026-09-13에는 설치본 수정 없이 D3D12 경로로 실제 영상 촬영을 완료했다(위 촬영 보고서).
 - `pp_full_fixture_diagnostic_20260912.json` 및 이후 review fixture는 합성 과거 이력을 주입해 실제 안정 배치·최종 종료·자동 reset 연결을 검사한다. 정책이 직접 집고 놓았다는 증거가 아니다.
 
 ## 현재 남은 작업
 
-실행 기반 검증과 revision 2의 seed 0/1/2 각 200회 ID 평가는 완료했다. 전체 Pick & Place 정책 성공은 0/600으로 미달이다. 남은 핵심은 들어 올린 물체를 목표 높이로 내려놓고 해제하는 학습이다. DR/ablation/held-out/MuJoCo 교차평가와 영상 검증은 아직 수행하지 않았다.
+실행 기반 검증과 revision 2 원본 model_299의 seed 0/1/2 각 200회 ID 평가는 완료했다. 해당 모델의 전체 Pick & Place 성공은 0/600으로 미달이다. 남은 핵심은 들어 올린 물체를 목표 높이로 내려놓고 해제하는 학습이다. DR/ablation/held-out/MuJoCo 교차평가는 미실행이다. 병렬 학습 영상은 검증했지만 촬영 후 model_339의 정식 성공률 평가는 미실행이다.
 
 ## revision 1 clean-source 실행 및 중단
 
