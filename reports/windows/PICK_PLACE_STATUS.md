@@ -1,6 +1,6 @@
 # Pick & Place 구현·실행 증거
 
-2026-09-12. 기존 `STATUS.md`는 LiftCube 이력으로 보존한다. 신규 `SO101-PickPlace-v0`의 전체 성공 조건은 `common/pick_place_spec.json` revision 2다. 실물 실행과 원격 push는 하지 않는다.
+2026-09-12부터의 기록이다. 기존 `STATUS.md`는 LiftCube 이력으로 보존한다. 신규 `SO101-PickPlace-v0`의 전체 성공 조건은 `common/pick_place_spec.json` revision 2다. 실물 실행은 하지 않았다. 이후 사용자의 push 요청에 따라 코드와 작은 검증 기록만 원격에 반영했으며 MP4·학습 원본 데이터는 로컬에 남겼다.
 
 ## 구현 검증
 
