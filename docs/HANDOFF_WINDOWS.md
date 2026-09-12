@@ -1,5 +1,7 @@
 # Windows 인계서: Isaac Lab PPO
 
+2026-09-12 업데이트: 사용자가 전체 Pick & Place와 GPU 병렬 학습 진행을 요청했다. 신규 `SO101-PickPlace-v0`는 39차원 관측과 별도 계약/체크포인트를 사용한다. 현재 계획은 [PICK_PLACE_PLAN.md](PICK_PLACE_PLAN.md)를 따르며, 아래 2026-09-04 내용은 기존 LiftCube 실행 이력이다.
+
 2026-09-04 기준 G0~G4와 checkpoint 재시작을 통과했습니다. 실제 수치, source commit, checkpoint SHA-256, 남은 범위는 `reports/windows/STATUS.md`에 있습니다. 256환경 이상과 수렴 학습은 사용자가 지정한 저부하 조건 때문에 실행하지 않았습니다.
 
 ## 맡은 결과

@@ -2,6 +2,11 @@
 
 ## 프로젝트 상태
 
+2026-09-12에 최종 목표가 Pick & Place 전체로 확장됐다. 현재 작업은
+`docs/PICK_PLACE_PLAN.md`와 `common/pick_place_spec.json`을 따른다.
+아래 G0~G4 기록과 지시는 기존 LiftCube 기준이다. 새 태스크에는 별도 검증이 필요하며,
+LiftCube 체크포인트를 입력 차원이 다른 Pick & Place에 그대로 resume하지 않는다.
+
 Windows의 SO-101 Isaac task와 64환경 PPO smoke는 G0~G4를 통과했습니다. `reports/windows/STATUS.md`의 측정값과 재현 명령을 정본으로 사용합니다. 256환경 이상 확장, 수렴 학습, MuJoCo 교차평가는 아직 실행하지 않았습니다.
 
 현재 contract SHA-256은 각 PC에서 `python scripts/validate_contract.py`로 다시 계산합니다. 문서에 복사된 과거 SHA를 신뢰하지 않습니다.

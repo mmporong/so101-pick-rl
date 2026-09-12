@@ -24,13 +24,23 @@ sys.path.insert(0, str(SCRIPT_DIR))
 
 from runtime_metrics import ResourceSampler, enforce_resource_guard, write_json
 from so101_pick_rl.kit_log import bind_kit_log, summarize_kit_log
-from so101_pick_rl.task_contract import TASK_ID
+from so101_pick_rl.policy_evaluation import evaluate_policy
+from so101_pick_rl.run_contract import (
+    LIFT_TASK_ID,
+    PICK_PLACE_TASK_ID,
+    contract_sha256,
+    load_resume_binding,
+    load_spec,
+    run_binding,
+)
 
 
-REQUIRED_SCALAR_TAGS = (
+REQUIRED_ITERATION_SCALAR_TAGS = (
     "Loss/value_function",
     "Loss/surrogate",
     "Policy/mean_noise_std",
+)
+EPISODIC_SCALAR_TAGS = (
     "Train/mean_reward",
     "Episode_Termination/non_finite",
 )
@@ -45,6 +55,8 @@ parser.add_argument("--save_interval", type=int, default=5)
 parser.add_argument("--run_name", default="smoke")
 parser.add_argument("--log_root", type=Path, default=ISAACLAB_PROJECT_DIR / "logs" / "rsl_rl")
 parser.add_argument("--resume_checkpoint", type=Path, default=None)
+parser.add_argument("--evaluate_episodes", type=int, default=0)
+parser.add_argument("--evaluation_seed", type=int, default=0)
 parser.add_argument("--output", type=Path, required=True)
 parser.add_argument("--max_baseline_gpu_util", type=float, default=40.0)
 parser.add_argument("--minimum_free_vram_mib", type=float, default=4096.0)
@@ -119,6 +131,38 @@ from isaaclab_tasks.utils import load_cfg_from_registry, parse_env_cfg  # noqa: 
 from isaaclab.utils.io import dump_pickle, dump_yaml  # noqa: E402
 
 
+class InstrumentedRslRlVecEnvWrapper(RslRlVecEnvWrapper):
+    """Accumulate training safety evidence on-device before automatic resets obscure it."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        device = self.unwrapped.device
+        self._non_finite_observation_steps = torch.zeros((), dtype=torch.long, device=device)
+        self._non_finite_reward_steps = torch.zeros((), dtype=torch.long, device=device)
+        self._termination_counts = {
+            name: torch.zeros((), dtype=torch.long, device=device)
+            for name in self.unwrapped.termination_manager.active_terms
+        }
+
+    def step(self, actions):
+        observations, rewards, dones, extras = super().step(actions)
+        self._non_finite_observation_steps += (~torch.isfinite(observations).all()).long()
+        self._non_finite_reward_steps += (~torch.isfinite(rewards).all()).long()
+        termination_manager = self.unwrapped.termination_manager
+        for name, count in self._termination_counts.items():
+            count += torch.count_nonzero(termination_manager.get_term(name))
+        return observations, rewards, dones, extras
+
+    def runtime_snapshot(self) -> dict[str, Any]:
+        return {
+            "non_finite_observation_steps": int(self._non_finite_observation_steps.item()),
+            "non_finite_reward_steps": int(self._non_finite_reward_steps.item()),
+            "termination_term_counts": {
+                name: int(count.item()) for name, count in self._termination_counts.items()
+            },
+        }
+
+
 def git_metadata() -> dict[str, object]:
     def run(*command: str) -> str:
         return subprocess.run(
@@ -135,19 +179,6 @@ def git_metadata() -> dict[str, object]:
         "dirty": bool(status),
         "dirty_paths": status.splitlines(),
     }
-
-
-def contract_sha256() -> str:
-    completed = subprocess.run(
-        [sys.executable, str(REPOSITORY_ROOT / "scripts" / "validate_contract.py")],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    for line in completed.stdout.splitlines():
-        if line.startswith("contract_sha256="):
-            return line.split("=", 1)[1]
-    raise RuntimeError("contract validator did not emit contract_sha256")
 
 
 def file_sha256(path: Path) -> str:
@@ -229,7 +260,10 @@ def inspect_tensorboard(log_dir: Path) -> dict[str, Any]:
 
 def main() -> int:
     git = git_metadata()
-    task_contract_sha = contract_sha256()
+    if args.evaluate_episodes < 0:
+        raise ValueError("--evaluate_episodes must be non-negative")
+    load_spec(args.task)
+    task_contract_sha = contract_sha256(args.task)
     fallback_config_path = REPOSITORY_ROOT / "configs" / "isaaclab" / "windows_runtime.json"
     payload: dict[str, Any] = {
         "schema": "so101_pick_rl.windows_ppo.v1",
@@ -268,8 +302,21 @@ def main() -> int:
         payload["log_dir"] = str(log_dir)
 
         env = gym.make(args.task, cfg=env_cfg)
-        wrapped_env = RslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
+        wrapped_env = InstrumentedRslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
+        observation_dimension = int(wrapped_env.num_obs)
+        action_dimension = int(wrapped_env.num_actions)
+        binding = run_binding(args.task, observation_dimension, action_dimension)
+        binding["device"] = str(wrapped_env.unwrapped.device)
+        payload.update(
+            {
+                "observation_dimension": observation_dimension,
+                "action_dimension": action_dimension,
+                "device": str(wrapped_env.unwrapped.device),
+                "runner_device": str(agent_cfg.device),
+            }
+        )
         runner = OnPolicyRunner(wrapped_env, agent_cfg.to_dict(), log_dir=str(log_dir), device=agent_cfg.device)
+        payload["policy_device"] = str(next(runner.alg.policy.parameters()).device)
         runner.add_git_repo_to_log(str(Path(__file__).resolve()))
 
         resume_checkpoint = args.resume_checkpoint.expanduser().resolve() if args.resume_checkpoint else None
@@ -277,6 +324,8 @@ def main() -> int:
         if resume_checkpoint is not None:
             if not resume_checkpoint.is_file():
                 raise FileNotFoundError(resume_checkpoint)
+            resume_sidecar_path = resume_checkpoint.parent / "run_contract.json"
+            resume_binding = load_resume_binding(resume_checkpoint, binding)
             resume_payload = torch.load(resume_checkpoint, map_location="cpu", weights_only=False)
             resume_from_iteration = int(resume_payload["iter"])
             runner.load(str(resume_checkpoint))
@@ -286,8 +335,10 @@ def main() -> int:
                 "path": str(resume_checkpoint),
                 "sha256": file_sha256(resume_checkpoint),
                 "iteration": resume_from_iteration,
+                "run_contract_path": str(resume_sidecar_path) if resume_binding is not None else None,
             }
         payload["start_iteration"] = start_iteration
+        write_json(log_dir / "run_contract.json", binding)
 
         params_dir = log_dir / "params"
         params_dir.mkdir(parents=True, exist_ok=True)
@@ -302,6 +353,24 @@ def main() -> int:
         train_started = time.perf_counter()
         runner.learn(num_learning_iterations=agent_cfg.max_iterations, init_at_random_ep_len=True)
         training_seconds = time.perf_counter() - train_started
+        training_runtime = wrapped_env.runtime_snapshot()
+
+        if args.evaluate_episodes and args.task != PICK_PLACE_TASK_ID:
+            raise ValueError("--evaluate_episodes is currently supported only for SO101-PickPlace-v0")
+        evaluation = evaluate_policy(
+            runner,
+            wrapped_env,
+            args.evaluate_episodes,
+            seed=args.evaluation_seed,
+        ) if args.task == PICK_PLACE_TASK_ID else {
+            "requested_episodes": args.evaluate_episodes,
+            "completed_episodes": 0,
+            "successes": 0,
+            "failures": 0,
+            "invalid_episode_count": 0,
+            "success_rate": None,
+            "policy_success_claimed": False,
+        }
 
         checkpoints = sorted(log_dir.glob("model_*.pt"), key=lambda path: path.stat().st_mtime)
         checkpoint_rows = []
@@ -324,9 +393,12 @@ def main() -> int:
         checkpoint_rows.sort(key=lambda row: row["iteration"])
         final_iteration = checkpoint_rows[-1]["iteration"] if checkpoint_rows else None
         expected_final_iteration = start_iteration + args.max_iterations - 1
-        required_scalar_tags_present = all(tag in tensorboard["scalar_tags"] for tag in REQUIRED_SCALAR_TAGS)
+        required_scalar_tags_present = all(
+            tag in tensorboard["scalar_tags"] for tag in REQUIRED_ITERATION_SCALAR_TAGS
+        )
         required_scalar_event_counts_ok = all(
-            tensorboard["scalar_event_counts"].get(tag, 0) >= args.max_iterations for tag in REQUIRED_SCALAR_TAGS
+            tensorboard["scalar_event_counts"].get(tag, 0) >= args.max_iterations
+            for tag in REQUIRED_ITERATION_SCALAR_TAGS
         )
         non_finite_termination_max = tensorboard["scalar_ranges"].get(
             "Episode_Termination/non_finite", {}
@@ -338,11 +410,23 @@ def main() -> int:
             "tensorboard_scalars_finite": tensorboard["non_finite_scalar_count"] == 0,
             "required_scalar_tags_present": required_scalar_tags_present,
             "required_scalar_event_counts": required_scalar_event_counts_ok,
-            "no_non_finite_termination": non_finite_termination_max == 0.0,
+            "finite_training_observations": training_runtime["non_finite_observation_steps"] == 0,
+            "finite_training_rewards": training_runtime["non_finite_reward_steps"] == 0,
+            "no_non_finite_termination": (
+                training_runtime["termination_term_counts"].get("non_finite") == 0
+            ),
             "expected_final_iteration": final_iteration == expected_final_iteration,
+            "evaluation_episode_count": (
+                args.evaluate_episodes == 0
+                or evaluation["completed_episodes"] == args.evaluate_episodes
+            ),
         }
         preliminary_passed = all(validation_checks.values())
-        gate_eligible = args.task == TASK_ID and args.num_envs == 64 and args.max_iterations >= 10
+        gate_eligible = (
+            args.task in (LIFT_TASK_ID, PICK_PLACE_TASK_ID)
+            and args.num_envs == 64
+            and args.max_iterations >= 10
+        )
         payload.update(
             {
                 "status": "pending_evidence" if preliminary_passed else "failed",
@@ -352,8 +436,14 @@ def main() -> int:
                 "num_steps_per_env": agent_cfg.num_steps_per_env,
                 "checkpoints": checkpoint_rows,
                 "tensorboard": tensorboard,
+                "evaluation": evaluation,
+                "training_runtime": training_runtime,
                 "checkpoint_tensors_finite": checkpoints_finite,
-                "required_scalar_tags": list(REQUIRED_SCALAR_TAGS),
+                "required_scalar_tags": list(REQUIRED_ITERATION_SCALAR_TAGS),
+                "episodic_scalar_tags": list(EPISODIC_SCALAR_TAGS),
+                "episodic_scalar_tags_present": {
+                    tag: tag in tensorboard["scalar_tags"] for tag in EPISODIC_SCALAR_TAGS
+                },
                 "required_scalar_tags_present": required_scalar_tags_present,
                 "required_scalar_event_counts_ok": required_scalar_event_counts_ok,
                 "non_finite_termination_max": non_finite_termination_max,

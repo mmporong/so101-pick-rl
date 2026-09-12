@@ -21,7 +21,12 @@ sys.path.insert(0, str(SCRIPT_DIR))
 
 from runtime_metrics import ResourceSampler, enforce_resource_guard, write_json
 from so101_pick_rl.kit_log import bind_kit_log, summarize_kit_log
-from so101_pick_rl.task_contract import ACTION_SCALE_RAD, DECIMATION, JOINT_ORDER, PHYSICS_HZ, POLICY_HZ, TASK_ID
+from so101_pick_rl.run_contract import (
+    LIFT_TASK_ID,
+    PICK_PLACE_TASK_ID,
+    contract_sha256,
+    load_spec,
+)
 from so101_pick_rl.validation import count_reset_events, finalize_smoke_checks, summarize_reset_failures
 
 
@@ -121,18 +126,6 @@ def git_metadata() -> dict[str, object]:
     }
 
 
-def contract_sha256() -> str:
-    completed = subprocess.run(
-        [sys.executable, str(REPOSITORY_ROOT / "scripts" / "validate_contract.py")],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return next(
-        line.split("=", 1)[1] for line in completed.stdout.splitlines() if line.startswith("contract_sha256=")
-    )
-
-
 def run_config_sha256(command: str) -> str:
     digest = hashlib.sha256()
     digest.update((REPOSITORY_ROOT / "configs" / "isaaclab" / "windows_runtime.json").read_bytes())
@@ -172,9 +165,24 @@ def per_environment_finite_mask(value, num_envs: int, device) -> torch.Tensor:
     return result
 
 
+def per_environment_nonzero_mask(value: torch.Tensor) -> torch.Tensor:
+    """Return one non-zero flag per environment for a state tensor."""
+    if value.ndim == 1:
+        return value != 0
+    return (value != 0).reshape(value.shape[0], -1).any(dim=1)
+
+
 def main() -> int:
     git = git_metadata()
-    task_contract_sha = contract_sha256()
+    task_spec = load_spec(args.task)
+    task_contract_sha = contract_sha256(args.task)
+    joint_order = tuple(task_spec["robot"]["joint_order"])
+    physics_hz = int(task_spec["control"]["physics_hz"])
+    policy_hz = int(task_spec["control"]["policy_hz"])
+    expected_decimation = physics_hz // policy_hz
+    action_scale_rad = float(task_spec["control"]["action"]["clip_abs_rad"])
+    expected_observation_dimension = int(task_spec.get("observation", {}).get("dimension", 22))
+    pick_place_target_cfg = task_spec["task"].get("target")
     payload: dict[str, object] = {
         "schema": "so101_pick_rl.windows_smoke.v1",
         "status": "failed",
@@ -201,7 +209,8 @@ def main() -> int:
         observations, _ = env.reset(seed=args.seed)
 
         unwrapped = env.unwrapped
-        is_so101_task = args.task == TASK_ID
+        is_so101_task = args.task in (LIFT_TASK_ID, PICK_PLACE_TASK_ID)
+        is_pick_place_task = args.task == PICK_PLACE_TASK_ID
         decimation = int(unwrapped.cfg.decimation)
         policy_steps = math.ceil(args.physics_steps / decimation)
         action_shape = env.action_space.shape
@@ -209,6 +218,14 @@ def main() -> int:
         cube = unwrapped.scene["cube"] if "cube" in unwrapped.scene.rigid_objects else None
         initial_joint_positions = robot.data.joint_pos.clone()
         initial_cube_positions = cube.data.root_pos_w.clone() if cube is not None else None
+        initial_target_positions = unwrapped.target_pos_w.clone() if is_pick_place_task else None
+        initial_pick_place_state_zero = None
+        if is_pick_place_task:
+            state = unwrapped.pick_place_state
+            state_fields = ("picked", "carry_valid", "released", "lift_steps", "stable_steps", "previous_release_ready")
+            initial_pick_place_state_zero = all(
+                bool(torch.count_nonzero(getattr(state, field)).item() == 0) for field in state_fields
+            )
 
         non_finite_steps = 0
         reward_non_finite_steps = 0
@@ -224,6 +241,21 @@ def main() -> int:
             "cube_initial_height_non_finite": 0,
             "cube_initial_height_mismatch": 0,
         }
+        if is_pick_place_task:
+            reset_failure_reason_counts.update(
+                {
+                    "picked_not_zero": 0,
+                    "carry_valid_not_zero": 0,
+                    "released_not_zero": 0,
+                    "lift_steps_not_zero": 0,
+                    "stable_steps_not_zero": 0,
+                    "previous_release_ready_not_zero": 0,
+                    "target_non_finite": 0,
+                    "target_x_out_of_range": 0,
+                    "target_y_out_of_range": 0,
+                    "target_too_close_to_start": 0,
+                }
+            )
         termination_term_counts = {name: 0 for name in unwrapped.termination_manager.active_terms}
         max_abs_joint_position = float(torch.abs(robot.data.joint_pos).max().item())
         max_abs_joint_velocity = float(torch.abs(robot.data.joint_vel).max().item())
@@ -283,6 +315,40 @@ def main() -> int:
                                 atol=1.0e-5,
                                 rtol=0.0,
                             ),
+                        }
+                    )
+                if is_pick_place_task and cube is not None:
+                    state = unwrapped.pick_place_state
+                    target = unwrapped.target_pos_w
+                    relative_target = target - unwrapped.scene.env_origins
+                    x_range = pick_place_target_cfg["position_range_m"]["x"]
+                    y_range = pick_place_target_cfg["position_range_m"]["y"]
+                    minimum_separation = float(pick_place_target_cfg["minimum_start_distance_m"])
+                    target_separation = torch.linalg.vector_norm(
+                        target[:, :2] - cube.data.root_pos_w[:, :2], dim=1
+                    )
+                    reason_masks.update(
+                        {
+                            "picked_not_zero": per_environment_nonzero_mask(state.picked)[reset_env_ids],
+                            "carry_valid_not_zero": per_environment_nonzero_mask(state.carry_valid)[reset_env_ids],
+                            "released_not_zero": per_environment_nonzero_mask(state.released)[reset_env_ids],
+                            "lift_steps_not_zero": per_environment_nonzero_mask(state.lift_steps)[reset_env_ids],
+                            "stable_steps_not_zero": per_environment_nonzero_mask(state.stable_steps)[reset_env_ids],
+                            "previous_release_ready_not_zero": per_environment_nonzero_mask(
+                                state.previous_release_ready
+                            )[reset_env_ids],
+                            "target_non_finite": ~torch.isfinite(target).all(dim=1)[reset_env_ids],
+                            "target_x_out_of_range": ~(
+                                (relative_target[:, 0] >= float(x_range[0]))
+                                & (relative_target[:, 0] <= float(x_range[1]))
+                            )[reset_env_ids],
+                            "target_y_out_of_range": ~(
+                                (relative_target[:, 1] >= float(y_range[0]))
+                                & (relative_target[:, 1] <= float(y_range[1]))
+                            )[reset_env_ids],
+                            "target_too_close_to_start": (
+                                target_separation < minimum_separation
+                            )[reset_env_ids],
                         }
                     )
                 step_reset_failures = summarize_reset_failures(
@@ -350,15 +416,61 @@ def main() -> int:
         loop_seconds = time.perf_counter() - loop_started
         completed_physics_steps = policy_steps * decimation
         unique_cube_xy = None
+        unique_cube_xy_ratio = None
+        cube_xy_standard_deviation = None
         cube_position_range = None
         if initial_cube_positions is not None:
             relative_positions = initial_cube_positions - unwrapped.scene.env_origins
             rounded_xy = torch.round(relative_positions[:, :2] * 10000) / 10000
             unique_cube_xy = int(torch.unique(rounded_xy, dim=0).shape[0])
+            unique_cube_xy_ratio = unique_cube_xy / args.num_envs
+            cube_xy_standard_deviation = relative_positions[:, :2].std(
+                dim=0, unbiased=False
+            ).tolist()
             cube_position_range = {
                 "minimum": relative_positions.min(dim=0).values.tolist(),
                 "maximum": relative_positions.max(dim=0).values.tolist(),
             }
+
+        unique_target_xy = None
+        unique_target_xy_ratio = None
+        target_xy_standard_deviation = None
+        target_position_range = None
+        target_finite = None
+        target_within_xy_range = None
+        target_separated_from_cube = None
+        minimum_initial_target_separation_m = None
+        if initial_target_positions is not None and initial_cube_positions is not None:
+            relative_targets = initial_target_positions - unwrapped.scene.env_origins
+            rounded_target_xy = torch.round(relative_targets[:, :2] * 10000) / 10000
+            unique_target_xy = int(torch.unique(rounded_target_xy, dim=0).shape[0])
+            unique_target_xy_ratio = unique_target_xy / args.num_envs
+            target_xy_standard_deviation = relative_targets[:, :2].std(
+                dim=0, unbiased=False
+            ).tolist()
+            target_position_range = {
+                "minimum": relative_targets.min(dim=0).values.tolist(),
+                "maximum": relative_targets.max(dim=0).values.tolist(),
+            }
+            target_finite = bool(torch.isfinite(initial_target_positions).all().item())
+            target_cfg = pick_place_target_cfg
+            x_range = target_cfg["position_range_m"]["x"]
+            y_range = target_cfg["position_range_m"]["y"]
+            target_within_xy_range = bool(
+                (
+                    (relative_targets[:, 0] >= float(x_range[0]))
+                    & (relative_targets[:, 0] <= float(x_range[1]))
+                    & (relative_targets[:, 1] >= float(y_range[0]))
+                    & (relative_targets[:, 1] <= float(y_range[1]))
+                ).all().item()
+            )
+            minimum_initial_target_separation_m = float(target_cfg["minimum_start_distance_m"])
+            initial_separation = torch.linalg.vector_norm(
+                initial_target_positions[:, :2] - initial_cube_positions[:, :2], dim=1
+            )
+            target_separated_from_cube = bool(
+                (initial_separation >= minimum_initial_target_separation_m).all().item()
+            )
 
         contact_shapes = {}
         for sensor_name in ("fixed_finger_contact", "moving_finger_contact"):
@@ -381,18 +493,43 @@ def main() -> int:
             runtime_checks.update(
                 {
                     "physics_rate_120_hz": math.isclose(
-                        float(unwrapped.physics_dt), 1.0 / PHYSICS_HZ, abs_tol=1.0e-9
+                        float(unwrapped.physics_dt), 1.0 / physics_hz, abs_tol=1.0e-9
                     ),
                     "policy_rate_30_hz": math.isclose(
-                        float(unwrapped.step_dt), 1.0 / POLICY_HZ, abs_tol=1.0e-9
+                        float(unwrapped.step_dt), 1.0 / policy_hz, abs_tol=1.0e-9
                     ),
-                    "decimation_contract": decimation == DECIMATION,
-                    "action_dimension": action_shape[-1] == len(JOINT_ORDER),
-                    "observation_dimension": observation_shape is not None and observation_shape[-1] == 22,
-                    "action_delta_clip": max_abs_processed_action_delta <= ACTION_SCALE_RAD + 1.0e-6,
+                    "decimation_contract": decimation == expected_decimation,
+                    "action_dimension": action_shape[-1] == len(joint_order),
+                    "observation_dimension": (
+                        observation_shape is not None
+                        and observation_shape[-1] == expected_observation_dimension
+                    ),
+                    "action_delta_clip": max_abs_processed_action_delta <= action_scale_rad + 1.0e-6,
                     "finite_contact_sensors": non_finite_contact_steps == 0,
                     "no_tabletop_penetration": tabletop_penetration_steps == 0,
-                    "independent_initial_cube_randomization": unique_cube_xy == args.num_envs,
+                    "independent_initial_cube_randomization": (
+                        unique_cube_xy_ratio >= 0.95
+                        and (
+                            args.num_envs == 1
+                            or min(cube_xy_standard_deviation) >= 1.0e-4
+                        )
+                    ),
+                }
+            )
+        if is_pick_place_task:
+            runtime_checks.update(
+                {
+                    "pick_place_state_zero_after_reset": initial_pick_place_state_zero is True,
+                    "finite_initial_targets": target_finite is True,
+                    "targets_within_contract_xy_range": target_within_xy_range is True,
+                    "initial_target_separation": target_separated_from_cube is True,
+                    "independent_initial_target_randomization": (
+                        unique_target_xy_ratio >= 0.95
+                        and (
+                            args.num_envs == 1
+                            or min(target_xy_standard_deviation) >= 1.0e-4
+                        )
+                    ),
                 }
             )
         preliminary_passed = all(runtime_checks.values())
@@ -408,6 +545,10 @@ def main() -> int:
                 "classification": "not_run" if preliminary_passed else "failed",
                 "actual_num_envs": unwrapped.num_envs,
                 "device": unwrapped.device,
+                "observation_device": (
+                    str(observations["policy"].device) if isinstance(observations, dict) else None
+                ),
+                "target_device": str(initial_target_positions.device) if initial_target_positions is not None else None,
                 "physics_dt_seconds": float(unwrapped.physics_dt),
                 "policy_dt_seconds": float(unwrapped.step_dt),
                 "decimation": decimation,
@@ -442,7 +583,15 @@ def main() -> int:
                 "maximum_cube_height_m": maximum_cube_height,
                 "peak_filtered_contact_force_n": peak_filtered_contact_force_n if cube is not None else None,
                 "unique_initial_cube_xy_count": unique_cube_xy,
+                "unique_initial_cube_xy_ratio": unique_cube_xy_ratio,
+                "initial_cube_xy_standard_deviation_m": cube_xy_standard_deviation,
                 "initial_cube_position_range_m": cube_position_range,
+                "pick_place_state_zero_after_reset": initial_pick_place_state_zero,
+                "unique_initial_target_xy_count": unique_target_xy,
+                "unique_initial_target_xy_ratio": unique_target_xy_ratio,
+                "initial_target_xy_standard_deviation_m": target_xy_standard_deviation,
+                "initial_target_position_range_m": target_position_range,
+                "minimum_initial_target_separation_m": minimum_initial_target_separation_m,
                 "contact_force_matrix_shapes": contact_shapes,
                 "runtime_checks": runtime_checks,
                 "gate_evaluation": gate_evaluation,
@@ -461,11 +610,11 @@ def main() -> int:
         payload["resources"] = sampler.stop()
         payload["simulator_log"] = summarize_kit_log(kit_log_binding)
         if "runtime_checks" in payload:
-            is_g3_run = args.task == TASK_ID and args.num_envs == 64 and args.physics_steps >= 10000
+            is_g3_run = args.task in (LIFT_TASK_ID, PICK_PLACE_TASK_ID) and args.num_envs == 64 and args.physics_steps >= 10000
             final_checks = finalize_smoke_checks(
                 payload["runtime_checks"],
                 payload["termination_term_counts"],
-                is_so101_task=args.task == TASK_ID,
+                is_so101_task=args.task in (LIFT_TASK_ID, PICK_PLACE_TASK_ID),
                 is_g3_run=is_g3_run,
                 automatic_reset_count=payload["automatic_reset_count"],
                 reset_failure_count=payload["reset_failure_count"],

@@ -21,6 +21,7 @@ LeIsaac LiftCube 코드는 카메라·텔레오퍼레이션/Mimic 예제이며 �
 | --- | --- | --- |
 | LeIsaac `source/leisaac/leisaac/assets/robots/lerobot.py` | `isaaclab/so101_pick_rl/assets/so101.py` | 관절명·STS3215 actuator 초기값을 가져오고 로컬 캐시 경로, contact sensor 활성화, 안정성 설정을 추가 |
 | Isaac Lab `scripts/reinforcement_learning/rsl_rl/train.py` | `isaaclab/scripts/train_rsl_rl.py` | 외부 태스크 등록, 자원 사전 게이트, TensorBoard/체크포인트 유한값 검사, manifest 생성을 추가 |
+| Isaac Lab `source/isaaclab/isaaclab/envs/manager_based_rl_env.py` | `isaaclab/so101_pick_rl/tasks/pick_place/environment.py` | 같은 v2.1.1 commit의 step 루프를 유지하고 매 scene.update 직후 120Hz 파지/배치 이력 및 성공 latch를 추가. 상류 갱신 때 재대조 필요. BSD 고지는 `docs/licenses/ISAACLAB-BSD-3-Clause.txt`에 보존 |
 
 ## 파일을 가져올 때 기록할 항목
 

@@ -1,0 +1,72 @@
+{
+  "schema_version": "0.1.0",
+  "status": "design_default_requires_runtime_validation",
+  "task": {
+    "id": "SO101-PickPlace-v0",
+    "scope": "simulation_only",
+    "episode_seconds": 20.0,
+    "success": {
+      "minimum_delta_z_m": 0.08,
+      "minimum_carry_clearance_m": 0.01,
+      "grasp_hold_seconds": 0.2,
+      "minimum_hold_seconds": 1.0,
+      "placement_xy_tolerance_m": 0.03,
+      "placement_z_tolerance_m": 0.01,
+      "maximum_linear_speed_m_s": 0.05,
+      "maximum_angular_speed_rad_s": 0.5,
+      "minimum_ee_clearance_m": 0.08,
+      "minimum_gripper_open_fraction": 0.65,
+      "contact_threshold_n": 0.2,
+      "release_contact_threshold_n": 0.05,
+      "requires_grasped_lift_history": true,
+      "requires_controlled_release_at_target": true,
+      "history_sampling": "every_physics_step"
+    },
+    "target": {
+      "position_range_m": {"x": [0.08, 0.12], "y": [0.24, 0.28]},
+      "rest_height_m": 0.02,
+      "minimum_start_distance_m": 0.06
+    },
+    "failure": {"terminate_on_non_finite_state": true, "terminate_on_workspace_exit": true}
+  },
+  "robot": {
+    "name": "so101_follower",
+    "joint_order": ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
+  },
+  "control": {
+    "physics_hz": 120,
+    "policy_hz": 30,
+    "action": {"type": "joint_position_delta", "dimension": 6, "unit": "radian", "clip_abs_rad": 0.05}
+  },
+  "observation": {
+    "mode": "privileged_state",
+    "dimension": 39,
+    "terms": [
+      "joint_position_rad", "joint_velocity_rad_s", "previous_action_rad",
+      "end_effector_to_cube_position_m", "cube_height_relative_to_initial_m",
+      "cube_to_target_position_m", "cube_linear_angular_velocity",
+      "finger_contact_force_n", "episode_phase_state"
+    ],
+    "term_dimensions": [6, 6, 6, 3, 1, 3, 6, 2, 6],
+    "episode_phase_fields": ["picked", "carry_valid", "released", "previous_release_ready", "lift_hold_fraction", "stable_hold_fraction"],
+    "real_robot_deployable": false
+  },
+  "reward": {
+    "positive_rates": {
+      "reaching_cube": 2.0, "gripper_alignment": 1.0, "finger_contact": 2.0,
+      "lift_progress": 8.0, "transport": 12.0, "placement": 16.0,
+      "release_and_retreat": 24.0, "stable_placement": 80.0
+    },
+    "terminal_success_bonus": 1000.0,
+    "discount_gamma": 0.99
+  },
+  "evaluation": {
+    "seeds": [0, 1, 2], "episodes_per_seed": 200,
+    "environment_scale_ladder": [1, 64, 256, 512, 1024, 2048],
+    "simulators": ["isaac_sim_physx", "mujoco"]
+  },
+  "provenance": {
+    "kind": "design_default", "runtime_measurements_present": false,
+    "notes": "Pick & Place design contract; independent of retained LiftCube contract. Thresholds require runtime validation."
+  }
+}

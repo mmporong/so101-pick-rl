@@ -1,5 +1,13 @@
 # 실험 프로토콜
 
+## 2026-09-12 Pick & Place 확장
+
+현재 최종 태스크는 `common/pick_place_spec.json`의 `SO101-PickPlace-v0`다.
+아래 LiftCube 정의는 과거 실험 재현을 위해 보존한다. 신규 성공률은 전체 Pick & Place
+성공률이며 파지 이력, 목표 위 저속 해제, 그리퍼 개방·이격 후 안정 유지가 모두 필요하다.
+설계값과 실행 순서는 [Pick & Place 실행 계획](PICK_PLACE_PLAN.md)을 따른다.
+평가 중 workspace 이탈·non-finite 에피소드도 분모에 포함하여 실패로 집계한다.
+
 ## 질문
 
 이 실험은 SO-101이 Isaac에서 큐브를 들어 올리는지, 계산량을 늘렸을 때 학습 효율이 어떻게 변하는지, 학습 결과가 MuJoCo에서도 유지되는지를 확인합니다.
@@ -77,17 +85,17 @@ E2와 E4 checkpoint를 MuJoCo에서 평가합니다. Isaac과 MuJoCo의 성공�
 
 ## 실패 단계
 
-각 실패 에피소드는 아래 하나로 분류합니다.
+신규 Pick & Place 평가기는 각 실패 에피소드를 아래 하나로 분류합니다. `non_finite`, `workspace_exit`를 우선하고 나머지는 가장 높은 달성 단계 하나를 선택합니다. `transferred`는 XY와 Z 배치 허용오차를 모두 만족한 이력입니다. 안전 종료도 전체 에피소드 분모에 포함합니다.
 
 ```text
 not_reached
-reached_not_aligned
-aligned_not_grasped
-grasped_dropped
-lifted_below_threshold
+reached_not_grasped
+grasped_not_lifted
+lifted_not_transferred
+transferred_not_released
+released_unstable
 non_finite
 workspace_exit
-timeout_other
 ```
 
 영상과 수치가 충돌하면 수치를 다시 계산하고 원본 trajectory를 보존합니다.

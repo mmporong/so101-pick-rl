@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "pp_g2_diagnostic_20260912",
+  "git_commit": "9913760b18655f1cbab27381b33b223e31888abd",
+  "git_dirty": true,
+  "task_contract_sha256": "3e51406bdcfa369f91e231d825c673fd1739fec3eb29e5e85c2c003120df11a4",
+  "platform": "windows",
+  "simulator": "isaac_sim_physx",
+  "algorithm": "scripted",
+  "seed": 0,
+  "num_envs": 1,
+  "status": "completed",
+  "started_at_utc": "2026-09-12T03:59:20.033641+00:00",
+  "finished_at_utc": "2026-09-12T03:59:40.098840+00:00",
+  "config_sha256": "2ec8c6ff59ff1454b8751a71bb550f2930dc5aff1a236b1927737584fdc126bc",
+  "checkpoint_uri": null,
+  "checkpoint_sha256": null,
+  "metrics_path": "reports/windows/pp_g2_diagnostic_20260912.json",
+  "notes": "bounded smoke; requested_physics_steps=1000; classification=runtime_validated"
+}
