@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "pp_g2",
+  "git_commit": "ddb1583a4a6fd78a0e93865e0dcf7b238e914f09",
+  "git_dirty": false,
+  "task_contract_sha256": "5cef9bc9bd04fb98678b65758e043dbe419e6044992eb4e740765db2d9c46de1",
+  "platform": "windows",
+  "simulator": "isaac_sim_physx",
+  "algorithm": "scripted",
+  "seed": 0,
+  "num_envs": 1,
+  "status": "completed",
+  "started_at_utc": "2026-09-12T04:22:21.451779+00:00",
+  "finished_at_utc": "2026-09-12T04:22:45.418940+00:00",
+  "config_sha256": "da9d291a5b0038acca40af21a6333671c86fbc509cd68f4e58ecfe69f04303ab",
+  "checkpoint_uri": null,
+  "checkpoint_sha256": null,
+  "metrics_path": "artifacts/pick_place_20260912/pp_g2.json",
+  "notes": "bounded smoke; requested_physics_steps=1000; classification=runtime_validated"
+}

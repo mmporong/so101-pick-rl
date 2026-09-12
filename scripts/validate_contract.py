@@ -116,6 +116,8 @@ def validate_pick_place_spec(spec: dict[str, Any]) -> list[str]:
 
     if task.get("id") != "SO101-PickPlace-v0":
         errors.append("task.id must be SO101-PickPlace-v0")
+    if task.get("revision") != 2:
+        errors.append("task.revision must be 2")
 
     positive_thresholds = (
         "minimum_delta_z_m",
@@ -157,6 +159,8 @@ def validate_pick_place_spec(spec: dict[str, Any]) -> list[str]:
             errors.append(f"success.{name} must be true")
     if success.get("history_sampling") != "every_physics_step":
         errors.append("success.history_sampling must be every_physics_step")
+    if success.get("carry_clearance_scope") != "outside_target_xy_footprint":
+        errors.append("success.carry_clearance_scope must be outside_target_xy_footprint")
 
     terms = observation.get("terms")
     term_dimensions = observation.get("term_dimensions")

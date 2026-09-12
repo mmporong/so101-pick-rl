@@ -39,15 +39,16 @@ class PickPlaceState:
         self.picked |= new_pick
         self.carry_valid |= new_pick
 
-        at_target = ((torch.linalg.vector_norm(target_delta_m[:, :2], dim=1)
-                      <= cfg["placement_xy_tolerance_m"])
-                     & (target_delta_m[:, 2].abs() <= cfg["placement_z_tolerance_m"]) & finite)
+        above_target = ((torch.linalg.vector_norm(target_delta_m[:, :2], dim=1)
+                         <= cfg["placement_xy_tolerance_m"]) & finite)
+        at_target = above_target & (target_delta_m[:, 2].abs() <= cfg["placement_z_tolerance_m"])
         gentle = ((linear_speed_m_s <= cfg["maximum_linear_speed_m_s"])
                   & (angular_speed_rad_s <= cfg["maximum_angular_speed_rad_s"]) & finite)
         # One-finger contact is allowed only during gentle placement at the target.
         # Otherwise a qualified lift followed by pushing could impersonate carrying.
         unsafe_partial_contact = ~contact & ~no_contact & (~at_target | ~gentle)
-        dragging_outside_target = ~at_target & (lift_height_m < cfg["minimum_carry_clearance_m"])
+        # Allow lowering into the goal footprint before entering its resting Z band.
+        dragging_outside_target = ~above_target & (lift_height_m < cfg["minimum_carry_clearance_m"])
         self.carry_valid &= ~unsafe_partial_contact & ~dragging_outside_target & finite
         # Require a gentle, at-target contact sample BEFORE separation as well.
         # A throw can collide and settle between two policy samples.

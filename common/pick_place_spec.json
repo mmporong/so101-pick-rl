@@ -3,11 +3,13 @@
   "status": "design_default_requires_runtime_validation",
   "task": {
     "id": "SO101-PickPlace-v0",
+    "revision": 2,
     "scope": "simulation_only",
     "episode_seconds": 20.0,
     "success": {
       "minimum_delta_z_m": 0.08,
       "minimum_carry_clearance_m": 0.01,
+      "carry_clearance_scope": "outside_target_xy_footprint",
       "grasp_hold_seconds": 0.2,
       "minimum_hold_seconds": 1.0,
       "placement_xy_tolerance_m": 0.03,

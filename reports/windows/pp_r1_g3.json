@@ -1,0 +1,263 @@
+{
+  "schema": "so101_pick_rl.windows_smoke.v1",
+  "status": "passed",
+  "classification": "runtime_validated",
+  "command": "isaaclab/scripts/smoke_env.py --task SO101-PickPlace-v0 --num_envs 64 --physics_steps 10000 --action_mode random --headless --device cuda:0 --output artifacts/pick_place_20260912/pp_g3.json",
+  "started_at_utc": "2026-09-12T04:22:57.322471+00:00",
+  "task": "SO101-PickPlace-v0",
+  "seed": 0,
+  "requested_num_envs": 64,
+  "requested_physics_steps": 10000,
+  "action_mode": "random",
+  "preflight_resources": {
+    "name": "NVIDIA GeForce RTX 3060",
+    "driver_version": "610.62",
+    "memory_total_mib": 12288.0,
+    "memory_used_mib": 1782.0,
+    "utilization_gpu_percent": 6.0,
+    "utilization_memory_percent": 2.0,
+    "memory_free_mib": 10506.0,
+    "system_cpu_percent": 6.2
+  },
+  "git": {
+    "commit": "ddb1583a4a6fd78a0e93865e0dcf7b238e914f09",
+    "branch": "feat/isaaclab-windows",
+    "dirty": false,
+    "dirty_paths": []
+  },
+  "contract_sha256": "5cef9bc9bd04fb98678b65758e043dbe419e6044992eb4e740765db2d9c46de1",
+  "actual_num_envs": 64,
+  "device": "cuda:0",
+  "observation_device": "cuda:0",
+  "target_device": "cuda:0",
+  "physics_dt_seconds": 0.008333333333333333,
+  "policy_dt_seconds": 0.03333333333333333,
+  "decimation": 4,
+  "policy_steps": 2500,
+  "completed_physics_steps": 10000,
+  "wall_clock_seconds": 152.1066681999946,
+  "physics_frames_per_second": 65.74333734568222,
+  "aggregate_sim_steps_per_second": 4207.573590123662,
+  "observation_space": "Dict('policy': Box(-inf, inf, (64, 39), float32))",
+  "action_space": "Box(-inf, inf, (64, 6), float32)",
+  "observation_tensor_shape": [
+    64,
+    39
+  ],
+  "joint_names": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll",
+    "gripper"
+  ],
+  "body_names": [
+    "base",
+    "shoulder",
+    "upper_arm",
+    "lower_arm",
+    "wrist",
+    "gripper",
+    "jaw"
+  ],
+  "soft_joint_position_limits_rad": [
+    [
+      -1.823866844177246,
+      1.823866844177246
+    ],
+    [
+      -1.658063292503357,
+      1.658063292503357
+    ],
+    [
+      -1.662426471710205,
+      1.4878966808319092
+    ],
+    [
+      -1.575156807899475,
+      1.575156807899475
+    ],
+    [
+      -2.6529035568237305,
+      2.6529035568237305
+    ],
+    [
+      -0.12653642892837524,
+      1.6973333358764648
+    ]
+  ],
+  "non_finite_observation_steps": 0,
+  "non_finite_reward_steps": 0,
+  "terminated_count": 0,
+  "truncated_count": 256,
+  "automatic_reset_count": 256,
+  "reset_failure_count": 0,
+  "reset_failure_reason_counts": {
+    "returned_observation_non_finite": 0,
+    "episode_length_not_zero": 0,
+    "robot_state_non_finite": 0,
+    "cube_state_non_finite": 0,
+    "cube_initial_height_non_finite": 0,
+    "cube_initial_height_mismatch": 0,
+    "picked_not_zero": 0,
+    "carry_valid_not_zero": 0,
+    "released_not_zero": 0,
+    "lift_steps_not_zero": 0,
+    "stable_steps_not_zero": 0,
+    "previous_release_ready_not_zero": 0,
+    "target_non_finite": 0,
+    "target_x_out_of_range": 0,
+    "target_y_out_of_range": 0,
+    "target_too_close_to_start": 0
+  },
+  "termination_term_counts": {
+    "time_out": 256,
+    "non_finite": 0,
+    "workspace_exit": 0,
+    "pick_place_success": 0
+  },
+  "max_abs_joint_position_rad": 0.6615529656410217,
+  "max_abs_joint_velocity_rad_s": 0.6739935874938965,
+  "max_abs_joint_delta_from_initial_rad": 0.6615529656410217,
+  "max_abs_processed_action_delta_rad": 0.012499998323619366,
+  "joint_position_limit_violation_steps": 0,
+  "joint_velocity_limit_violation_steps": 0,
+  "non_finite_contact_steps": 0,
+  "tabletop_penetration_steps": 0,
+  "minimum_cube_height_m": 0.019999762997031212,
+  "maximum_cube_height_m": 0.02199999988079071,
+  "peak_filtered_contact_force_n": {
+    "fixed_finger_contact": 0.0,
+    "moving_finger_contact": 0.0
+  },
+  "unique_initial_cube_xy_count": 64,
+  "unique_initial_cube_xy_ratio": 1.0,
+  "initial_cube_xy_standard_deviation_m": [
+    0.01068390253931284,
+    0.010489598847925663
+  ],
+  "initial_cube_position_range_m": {
+    "minimum": [
+      -0.029172122478485107,
+      0.28091347217559814,
+      0.02199999988079071
+    ],
+    "maximum": [
+      0.007975578308105469,
+      0.318591833114624,
+      0.02199999988079071
+    ]
+  },
+  "pick_place_state_zero_after_reset": true,
+  "unique_initial_target_xy_count": 64,
+  "unique_initial_target_xy_ratio": 1.0,
+  "initial_target_xy_standard_deviation_m": [
+    0.011104264296591282,
+    0.011132190003991127
+  ],
+  "initial_target_position_range_m": {
+    "minimum": [
+      0.08077788352966309,
+      0.24001824855804443,
+      0.019999999552965164
+    ],
+    "maximum": [
+      0.11880329251289368,
+      0.27611327171325684,
+      0.019999999552965164
+    ]
+  },
+  "minimum_initial_target_separation_m": 0.06,
+  "contact_force_matrix_shapes": {
+    "fixed_finger_contact": [
+      64,
+      1,
+      1,
+      3
+    ],
+    "moving_finger_contact": [
+      64,
+      1,
+      1,
+      3
+    ]
+  },
+  "runtime_checks": {
+    "requested_environment_count": true,
+    "requested_physics_steps": true,
+    "finite_observations": true,
+    "finite_rewards": true,
+    "joint_position_limits": true,
+    "joint_velocity_limits": true,
+    "physics_rate_120_hz": true,
+    "policy_rate_30_hz": true,
+    "decimation_contract": true,
+    "action_dimension": true,
+    "observation_dimension": true,
+    "action_delta_clip": true,
+    "finite_contact_sensors": true,
+    "no_tabletop_penetration": true,
+    "independent_initial_cube_randomization": true,
+    "pick_place_state_zero_after_reset": true,
+    "finite_initial_targets": true,
+    "targets_within_contract_xy_range": true,
+    "initial_target_separation": true,
+    "independent_initial_target_randomization": true,
+    "resource_samples_present": true,
+    "simulator_log_captured": true,
+    "simulator_error_free": true,
+    "no_non_finite_termination": true,
+    "no_workspace_exit": true,
+    "at_least_100_automatic_resets": true,
+    "reset_failure_count_zero": true
+  },
+  "gate_evaluation": {
+    "gate": "G3",
+    "eligible": true,
+    "passed": true
+  },
+  "finished_at_utc": "2026-09-12T04:25:38.890765+00:00",
+  "resources": {
+    "sample_count": 152,
+    "error_count": 0,
+    "last_error": null,
+    "peak_vram_mib": 3142.0,
+    "mean_gpu_utilization_percent": 31.42105263157895,
+    "peak_gpu_utilization_percent": 38.0,
+    "mean_system_cpu_percent": 24.64934210526315,
+    "peak_system_cpu_percent": 41.4,
+    "mean_process_cpu_percent": 127.80197368421044,
+    "peak_process_cpu_percent": 145.5,
+    "peak_process_rss_mib": 2496.46875
+  },
+  "simulator_log": {
+    "path": "E:\\IsaacSim\\isaac-sim-4.5.0\\kit\\logs\\Kit\\Isaac-Sim\\4.5\\kit_20260912_132257.log",
+    "binding": "command_line_token",
+    "command_token": "pp_g3.json",
+    "process_id": 49572,
+    "warning_count": 18,
+    "error_count": 0,
+    "warning_samples": [
+      "2026-09-12 04:22:57 [0ms] [Warning] [omni.kit.app.plugin] No crash reporter present, dumps uploading isn't available.",
+      "2026-09-12 04:22:57 [9ms] [Warning] [omni.ext.plugin] [ext: rendering_modes] Extensions config 'extension.toml' doesn't exist 'c:/users/limmm/isaaclab/apps/rendering_modes' or 'c:/users/limmm/isaaclab/apps/rendering_modes/config'",
+      "2026-09-12 04:22:58 [514ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX",
+      "2026-09-12 04:22:58 [912ms] [Warning] [omni.datastore] OmniHub is inaccessible",
+      "2026-09-12 04:22:58 [1,112ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.",
+      "2026-09-12 04:23:04 [6,957ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPreviewSurface.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,958ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdUVTexture.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,958ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,958ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float2.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,958ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float3.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,959ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float4.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,959ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_int.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,959ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_string.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,959ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_normal.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,960ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_point.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,960ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_vector.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,960ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_matrix.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.",
+      "2026-09-12 04:23:04 [6,960ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of C:\\g\\122538378\\USD\\pxr\\usd\\usdShade\\shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdTransform2d.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@."
+    ],
+    "error_samples": []
+  }
+}

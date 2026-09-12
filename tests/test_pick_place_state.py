@@ -163,6 +163,16 @@ class PickPlaceStateTest(unittest.TestCase):
         results = [self.controlled_release() for _ in range(self.state.required_stable_steps + 1)]
         self.assertFalse(any(results))
 
+    def test_continuous_lowering_above_goal_preserves_carry_into_rest_band(self) -> None:
+        self.establish_pick()
+        # Initial center is 22 mm and target center 20 mm. Traverse the previous
+        # 30--32 mm dead band without needing an unphysical jump between samples.
+        for cube_z in (0.040, 0.033, 0.032, 0.0315, 0.031, 0.0305, 0.030, 0.025, 0.020):
+            self.update(lift=cube_z - 0.022, contact=(1.0, 1.0), target=(0.0, 0.0, 0.020 - cube_z))
+            self.assertTrue(self.state.carry_valid.item(), msg=f"cube_z={cube_z}")
+        results = [self.controlled_release() for _ in range(self.state.required_stable_steps)]
+        self.assertTrue(results[-1])
+
     def test_throw_settling_between_samples_cannot_succeed(self) -> None:
         self.establish_pick()
         self.update(lift=0.08, contact=(1.0, 1.0), target=(0.2, 0.0, 0.0))
@@ -318,6 +328,7 @@ class PickPlaceContractTest(unittest.TestCase):
 
     def test_invalid_reward_and_phase_contracts_are_rejected(self) -> None:
         mutations = (
+            ("task", "revision", 1),
             ("reward", "discount_gamma", 1.0),
             ("reward", "terminal_success_bonus", 1.0),
             ("reward", "positive_rates", {"transport": float("nan")}),

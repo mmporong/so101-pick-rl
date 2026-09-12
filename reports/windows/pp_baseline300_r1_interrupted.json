@@ -1,0 +1,28 @@
+{
+  "schema": "so101_pick_rl.interruption_record.v1",
+  "status": "interrupted",
+  "classification": "diagnostic_reconstructed_from_tensorboard_and_checkpoint",
+  "task": "SO101-PickPlace-v0",
+  "git_commit": "ddb1583a4a6fd78a0e93865e0dcf7b238e914f09",
+  "contract_sha256": "5cef9bc9bd04fb98678b65758e043dbe419e6044992eb4e740765db2d9c46de1",
+  "seed": 0,
+  "num_envs": 1024,
+  "requested_iterations": 300,
+  "tensorboard_completed_iteration_count": 107,
+  "last_logged_iteration": 106,
+  "logged_transitions": 2629632,
+  "last_logged_mean_reward": 34.71434783935547,
+  "last_logged_success_scalar": 0.0,
+  "interruption_method": "Ctrl-C to the owned training session after checkpoint 100 was verified on disk",
+  "reason": "Revision 1 invalidated carry while lowering above the goal in the 30-32 mm center-height band. Stopped to correct XY-versus-XYZ clearance scope before further training.",
+  "log_dir": "C:/Users/LIMMM/so101-pick-rl/isaaclab/logs/rsl_rl/so101_pick_place/2026-09-12_13-32-10_pp_baseline300",
+  "checkpoint": {
+    "path": "C:/Users/LIMMM/so101-pick-rl/isaaclab/logs/rsl_rl/so101_pick_place/2026-09-12_13-32-10_pp_baseline300/model_100.pt",
+    "sha256": "f38a22195c848c34a12ca0c47320821289eb57a654c911f64e55b277cf6ef171",
+    "iteration": 100
+  },
+  "resume_under_revision_2": false,
+  "policy_success_claimed": false,
+  "runtime_manifest_written": false,
+  "runtime_manifest_gap": "Windows Ctrl-C terminated the process without the final report; this separate record does not fabricate missing resource aggregates or final runner state."
+}
