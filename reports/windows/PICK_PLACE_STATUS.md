@@ -20,9 +20,9 @@
 - `--capture --enable_cameras` 진단은 Isaac viewport 초기화의 access violation으로 JSON 생성 전에 종료됐다. 배치 exit code만으로 성공을 판단하지 않았다. 화면 없는 물리 경로는 정상 동작했으며, 영상 증거는 아직 없다.
 - `pp_full_fixture_diagnostic_20260912.json` 및 이후 review fixture는 합성 과거 이력을 주입해 실제 안정 배치·최종 종료·자동 reset 연결을 검사한다. 정책이 직접 집고 놓았다는 증거가 아니다.
 
-## 남은 실제 실행
+## 현재 남은 작업
 
-clean source commit의 1환경/64환경 smoke, PPO 학습·재시작, 환경 수별 자원 비교, 저장된 checkpoint의 독립 평가를 순서대로 진행한다. 전체 정책 성공, seed 0/1/2 각 200회 정식 평가, DR/ablation/MuJoCo 교차평가는 아직 완료로 주장하지 않는다.
+실행 기반 검증과 revision 2의 seed 0/1/2 각 200회 ID 평가는 완료했다. 전체 Pick & Place 정책 성공은 0/600으로 미달이다. 남은 핵심은 들어 올린 물체를 목표 높이로 내려놓고 해제하는 학습이다. DR/ablation/held-out/MuJoCo 교차평가와 영상 검증은 아직 수행하지 않았다.
 
 ## revision 1 clean-source 실행 및 중단
 
@@ -47,3 +47,31 @@ source `ddb1583a4a6fd78a0e93865e0dcf7b238e914f09`, contract `5cef9bc9bd04fb98678
 revision 2는 XY 목표 영역 안의 정상 하강을 복구한다. 성공 XYZ 조건·해제 속도·안정 시간·목표 밖 끌기 금지는 유지한다. 계약 SHA가 바뀌었으므로 revision 1 checkpoint를 자동 재개하지 않는다.
 
 독립 리뷰: code-reviewer COMMENT(미해결 blocker 0, LSP/pyright/ruff 부재), architect CLEAR. 따라서 시스템 baseline 진입은 가능하나 정식 정적 분석까지 완료했다고 주장하지 않는다.
+
+## revision 2 최종 baseline
+
+- source commit: `a678ceda7dad1b9bc6d1c50c28a663fcc83fdb21`
+- contract SHA: `f4af446ce9644e558653da595d34b0c752dde974e3951051dee7d8d672dc52d3`
+- G2 1환경/1,000 physics step, G3 64환경/10,000 physics step, 물리 fixture, G4 64환경/10 iteration, checkpoint restart 모두 새 commit의 clean 상태에서 PASS.
+- 1,024환경 scratch PPO 300 iteration: 7,372,800 transitions, 학습 716.6068초, 최대 VRAM 3,557MiB, 평균 GPU 41.38%, 최고 GPU 53%. 환경과 정책은 모두 cuda:0.
+- 관측/보상 비유한 값과 non_finite 종료 0. 학습 중 작업 영역 이탈 2,389회는 실패 에피소드로 기록했다. 최종 성공 종료 0회.
+- checkpoint: `isaaclab/logs/rsl_rl/so101_pick_place/2026-09-12_13-48-21_pp_r2_baseline300/model_299.pt`
+- checkpoint SHA: `d8d87329b4eeb3f2b45997aa3b61fc5eff6e411e9d2500b2711927ab4d26b35e`
+- checkpoint·TensorBoard·저장된 agent.yaml·run_contract.json은 로컬에 보존한다. 대용량 파일은 Git에 넣지 않았다.
+
+### 독립 ID 평가: 동일 checkpoint, seed별 200회
+
+학습 프로세스를 종료한 뒤 별도 평가기가 checkpoint를 다시 읽었다. 각 seed에서 256환경을 생성하고 고정 quota로 정확히 200회만 집계했다. non_finite와 workspace_exit도 실패 분모에 포함했다. 각 원본 JSON은 단일 seed diagnostic이라고 표시하며, 아래 3개 결과를 모두 확인해 계약의 ID 평가 세트를 완성했다. 이는 정책 성능 목표 달성을 뜻하지 않는다.
+
+| seed | 평가 수 | 전체 성공 | 접촉했으나 들기 미달 | 든 뒤 목표 배치 미달 | 영역 이탈 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 0 | 200 | 0 | 27 | 172 | 1 |
+| 1 | 200 | 0 | 20 | 179 | 1 |
+| 2 | 200 | 0 | 24 | 174 | 2 |
+| 합계 | 600 | 0 | 71 | 525 | 4 |
+
+전체 성공률은 **0/600 = 0%**다. 525회(87.5%)는 양손 접촉으로 8cm 들기·0.2초 유지 이력까지 확인됐지만 최종 XYZ 배치 허용오차에 도달하지 못했다. 영역 이탈 4회는 우선 실패 분류가 적용되므로 이 표만으로 그 4회의 이전 파지 여부를 추정하지 않는다. 따라서 87.5%를 별도로 완결된 Pick 태스크 성공률이라고 과장하지 않는다.
+
+원본은 `pp_r2_eval_seed0.json`~`pp_r2_eval_seed2.json`, 공통 evaluation_result schema 투영본은 `pp_r2_id_seed0.json`~`pp_r2_id_seed2.json`이다. `status=passed/completed`는 실행·집계의 정상 완료이며, `successes=0`인 정책을 성공했다고 표시한 것이 아니다.
+
+현재 증거로는 **집기 이후 목표 배치/해제가 병목**임을 확인할 수 있다. 정확한 원인은 추가 trajectory 진단 없이는 단정하지 않는다. 기존 접근/정렬 보상 좌표와 실제 그리퍼 중앙의 관계, 목표 위 하강과 해제 학습은 후속 검증 대상으로 남긴다. 성공 기준을 낮추거나 기존 평가를 제외하지 않았다.

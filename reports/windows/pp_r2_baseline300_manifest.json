@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "pp_baseline300",
+  "git_commit": "a678ceda7dad1b9bc6d1c50c28a663fcc83fdb21",
+  "git_dirty": false,
+  "task_contract_sha256": "f4af446ce9644e558653da595d34b0c752dde974e3951051dee7d8d672dc52d3",
+  "platform": "windows",
+  "simulator": "isaac_sim_physx",
+  "algorithm": "ppo",
+  "seed": 0,
+  "num_envs": 1024,
+  "status": "completed",
+  "started_at_utc": "2026-09-12T04:48:14.755567+00:00",
+  "finished_at_utc": "2026-09-12T05:00:21.845456+00:00",
+  "config_sha256": "9198e97ae2f9792bf6c765aea46ba058e200387d3c4dd4341d959aa11ec68963",
+  "checkpoint_uri": "C:\\Users\\LIMMM\\so101-pick-rl\\isaaclab\\logs\\rsl_rl\\so101_pick_place\\2026-09-12_13-48-21_pp_r2_baseline300\\model_299.pt",
+  "checkpoint_sha256": "d8d87329b4eeb3f2b45997aa3b61fc5eff6e411e9d2500b2711927ab4d26b35e",
+  "metrics_path": "artifacts/pick_place_20260912_r2/pp_baseline300.json",
+  "notes": "RSL-RL PPO; iterations=300; classification=measured"
+}

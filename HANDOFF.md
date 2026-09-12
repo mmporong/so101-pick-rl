@@ -3,11 +3,14 @@
 ## 프로젝트 상태
 
 2026-09-12에 최종 목표가 Pick & Place 전체로 확장됐다. 현재 작업은
-`docs/PICK_PLACE_PLAN.md`와 `common/pick_place_spec.json`을 따른다.
-아래 G0~G4 기록과 지시는 기존 LiftCube 기준이다. 새 태스크에는 별도 검증이 필요하며,
-LiftCube 체크포인트를 입력 차원이 다른 Pick & Place에 그대로 resume하지 않는다.
+`docs/PICK_PLACE_PLAN.md`와 `common/pick_place_spec.json` revision 2를 따른다.
+현재 증거 정본은 `reports/windows/PICK_PLACE_STATUS.md`다.
+1,024환경 GPU PPO 300 iteration과 3 seed × 200회 독립 ID 평가를 완료했지만,
+전체 성공은 0/600이다. 525회는 집고 들어 올린 뒤 목표 배치에 실패했다.
+배치/해제 학습은 미완료이며, 실행 기반 검증 통과를 정책 성공으로 혼동하지 않는다.
+LiftCube 및 revision 1 체크포인트를 revision 2에 그대로 resume하지 않는다.
 
-Windows의 SO-101 Isaac task와 64환경 PPO smoke는 G0~G4를 통과했습니다. `reports/windows/STATUS.md`의 측정값과 재현 명령을 정본으로 사용합니다. 256환경 이상 확장, 수렴 학습, MuJoCo 교차평가는 아직 실행하지 않았습니다.
+`reports/windows/STATUS.md`는 기존 LiftCube 기록이다. 신규 Pick & Place는 64/256/512/1,024환경 확장과 수정된 계약의 G2/G3/G4·재시작까지 검증했다. MuJoCo·held-out·DR/ablation은 미실행이다.
 
 현재 contract SHA-256은 각 PC에서 `python scripts/validate_contract.py`로 다시 계산합니다. 문서에 복사된 과거 SHA를 신뢰하지 않습니다.
 
@@ -16,9 +19,9 @@ Windows의 SO-101 Isaac task와 64환경 PPO smoke는 G0~G4를 통과했습니�
 ```text
 이 저장소는 SO-101 큐브 파지를 Isaac Lab의 RSL-RL PPO로 학습하고 MuJoCo에서 교차평가하는 프로젝트다.
 
-먼저 AGENTS.md, common/task_spec.json, docs/PROJECT_PLAN.md를 읽고 python scripts/validate_contract.py와 python -m unittest discover -s tests -v를 실행한다.
+먼저 AGENTS.md, common/pick_place_spec.json, reports/windows/PICK_PLACE_STATUS.md, docs/PICK_PLACE_PLAN.md를 읽고 python scripts/validate_contract.py와 python -m unittest discover -s tests -v를 실행한다.
 
-Windows 작업이면 docs/HANDOFF_WINDOWS.md의 G0-G4만 수행한다. 기존 %USERPROFILE%\IsaacLab과 E:\IsaacSim\isaac-sim-4.5.0은 읽기 전용으로 사용하고, 새 코드는 이 저장소의 isaaclab/ 아래에만 작성한다. feat/isaaclab-windows 브랜치를 사용한다.
+Windows 작업이면 기존 G0-G4를 무조건 처음부터 반복하지 말고, revision 2 checkpoint와 평가의 배치/해제 병목을 확인한다. 기존 %USERPROFILE%\IsaacLab과 E:\IsaacSim\isaac-sim-4.5.0은 읽기 전용으로 사용하고, 새 코드는 이 저장소의 isaaclab/ 아래에만 작성한다. feat/isaaclab-windows 브랜치를 사용한다.
 
 Ubuntu 작업이면 docs/HANDOFF_LINUX.md의 L1-L3을 수행한다. 새 코드는 mujoco/, evaluation/ 아래에 작성하고 feat/mujoco-linux 브랜치를 사용한다.
 

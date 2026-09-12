@@ -1,0 +1,15 @@
+{
+  "schema_version": "0.1.0",
+  "policy_run_id": "pp_baseline300",
+  "git_commit": "a678ceda7dad1b9bc6d1c50c28a663fcc83fdb21",
+  "task_contract_sha256": "f4af446ce9644e558653da595d34b0c752dde974e3951051dee7d8d672dc52d3",
+  "simulator": "isaac_sim_physx",
+  "condition": "id",
+  "episodes": 200,
+  "successes": 0,
+  "success_rate": 0,
+  "status": "completed",
+  "evaluation_id": "pp_r2_baseline300_id_seed0_20260912",
+  "seed": 0,
+  "notes": "Projection of pp_r2_eval_seed0.json into the shared evaluation schema. Checkpoint SHA-256 d8d87329b4eeb3f2b45997aa3b61fc5eff6e411e9d2500b2711927ab4d26b35e. Fixed per-environment quotas, 256 environments, 200 episodes; safety terminations remain in the denominator. Completed means evaluation completed, not policy task success."
+}
