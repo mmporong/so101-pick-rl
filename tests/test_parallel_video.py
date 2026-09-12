@@ -2,6 +2,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 
@@ -10,6 +11,9 @@ from isaaclab.so101_pick_rl.parallel_video import (
     camera_views,
     interpolated_view,
     overlay_training_label,
+    select_focus_region,
+    cinematic_view,
+    cinematic_interpolated_view,
 )
 
 
@@ -53,6 +57,67 @@ class FakeEnv:
 
 
 class ParallelVideoTests(unittest.TestCase):
+    def test_focus_prefers_measured_success_in_compact_sixteen(self):
+        origins = np.array([(x, y, 0) for x in range(8) for y in range(8)])
+        scores = np.zeros(64)
+        scores[27:30] = 1000
+        scores[36] = 1000000
+        ids = select_focus_region(origins, scores)
+        self.assertEqual(len(ids), 16)
+        self.assertIn(36, ids)
+        self.assertTrue((np.ptp(origins[ids, :2], axis=0) <= 3).all())
+
+    def test_cinematic_angle_and_continuous_dolly(self):
+        origins = np.array([(x, y, 0) for x in range(32) for y in range(32)])
+        wide = cinematic_view("wide", origins, overview=True)
+        detail = cinematic_view("detail", origins[:4].copy())
+        offset = np.array(wide.eye) - wide.lookat
+        elevation = np.degrees(np.arctan2(offset[2], np.linalg.norm(offset[:2])))
+        self.assertGreater(elevation, 30)
+        self.assertLess(elevation, 45)
+        self.assertAlmostEqual(elevation, 37.0, delta=1.0)
+        first, _ = cinematic_interpolated_view(wide, detail, 1, 30)
+        start, _ = cinematic_interpolated_view(wide, detail, 121, 30)
+        end, alpha = cinematic_interpolated_view(wide, detail, 421, 30)
+        np.testing.assert_allclose(first.eye, wide.eye)
+        np.testing.assert_allclose(start.eye, wide.eye)
+        np.testing.assert_allclose(end.eye, detail.eye)
+        self.assertEqual(alpha, 1)
+        self.assertLess(np.linalg.norm(np.array(end.eye) - end.lookat), np.linalg.norm(offset))
+
+    def test_edge_hero_still_selects_full_four_by_four_block(self):
+        origins = np.array([(x, y, 0) for x in range(8) for y in range(8)])
+        scores = np.zeros(64)
+        scores[0] = 1000000
+        ids = select_focus_region(origins, scores)
+        self.assertIn(0, ids)
+        self.assertEqual(len(ids), 16)
+        np.testing.assert_array_equal(np.ptp(origins[ids, :2], axis=0), [3, 3])
+
+    def test_cinematic_selection_records_real_lift_not_success(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            origins = np.array([(x, y, 0) for x in range(4) for y in range(4)])
+            capture = ParallelTrainingVideo(Path(temporary) / "capture", 64, 64, 1,
+                16, 4, 340, 1, origins, writer_factory=FakeWriter, style="cinematic")
+            env = FakeEnv()
+            env.pick_place_state = SimpleNamespace(picked=np.ones(16, bool),
+                carry_valid=np.ones(16, bool), released=np.zeros(16, bool))
+            env.termination_manager = SimpleNamespace(get_term=lambda name: np.zeros(16, bool))
+            for _ in range(4):
+                capture.capture_post_step(env)
+            capture.close(completed=True)
+            assert capture.focus is not None
+            self.assertEqual(capture.focus["qualified_lift_seen_count"], 16)
+            self.assertEqual(capture.focus["full_task_success_seen_count"], 0)
+            self.assertEqual(capture.focus["selected_at_policy_step"], 4)
+            self.assertEqual(len(capture.focus["environment_ids"]), 16)
+            components, weights = capture.focus["components"], capture.focus["score_weights"]
+            expected = (np.array(components["carry_steps"]) * weights["carry_step"]
+                        + np.array(components["released_steps"]) * weights["released_step"]
+                        + np.array(components["qualified_lift_seen"]) * weights["qualified_lift_seen"]
+                        + np.array(components["full_success_seen"]) * weights["full_success_seen"])
+            np.testing.assert_array_equal(capture.focus["scores"], expected)
+
     def test_camera_starts_full_then_smoothly_reaches_detail(self):
         origins = np.array([(x, y, 0) for x in range(32) for y in range(32)])
         overview, detail = camera_views(origins)

@@ -65,6 +65,7 @@ parser.add_argument("--max_baseline_cpu_util", type=float, default=70.0)
 parser.add_argument("--video_dir", type=Path, default=None)
 parser.add_argument("--video_width", type=int, default=1280)
 parser.add_argument("--video_height", type=int, default=720)
+parser.add_argument("--video_style", choices=("overview", "cinematic"), default="overview")
 
 from isaaclab.app import AppLauncher
 
@@ -390,6 +391,7 @@ def main() -> int:
                     "training_report": str(output_path),
                     "log_dir": str(log_dir),
                 },
+                style=args.video_style,
             )
             training_video.warm_up(wrapped_env.unwrapped)
             wrapped_env.training_video = training_video
@@ -414,6 +416,10 @@ def main() -> int:
                 "status": video_manifest["status"],
                 "simulation_duration_seconds": video_manifest["simulation_duration_seconds"],
                 "files": video_manifest["files"],
+                "camera_views": video_manifest["camera_views"],
+                "camera_style": video_manifest["camera_style"],
+                "focus_selection": video_manifest["focus_selection"],
+                "lens": video_manifest["lens"],
             })
         training_runtime = wrapped_env.runtime_snapshot()
 
