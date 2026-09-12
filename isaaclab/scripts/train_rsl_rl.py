@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import math
 import os
 import subprocess
@@ -61,11 +62,21 @@ parser.add_argument("--output", type=Path, required=True)
 parser.add_argument("--max_baseline_gpu_util", type=float, default=40.0)
 parser.add_argument("--minimum_free_vram_mib", type=float, default=4096.0)
 parser.add_argument("--max_baseline_cpu_util", type=float, default=70.0)
+parser.add_argument("--video_dir", type=Path, default=None)
+parser.add_argument("--video_width", type=int, default=1280)
+parser.add_argument("--video_height", type=int, default=720)
 
 from isaaclab.app import AppLauncher
 
 AppLauncher.add_app_launcher_args(parser)
 args = parser.parse_args()
+if args.video_dir is not None:
+    if not args.headless or not args.enable_cameras:
+        parser.error("--video_dir requires --headless --enable_cameras")
+    if args.video_dir.expanduser().resolve().exists():
+        parser.error("--video_dir must not already exist")
+    if min(args.video_width, args.video_height) < 64 or args.video_width % 2 or args.video_height % 2:
+        parser.error("Video dimensions must be even and at least 64")
 
 started_at = datetime.now(timezone.utc)
 output_path = args.output.expanduser().resolve()
@@ -143,6 +154,7 @@ class InstrumentedRslRlVecEnvWrapper(RslRlVecEnvWrapper):
             name: torch.zeros((), dtype=torch.long, device=device)
             for name in self.unwrapped.termination_manager.active_terms
         }
+        self.training_video = None
 
     def step(self, actions):
         observations, rewards, dones, extras = super().step(actions)
@@ -151,6 +163,8 @@ class InstrumentedRslRlVecEnvWrapper(RslRlVecEnvWrapper):
         termination_manager = self.unwrapped.termination_manager
         for name, count in self._termination_counts.items():
             count += torch.count_nonzero(termination_manager.get_term(name))
+        if self.training_video is not None:
+            self.training_video.capture_post_step(self.unwrapped)
         return observations, rewards, dones, extras
 
     def runtime_snapshot(self) -> dict[str, Any]:
@@ -262,6 +276,8 @@ def main() -> int:
     git = git_metadata()
     if args.evaluate_episodes < 0:
         raise ValueError("--evaluate_episodes must be non-negative")
+    if args.video_dir is not None and args.task != PICK_PLACE_TASK_ID:
+        raise ValueError("--video_dir is supported only for SO101-PickPlace-v0")
     load_spec(args.task)
     task_contract_sha = contract_sha256(args.task)
     fallback_config_path = REPOSITORY_ROOT / "configs" / "isaaclab" / "windows_runtime.json"
@@ -281,11 +297,14 @@ def main() -> int:
     }
     env = None
     wrapped_env = None
+    training_video = None
     exit_code = 1
     try:
         torch.manual_seed(args.seed)
         env_cfg = parse_env_cfg(args.task, device=args.device, num_envs=args.num_envs, use_fabric=True)
         env_cfg.seed = args.seed
+        if args.video_dir is not None:
+            env_cfg.viewer.resolution = (args.video_width, args.video_height)
         agent_cfg = load_cfg_from_registry(args.task, "rsl_rl_cfg_entry_point")
         agent_cfg.seed = args.seed
         agent_cfg.max_iterations = args.max_iterations
@@ -301,7 +320,7 @@ def main() -> int:
         log_dir.mkdir(parents=True, exist_ok=False)
         payload["log_dir"] = str(log_dir)
 
-        env = gym.make(args.task, cfg=env_cfg)
+        env = gym.make(args.task, cfg=env_cfg, render_mode="rgb_array" if args.video_dir else None)
         wrapped_env = InstrumentedRslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
         observation_dimension = int(wrapped_env.num_obs)
         action_dimension = int(wrapped_env.num_actions)
@@ -350,9 +369,52 @@ def main() -> int:
             command, params_dir / "env.yaml", params_dir / "agent.yaml"
         )
 
+        if args.video_dir is not None:
+            from so101_pick_rl.parallel_video import ParallelTrainingVideo
+
+            training_video = ParallelTrainingVideo(
+                output_dir=args.video_dir.expanduser().resolve(),
+                width=args.video_width,
+                height=args.video_height,
+                fps=int(wrapped_env.unwrapped.pick_place_spec["control"]["policy_hz"]),
+                num_envs=args.num_envs,
+                num_steps_per_env=agent_cfg.num_steps_per_env,
+                start_iteration=start_iteration,
+                max_iterations=args.max_iterations,
+                environment_origins=wrapped_env.unwrapped.scene.env_origins,
+                provenance={
+                    "git": git,
+                    "task": args.task,
+                    "contract_sha256": task_contract_sha,
+                    "resume_checkpoint": payload.get("resume_checkpoint"),
+                    "training_report": str(output_path),
+                    "log_dir": str(log_dir),
+                },
+            )
+            training_video.warm_up(wrapped_env.unwrapped)
+            wrapped_env.training_video = training_video
+            payload["parallel_training_video"] = {
+                "directory": str(training_video.output_dir),
+                "manifest": str(training_video.manifest_path),
+                "expected_frames": training_video.expected_frames,
+                "fps": training_video.fps,
+                "resolution": [training_video.width, training_video.height],
+                "camera_views": [training_video.overview.__dict__, training_video.detail.__dict__],
+            }
+
         train_started = time.perf_counter()
         runner.learn(num_learning_iterations=agent_cfg.max_iterations, init_at_random_ep_len=True)
         training_seconds = time.perf_counter() - train_started
+        if training_video is not None:
+            wrapped_env.training_video = None
+            training_video.close(completed=True)
+            video_manifest = json.loads(training_video.manifest_path.read_text(encoding="utf-8"))
+            payload["parallel_training_video"].update({
+                "frames": training_video.frames,
+                "status": video_manifest["status"],
+                "simulation_duration_seconds": video_manifest["simulation_duration_seconds"],
+                "files": video_manifest["files"],
+            })
         training_runtime = wrapped_env.runtime_snapshot()
 
         if args.evaluate_episodes and args.task != PICK_PLACE_TASK_ID:
@@ -468,6 +530,17 @@ def main() -> int:
         payload["traceback"] = traceback.format_exc()
         raise
     finally:
+        if training_video is not None and not training_video.closed:
+            if wrapped_env is not None:
+                wrapped_env.training_video = None
+            try:
+                training_video.close(
+                    completed=False, error=payload.get("error", "training did not complete")
+                )
+            except Exception as video_close_exc:
+                payload.setdefault(
+                    "video_cleanup_error", f"{type(video_close_exc).__name__}: {video_close_exc}"
+                )
         if wrapped_env is not None:
             wrapped_env.close()
         elif env is not None:
