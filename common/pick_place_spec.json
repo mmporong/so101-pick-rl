@@ -3,7 +3,7 @@
   "status": "design_default_requires_runtime_validation",
   "task": {
     "id": "SO101-PickPlace-v0",
-    "revision": 2,
+    "revision": 3,
     "scope": "simulation_only",
     "episode_seconds": 20.0,
     "success": {
@@ -22,6 +22,10 @@
       "release_contact_threshold_n": 0.05,
       "requires_grasped_lift_history": true,
       "requires_controlled_release_at_target": true,
+      "requires_open_before_grasp": true,
+      "pregrasp_open_fraction": 0.65,
+      "maximum_grasp_open_fraction": 0.55,
+      "pregrasp_maximum_ee_distance_m": 0.06,
       "history_sampling": "every_physics_step"
     },
     "target": {
@@ -42,21 +46,25 @@
   },
   "observation": {
     "mode": "privileged_state",
-    "dimension": 39,
+    "dimension": 41,
     "terms": [
       "joint_position_rad", "joint_velocity_rad_s", "previous_action_rad",
       "end_effector_to_cube_position_m", "cube_height_relative_to_initial_m",
       "cube_to_target_position_m", "cube_linear_angular_velocity",
       "finger_contact_force_n", "episode_phase_state"
     ],
-    "term_dimensions": [6, 6, 6, 3, 1, 3, 6, 2, 6],
-    "episode_phase_fields": ["picked", "carry_valid", "released", "previous_release_ready", "lift_hold_fraction", "stable_hold_fraction"],
+    "term_dimensions": [6, 6, 6, 3, 1, 3, 6, 2, 8],
+    "episode_phase_fields": ["picked", "carry_valid", "released", "previous_release_ready", "lift_hold_fraction", "stable_hold_fraction", "pregrasp_opened", "grasp_sequence_valid"],
     "real_robot_deployable": false
   },
   "reward": {
+    "shaping": "discounted_staged_potential_v1",
+    "positive_rates_semantics": "weights_of_signed_potential_differences_not_absolute_per_step_rates",
+    "geometry_validation": "required_before_training_not_proven_by_sequence_flags",
+    "distance_scales_m": {"reach": 0.12, "alignment_xy": 0.08, "alignment_z": 0.08, "pregrasp_vertical_gap": 0.06, "transport": 0.10, "placement": 0.06},
     "positive_rates": {
       "reaching_cube": 2.0, "gripper_alignment": 1.0, "finger_contact": 2.0,
-      "lift_progress": 8.0, "transport": 12.0, "placement": 16.0,
+      "lift_progress": 8.0, "transport": 12.0, "placement": 16.0, "gripper_opening": 24.0,
       "release_and_retreat": 24.0, "stable_placement": 80.0
     },
     "terminal_success_bonus": 1000.0,

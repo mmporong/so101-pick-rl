@@ -1,0 +1,65 @@
+{
+  "schema": "so101_pick_rl.staged_reward_implementation_review.v1",
+  "date": "2026-09-13",
+  "classification": "development_verification_not_policy_evaluation",
+  "base_commit": "216be61e0c5f7cb55e73e263573c5b6b1496559c",
+  "runtime_source_dirty": true,
+  "source_caveat": "Runtime artifacts capture intermediate development versions. They are not clean-source portfolio or policy-performance evidence. The containing implementation commit includes the final source and CPU regression tests.",
+  "task": "SO101-PickPlace-v0",
+  "task_revision": 3,
+  "contract_sha256": "fe1ad4d8d9df88a63649a8d9183d91c1b11f5c460cb6bd7bfacfc84583d4b929",
+  "observation_dimension": 41,
+  "cube_edge_m": 0.04,
+  "training": {"status": "not_run", "reason": "Normal physical grasp feasibility has not passed"},
+  "policy_evaluation": {"status": "not_run"},
+  "independent_review": {
+    "code_reviewer": "COMMENT_non_blocking",
+    "architect": "CLEAR",
+    "combined_verdict": "COMMENT",
+    "unresolved_new_findings": 0,
+    "static_analysis": {"tool": "Pyright 1.1.414", "pure_local_modules_and_tests_errors": 0, "changed_python_files_errors": 73, "probe_bundle_errors": 5, "caveat": "Isaac dynamic configuration and runtime-only imports remain unresolved statically. Do not claim a project-wide static-analysis PASS."}
+  },
+  "verification": {
+    "contract": "passed",
+    "cpu_tests": {"status": "passed", "count": 127, "command": "python -m unittest discover -s tests -q"},
+    "python_compilation": "passed",
+    "gpu_smoke_1": {"status": "passed", "physics_steps": 1000},
+    "gpu_smoke_64": {"status": "passed", "physics_steps": 10000, "automatic_resets": 256, "reset_failures": 0, "non_finite_reward_steps": 0},
+    "synthetic_fixtures": {"status": "passed", "checks": 18, "classification": "Synthetic history validates success/reward/reset plumbing, not a physical pick-place sequence"},
+    "missing_feasibility_report_gate": "rejected_before_simulator_or_training",
+    "failed_probe03_training_gate": "rejected_before_simulator_or_training",
+    "failed_probe04_training_gate": "rejected_before_simulator_or_training"
+  },
+  "physical_diagnostics": [
+    {"id": "probe01", "status": "not_feasible_or_incomplete", "controller": "configured moving-jaw frame, actual-relative DLS target", "failure": "descend position not reached", "descend_error_m": 0.093216389, "preclose_cube_motion_m": 0.02333064},
+    {"id": "probe02", "status": "not_feasible_or_incomplete", "controller": "measured fingertip midpoint plus one height-leveling row, actual-relative DLS target", "failure": "pregrasp position not reached", "pregrasp_error_m": 0.019351128, "preclose_cube_motion_m": 0.002000195},
+    {"id": "probe03", "status": "not_feasible_or_incomplete", "controller": "midpoint plus leveling, bounded target integrator", "descend_error_m": 0.001919189, "minimum_finger_cube_separation_m": -0.010308616, "maximum_cube_lift_m": 0.006272772, "maximum_abs_wrist_flex_rad": 1.576440811, "full_success": false,
+      "timeline": "First bilateral contact at step128 already had -1.033mm jaw separation. Four additional close commands deepened it to -10.271mm at step132; cube contact was lost by step141. Wrist crossed75deg later during empty-hand release, not during initial grasp loss.",
+      "inference": "Continuing closure contributes to squeezing/ejection; this is not proof of the sole cause or cooked collision hull correctness."
+    },
+    {"id": "probe04", "status": "not_feasible_or_incomplete", "controller": "midpoint plus leveling, bounded target integrator, unilateral fine close and bilateral target latch", "failure": "bilateral contact lost on sixth lift policy step; aborted immediately", "minimum_finger_cube_separation_m": -0.000345831795129925, "finger_table_contact_observed": false, "maximum_cube_lift_m": 0.0, "maximum_abs_wrist_flex_rad": 0.5445443391799927, "full_success": false,
+      "passed_gates": ["opened_near_cube_before_grasp", "cube_not_pushed_before_close", "bilateral_contact", "finger_cube_penetration_bounded", "finger_table_penetration_bounded", "wrist_flex_bounded", "simulator_error_free"],
+      "interpretation": "This diagnostic eliminated the prior deep squeeze and empty-hand continuation, but did not establish a maintained lift. It does not prove all policies or assets are free of penetration.",
+      "next_physics_work": "Validate grasp retention and lift path with unchanged penetration/success gates; inspect force/contact direction and fingertip/pad frame before modifying actuator, friction or collision settings. Do not start PPO until a clean-source normal full sequence passes."
+    }
+  ],
+  "artifacts": [
+    {"path": "artifacts/pp_r3_final_smoke1_20260913.json", "sha256": "13ce7b85bfe0c8875ed42f686ccbe06a6871a1003000cbd0b01eae9ed66424ba"},
+    {"path": "artifacts/pp_r3_final_smoke64_20260913.json", "sha256": "d2374b6e68f6ab2487a5b68aeeb79db2894874bb17117878f851c8c424988a33"},
+    {"path": "artifacts/pp_r3_fixtures01_20260913.json", "sha256": "ea56330e3eb7dc9c30f5b63097664fbbffe0c68ca21bf82d9fa54bbe5c3788d9"},
+    {"path": "artifacts/pp_r3_grasp_probe01_20260913.json", "sha256": "016231069dcc1faf86ee7aede577e775621576c9ac3dc17353453bb0238fb1e5"},
+    {"path": "artifacts/pp_r3_grasp_probe02_midpoint_20260913.json", "sha256": "11ca03895d24320c36fac57c76b2aabecfdf86a13eec31b0656482192d860d53"},
+    {"path": "artifacts/pp_r3_grasp_probe03_integrator_20260913.json", "sha256": "d59458bbd0f45f3ae1c502b18d7595c78f6e7bc55af8e64ef36a5296e21bb267"},
+    {"path": "artifacts/pp_r3_training_gate_check_20260913.json", "sha256": "bb9bd19042b59d4bbdc4e2b6fc28b3b916fb2e39c3a6977c466048d788aea35f"},
+    {"path": "artifacts/pp_r3_failed_probe_gate_check_20260913.json", "sha256": "41ea3a5246ac435632e220a34bd9bf5bbff6574cf40a27a730f30f48dbc7b676"},
+    {"path": "artifacts/pp_r3_grasp_probe04_contact_latch_20260913.json", "sha256": "0a04ff2b21eb0bac7b595d2db5b59f4299c3cc29569f22b5e563b022e051ae4e"},
+    {"path": "artifacts/pp_r3_probe04_gate_check_20260913.json", "sha256": "41a79837fe12fda50d89cd2b78077432cc77a71953c64d86cd5a54fb35f9b932"}
+  ],
+  "limitations": [
+    "Opening-before-contact flags are necessary sequence checks, not calibrated enclosure or collision validation.",
+    "Fingertip offsets are mesh-derived distal points, not calibrated inner-pad contact centers.",
+    "Contact audit samples the last 120Hz substep at 30Hz policy boundaries.",
+    "Requested target bounds are distinct from measured applied tracking error and do not constitute a hard physical safety limit.",
+    "No real robot execution, cube resizing, asset modification, new checkpoint, video upload or successful policy claim."
+  ]
+}

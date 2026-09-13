@@ -222,7 +222,11 @@ def main() -> int:
         initial_pick_place_state_zero = None
         if is_pick_place_task:
             state = unwrapped.pick_place_state
-            state_fields = ("picked", "carry_valid", "released", "lift_steps", "stable_steps", "previous_release_ready")
+            contact_term_index = task_spec["observation"]["terms"].index("finger_contact_force_n")
+            contact_start = sum(task_spec["observation"]["term_dimensions"][:contact_term_index])
+            contact_slice = slice(contact_start, contact_start + task_spec["observation"]["term_dimensions"][contact_term_index])
+            state_fields = ("picked", "carry_valid", "released", "lift_steps", "stable_steps", "previous_release_ready",
+                            "pregrasp_opened", "grasp_sequence_valid")
             initial_pick_place_state_zero = all(
                 bool(torch.count_nonzero(getattr(state, field)).item() == 0) for field in state_fields
             )
@@ -250,6 +254,9 @@ def main() -> int:
                     "lift_steps_not_zero": 0,
                     "stable_steps_not_zero": 0,
                     "previous_release_ready_not_zero": 0,
+                    "pregrasp_opened_not_zero": 0,
+                    "grasp_sequence_valid_not_zero": 0,
+                    "reset_contact_observation_not_zero": 0,
                     "target_non_finite": 0,
                     "target_x_out_of_range": 0,
                     "target_y_out_of_range": 0,
@@ -337,6 +344,9 @@ def main() -> int:
                             "previous_release_ready_not_zero": per_environment_nonzero_mask(
                                 state.previous_release_ready
                             )[reset_env_ids],
+                            "pregrasp_opened_not_zero": state.pregrasp_opened[reset_env_ids],
+                            "grasp_sequence_valid_not_zero": state.grasp_sequence_valid[reset_env_ids],
+                            "reset_contact_observation_not_zero": observations["policy"][reset_env_ids, contact_slice].ne(0).any(dim=1),
                             "target_non_finite": ~torch.isfinite(target).all(dim=1)[reset_env_ids],
                             "target_x_out_of_range": ~(
                                 (relative_target[:, 0] >= float(x_range[0]))

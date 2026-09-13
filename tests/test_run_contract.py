@@ -17,6 +17,47 @@ from so101_pick_rl import run_contract
 
 
 class RunContractTest(unittest.TestCase):
+    def test_pick_place_training_requires_normal_grasp_evidence(self) -> None:
+        with self.assertRaisesRegex(ValueError, "grasp_feasibility_report"):
+            run_contract.load_grasp_training_gate(None, run_contract.PICK_PLACE_TASK_ID)
+        self.assertIsNone(run_contract.load_grasp_training_gate(None, run_contract.LIFT_TASK_ID))
+
+    def test_grasp_training_gate_rejects_failed_dirty_stale_or_overridden_evidence(self) -> None:
+        names = ("opened_near_cube_before_grasp", "cube_not_pushed_before_close", "bilateral_contact",
+                 "finger_cube_penetration_bounded", "finger_table_penetration_bounded", "cube_lifted",
+                 "cube_reached_target_xy", "wrist_flex_bounded", "controlled_release_observed",
+                 "full_task_success", "simulator_error_free")
+        valid = {"schema": "so101_pick_rl.grasp_feasibility_probe.v1", "status": "feasible",
+                 "contract_sha256": run_contract.contract_sha256(run_contract.PICK_PLACE_TASK_ID),
+                 "git_dirty": False, "git_commit": "test-source", "classification": "scripted_diagnostic",
+                 "gate_limits": dict(run_contract.GRASP_GATE_LIMITS),
+                 "gates": dict.fromkeys(names, True), "collision_probe": {"source_override": False}}
+        with tempfile.TemporaryDirectory() as temporary, patch.object(
+                run_contract.subprocess, "check_output",
+                side_effect=lambda command, **kwargs: "test-source\n" if "rev-parse" in command else ""):
+            report = Path(temporary) / "probe.json"
+            report.write_text(json.dumps(valid))
+            gate = run_contract.load_grasp_training_gate(report, run_contract.PICK_PLACE_TASK_ID)
+            assert gate is not None
+            self.assertEqual("test-source", gate["source_commit"])
+            for change in ({"status": "not_feasible_or_incomplete"}, {"git_dirty": True}, {"git_commit": "old"},
+                           {"contract_sha256": "old"}, {"gates": {}}, {"collision_probe": {"source_override": True}}):
+                report.write_text(json.dumps({**valid, **change}))
+                with self.assertRaisesRegex(ValueError, "feasibility report"):
+                    run_contract.load_grasp_training_gate(report, run_contract.PICK_PLACE_TASK_ID)
+            for name, maximum in run_contract.GRASP_GATE_LIMITS.items():
+                report.write_text(json.dumps({**valid, "gate_limits": {**valid["gate_limits"], name: maximum * 2}}))
+                with self.assertRaisesRegex(ValueError, "relaxed"):
+                    run_contract.load_grasp_training_gate(report, run_contract.PICK_PLACE_TASK_ID)
+            for malformed in ([], {**valid, "gates": None}, {**valid, "gate_limits": None}):
+                report.write_text(json.dumps(malformed))
+                with self.assertRaises(ValueError):
+                    run_contract.load_grasp_training_gate(report, run_contract.PICK_PLACE_TASK_ID)
+            report.write_text(json.dumps(valid))
+            with patch.object(run_contract.subprocess, "check_output", return_value="test-source\n"):
+                with self.assertRaisesRegex(ValueError, "feasibility report"):
+                    run_contract.load_grasp_training_gate(report, run_contract.PICK_PLACE_TASK_ID)
+
     def test_supported_tasks_resolve_to_distinct_contracts(self) -> None:
         self.assertEqual(
             REPOSITORY_ROOT / "common" / "task_spec.json",
@@ -69,7 +110,7 @@ class RunContractTest(unittest.TestCase):
             lift_binding = run_contract.run_binding(run_contract.LIFT_TASK_ID, 22, 6)
             self.assertIsNone(run_contract.load_resume_binding(checkpoint, lift_binding))
 
-            pick_place_binding = run_contract.run_binding(run_contract.PICK_PLACE_TASK_ID, 39, 6)
+            pick_place_binding = run_contract.run_binding(run_contract.PICK_PLACE_TASK_ID, 41, 6)
             with self.assertRaisesRegex(FileNotFoundError, "missing run contract sidecar"):
                 run_contract.load_resume_binding(checkpoint, pick_place_binding)
 

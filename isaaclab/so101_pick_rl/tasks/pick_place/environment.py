@@ -8,6 +8,7 @@ import torch
 
 from ...task_contract import REPOSITORY_ROOT
 from ...pick_place_state import PickPlaceState
+from ...pick_place_rewards import potential_difference
 from ..lift_cube.environment import SO101LiftCubeEnv
 from . import mdp
 
@@ -20,6 +21,9 @@ class SO101PickPlaceEnv(SO101LiftCubeEnv):
             self.num_envs, self.device, self.pick_place_spec["task"]["success"], self.physics_dt)
         self.history_updates = 0
         self.policy_success = torch.zeros(self.num_envs, dtype=torch.bool, device=self.device)
+        self.contact_observation_valid = torch.zeros_like(self.policy_success)
+        self.staged_reward_terms = {name: torch.zeros(self.num_envs, device=self.device)
+                                    for name in self.pick_place_spec["reward"]["positive_rates"]}
         self.episode_metrics = {name: torch.zeros(self.num_envs, dtype=torch.bool, device=self.device)
                                 for name in ("reached", "contacted", "picked", "at_target", "released")}
         self.last_episode_metrics = {name: value.clone() for name, value in self.episode_metrics.items()}
@@ -28,9 +32,10 @@ class SO101PickPlaceEnv(SO101LiftCubeEnv):
     def step(self, action):
         """Isaac Lab 2.1.1 ManagerBasedRLEnv.step (BSD-3-Clause), with substep history.
 
-        The only added physics-loop operation is update_history after scene.update.
+        Contact validity and episode history are refreshed after scene.update.
         Keep this adapter aligned when upgrading the pinned Isaac Lab dependency.
         """
+        before = mdp.reward_potentials(self)
         self.action_manager.process_action(action.to(self.device))
         self.policy_success.zero_()
         self.recorder_manager.record_pre_step()
@@ -43,6 +48,7 @@ class SO101PickPlaceEnv(SO101LiftCubeEnv):
             if self._sim_step_counter % self.cfg.sim.render_interval == 0 and is_rendering:
                 self.sim.render()
             self.scene.update(dt=self.physics_dt)
+            self.contact_observation_valid.fill_(True)
             self.policy_success |= mdp.update_history(self)
             self.history_updates += 1
 
@@ -51,6 +57,9 @@ class SO101PickPlaceEnv(SO101LiftCubeEnv):
         self.reset_buf = self.termination_manager.compute()
         self.reset_terminated = self.termination_manager.terminated
         self.reset_time_outs = self.termination_manager.time_outs
+        self.staged_reward_terms = potential_difference(
+            before, mdp.reward_potentials(self), gamma=self.pick_place_spec["reward"]["discount_gamma"],
+            step_dt=self.step_dt, terminated=self.reset_terminated)
         self.reward_buf = self.reward_manager.compute(dt=self.step_dt)
         if len(self.recorder_manager.active_terms) > 0:
             self.obs_buf = self.observation_manager.compute()

@@ -49,7 +49,7 @@ try:
     obs, _ = env.reset(seed=0)
     raw = env.unwrapped
     checks = report["checks"]
-    checks["observation_shape"] = list(obs["policy"].shape) == [2, 39]
+    checks["observation_shape"] = list(obs["policy"].shape) == [2, raw.pick_place_spec["observation"]["dimension"]]
     checks["cuda_environment"] = str(raw.device).startswith("cuda")
     checks["lift_is_not_termination"] = "lift_held" not in raw.termination_manager.active_terms
     checks["full_success_termination"] = "pick_place_success" in raw.termination_manager.active_terms
@@ -86,6 +86,10 @@ try:
         forces = torch.maximum(forces, mdp.contact_forces(raw).amax(dim=0))
     report["peak_contact_forces_n"] = forces.tolist()
     checks["physical_contact_sensor_positive"] = bool((forces > 0.2).all())
+    env.reset(seed=0)
+    checks["reset_contact_observation_cleared"] = bool((mdp.contact_forces(raw) == 0).all())
+    checks["reset_grasp_sequence_cleared"] = bool(
+        not raw.pick_place_state.pregrasp_opened.any() and not raw.pick_place_state.grasp_sequence_valid.any())
     # Compare distal points rather than joint/body origins: the jaw rotates about its origin.
     from isaaclab.utils.math import quat_apply
     from pxr import UsdGeom, Usd, UsdPhysics, Gf
@@ -157,6 +161,7 @@ try:
     raw.pick_place_state.released[0] = True
     success_steps = []
     terminal_bonus_rewards = []
+    terminal_bonus_components = []
     pushed_successes = 0
     required_policy_steps = math.ceil(raw.pick_place_state.required_stable_steps / raw.cfg.decimation)
     updates_before = raw.history_updates
@@ -166,11 +171,15 @@ try:
         if bool(flags[0]):
             success_steps.append(i)
             terminal_bonus_rewards.append(float(rewards[0]))
+            components = dict(raw.reward_manager.get_active_iterable_terms(0))
+            terminal_bonus_components.append(components["terminal_success"][0] * raw.step_dt)
         pushed_successes += int(flags[1])
     report["synthetic_history_stable_success_steps"] = success_steps
     report["synthetic_history_terminal_step_rewards"] = terminal_bonus_rewards
-    checks["terminal_bonus_paid"] = bool(terminal_bonus_rewards) and all(
-        value >= 0.99 * raw.pick_place_spec["reward"]["terminal_success_bonus"] for value in terminal_bonus_rewards)
+    report["synthetic_history_terminal_bonus_components"] = terminal_bonus_components
+    checks["terminal_bonus_paid"] = bool(terminal_bonus_components) and all(
+        math.isclose(value, raw.pick_place_spec["reward"]["terminal_success_bonus"], rel_tol=1e-5)
+        for value in terminal_bonus_components)
     report["no_history_target_placement_success_count"] = pushed_successes
     checks["stable_placement_terminates_and_resets"] = len(success_steps) == 1 and success_steps[0] >= required_policy_steps
     checks["history_updated_every_physics_step"] = raw.history_updates - updates_before == i * raw.cfg.decimation
@@ -211,7 +220,8 @@ try:
     checks["intermediate_success_latched_to_policy_boundary"] = (
         any(substep_successes) and not substep_successes[-1]
         and bool(raw.termination_manager.get_term("pick_place_success")[0])
-        and float(rewards[0]) >= 0.99 * raw.pick_place_spec["reward"]["terminal_success_bonus"])
+        and math.isclose(dict(raw.reward_manager.get_active_iterable_terms(0))["terminal_success"][0] * raw.step_dt,
+                         raw.pick_place_spec["reward"]["terminal_success_bonus"], rel_tol=1e-5))
     report["device"] = str(raw.device)
     report["observation_dimension"] = obs["policy"].shape[-1]
 except Exception as exc:

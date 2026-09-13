@@ -3,13 +3,15 @@
 import torch
 
 from ..lift_cube.mdp.events import reset_cube_pose
+from ...pick_place_rewards import phase_potentials
 
 
 def contact_forces(env):
-    return torch.stack([
+    forces = torch.stack([
         torch.linalg.vector_norm(env.scene.sensors[name].data.force_matrix_w, dim=-1).amax(dim=(1, 2))
         for name in ("fixed_finger_contact", "moving_finger_contact")
     ], dim=1)
+    return torch.where(env.contact_observation_valid[:, None], forces, 0.0)
 
 
 def cube_to_target(env):
@@ -39,6 +41,9 @@ def ee_distance(env):
 def reset_pick_place(env, env_ids, pose_range, velocity_range, asset_cfg):
     reset_cube_pose(env, env_ids, pose_range, velocity_range, asset_cfg)
     env.pick_place_state.reset(env_ids)
+    # Sensor.reset clears history, but a subsequent lazy read before the next
+    # physics step can fetch the preceding episode's native contact buffer.
+    env.contact_observation_valid[env_ids] = False
     for value in env.episode_metrics.values():
         value[env_ids] = False
     ranges = env.pick_place_spec["task"]["target"]["position_range_m"]
@@ -81,32 +86,22 @@ def pick_place_success(env):
     return env.policy_success.clone()
 
 
-def lift_with_contact(env):
-    height = env.scene["cube"].data.root_pos_w[:, 2] - env._so101_cube_initial_z
-    contact = (contact_forces(env) > env.pick_place_spec["task"]["success"]["contact_threshold_n"]).all(dim=1)
-    return (height / env.pick_place_spec["task"]["success"]["minimum_delta_z_m"]).clamp(0, 1) * contact
+def reward_potentials(env):
+    cube = env.scene["cube"]
+    return phase_potentials(
+        state=env.pick_place_state, success_cfg=env.pick_place_spec["task"]["success"],
+        reward_cfg=env.pick_place_spec["reward"],
+        ee_to_cube_m=cube.data.root_pos_w - env.scene.sensors["ee_frame"].data.target_pos_w[:, 0],
+        target_delta_m=cube_to_target(env),
+        lift_height_m=cube.data.root_pos_w[:, 2] - env._so101_cube_initial_z,
+        gripper_open_fraction=gripper_open_fraction(env),
+        linear_speed_m_s=torch.linalg.vector_norm(cube.data.root_lin_vel_w, dim=1),
+        angular_speed_rad_s=torch.linalg.vector_norm(cube.data.root_ang_vel_w, dim=1),
+    )
 
 
-def transport(env):
-    delta = cube_to_target(env)
-    return env.pick_place_state.carry_valid.float() * (1 - torch.tanh(
-        torch.linalg.vector_norm(delta[:, :2], dim=1) / 0.10))
-
-
-def placement(env):
-    delta = cube_to_target(env)
-    return env.pick_place_state.carry_valid.float() * (1 - torch.tanh(
-        torch.linalg.vector_norm(delta, dim=1) / 0.06))
-
-
-def release_and_retreat(env):
-    at_target = torch.linalg.vector_norm(cube_to_target(env), dim=1) < 0.04
-    return (env.pick_place_state.released.float() * at_target
-            * gripper_open_fraction(env) * (ee_distance(env) / 0.08).clamp(0, 1))
-
-
-def stable_placement(env):
-    return (env.pick_place_state.stable_steps / env.pick_place_state.required_stable_steps).clamp(0, 1)
+def staged_reward(env, name):
+    return env.staged_reward_terms[name]
 
 
 def terminal_success_bonus(env):

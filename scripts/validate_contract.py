@@ -116,8 +116,8 @@ def validate_pick_place_spec(spec: dict[str, Any]) -> list[str]:
 
     if task.get("id") != "SO101-PickPlace-v0":
         errors.append("task.id must be SO101-PickPlace-v0")
-    if task.get("revision") != 2:
-        errors.append("task.revision must be 2")
+    if task.get("revision") != 3:
+        errors.append("task.revision must be 3")
 
     positive_thresholds = (
         "minimum_delta_z_m",
@@ -132,6 +132,9 @@ def validate_pick_place_spec(spec: dict[str, Any]) -> list[str]:
         "minimum_gripper_open_fraction",
         "contact_threshold_n",
         "release_contact_threshold_n",
+        "pregrasp_open_fraction",
+        "maximum_grasp_open_fraction",
+        "pregrasp_maximum_ee_distance_m",
     )
     for name in positive_thresholds:
         value = success.get(name)
@@ -154,7 +157,7 @@ def validate_pick_place_spec(spec: dict[str, Any]) -> list[str]:
     ):
         errors.append("success.release_contact_threshold_n must be below contact_threshold_n")
 
-    for name in ("requires_grasped_lift_history", "requires_controlled_release_at_target"):
+    for name in ("requires_grasped_lift_history", "requires_controlled_release_at_target", "requires_open_before_grasp"):
         if success.get(name) is not True:
             errors.append(f"success.{name} must be true")
     if success.get("history_sampling") != "every_physics_step":
@@ -174,16 +177,28 @@ def validate_pick_place_spec(spec: dict[str, Any]) -> list[str]:
             errors.append("observation.dimension must equal the sum of term_dimensions")
         if "episode_phase_state" not in terms:
             errors.append("observation.terms must include episode_phase_state")
-        elif term_dimensions[terms.index("episode_phase_state")] != 6:
-            errors.append("observation.episode_phase_state must have dimension 6")
+        elif term_dimensions[terms.index("episode_phase_state")] != 8:
+            errors.append("observation.episode_phase_state must have dimension 8")
     if observation.get("episode_phase_fields") != [
-        "picked", "carry_valid", "released", "previous_release_ready", "lift_hold_fraction", "stable_hold_fraction"
+        "picked", "carry_valid", "released", "previous_release_ready", "lift_hold_fraction", "stable_hold_fraction",
+        "pregrasp_opened", "grasp_sequence_valid"
     ]:
-        errors.append("observation.episode_phase_fields must match the six runtime state fields")
+        errors.append("observation.episode_phase_fields must match the eight runtime state fields")
     reward = spec.get("reward", {})
     rates = reward.get("positive_rates", {})
     expected_rates = {"reaching_cube", "gripper_alignment", "finger_contact", "lift_progress",
-                      "transport", "placement", "release_and_retreat", "stable_placement"}
+                      "transport", "placement", "gripper_opening", "release_and_retreat", "stable_placement"}
+    if reward.get("shaping") != "discounted_staged_potential_v1":
+        errors.append("reward.shaping must be discounted_staged_potential_v1")
+    scales = reward.get("distance_scales_m", {})
+    for name in ("reach", "alignment_xy", "alignment_z", "pregrasp_vertical_gap", "transport", "placement"):
+        value = scales.get(name)
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
+            errors.append(f"reward.distance_scales_m.{name} must be finite and positive")
+    opening, closing = success.get("pregrasp_open_fraction"), success.get("maximum_grasp_open_fraction")
+    if (isinstance(opening, (int, float)) and isinstance(closing, (int, float))
+            and not (0 < closing < opening <= 1)):
+        errors.append("grasp closing fraction must be below pregrasp opening fraction within (0, 1]")
     valid_rates = (isinstance(rates, dict) and set(rates) == expected_rates and all(
         not isinstance(v, bool) and isinstance(v, (int, float)) and math.isfinite(v) and v >= 0
         for v in rates.values()))
@@ -197,10 +212,8 @@ def validate_pick_place_spec(spec: dict[str, Any]) -> list[str]:
         errors.append("reward.discount_gamma must be finite and between zero and one")
     if not valid_bonus:
         errors.append("reward.terminal_success_bonus must be finite and positive")
-    policy_hz = spec.get("control", {}).get("policy_hz")
-    if valid_rates and valid_gamma and valid_bonus and isinstance(policy_hz, int) and policy_hz > 0:
-        if bonus <= sum(rates.values()) / policy_hz / (1 - gamma):
-            errors.append("reward.terminal_success_bonus must dominate the discounted dense reward bound")
+    if valid_rates and valid_bonus and bonus <= sum(rates.values()):
+        errors.append("reward.terminal_success_bonus must exceed the maximum weighted potential")
     return errors
 
 

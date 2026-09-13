@@ -38,12 +38,16 @@ class PickPlaceEventsCfg(EventCfg):
 
 @configclass
 class PickPlaceRewardsCfg(RewardsCfg):
-    lift_progress = RewTerm(func=mdp.lift_with_contact, weight=8.0)
     lifted = None
-    transport = RewTerm(func=mdp.transport, weight=12.0)
-    placement = RewTerm(func=mdp.placement, weight=16.0)
-    release_and_retreat = RewTerm(func=mdp.release_and_retreat, weight=24.0)
-    stable_placement = RewTerm(func=mdp.stable_placement, weight=80.0)
+    reaching_cube = RewTerm(func=mdp.staged_reward, weight=2.0, params={"name": "reaching_cube"})
+    gripper_alignment = RewTerm(func=mdp.staged_reward, weight=1.0, params={"name": "gripper_alignment"})
+    finger_contact = RewTerm(func=mdp.staged_reward, weight=2.0, params={"name": "finger_contact"})
+    lift_progress = RewTerm(func=mdp.staged_reward, weight=8.0, params={"name": "lift_progress"})
+    transport = RewTerm(func=mdp.staged_reward, weight=12.0, params={"name": "transport"})
+    placement = RewTerm(func=mdp.staged_reward, weight=16.0, params={"name": "placement"})
+    gripper_opening = RewTerm(func=mdp.staged_reward, weight=24.0, params={"name": "gripper_opening"})
+    release_and_retreat = RewTerm(func=mdp.staged_reward, weight=24.0, params={"name": "release_and_retreat"})
+    stable_placement = RewTerm(func=mdp.staged_reward, weight=80.0, params={"name": "stable_placement"})
     terminal_success = RewTerm(func=mdp.terminal_success_bonus, weight=SPEC["reward"]["terminal_success_bonus"])
 
     def __post_init__(self):

@@ -56,6 +56,7 @@ class PickPlaceStateTest(unittest.TestCase):
         return bool(success.item())
 
     def establish_pick(self) -> None:
+        self.update(gripper_open=1.0)
         for _ in range(self.state.required_lift_steps):
             self.update(lift=self.success["minimum_delta_z_m"], contact=(1.0, 1.0))
         self.assertTrue(self.state.picked.item())
@@ -86,6 +87,11 @@ class PickPlaceStateTest(unittest.TestCase):
 
     def test_partial_reset_clears_only_selected_environment(self) -> None:
         state = PickPlaceState(2, "cpu", self.success, self.step_dt)
+        state.update(
+            lift_height_m=torch.zeros(2), contact_forces_n=torch.zeros((2, 2)),
+            target_delta_m=torch.zeros((2, 3)), linear_speed_m_s=torch.zeros(2),
+            angular_speed_rad_s=torch.zeros(2), ee_distance_m=torch.zeros(2),
+            gripper_open_fraction=torch.ones(2))
         for _ in range(state.required_lift_steps):
             state.update(
                 lift_height_m=torch.tensor([0.08, 0.08]),
@@ -98,14 +104,47 @@ class PickPlaceStateTest(unittest.TestCase):
             )
         state.reset(torch.tensor([0]))
         phase_state = state.observation()
-        self.assertEqual([0.0] * 6, phase_state[0].tolist())
-        self.assertEqual([1.0, 1.0, 0.0, 1.0, 1.0, 0.0], phase_state[1].tolist())
+        self.assertEqual([0.0] * 8, phase_state[0].tolist())
+        self.assertEqual([1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0], phase_state[1].tolist())
 
-    def test_observation_includes_previous_release_ready_in_six_phase_values(self) -> None:
+    def test_observation_includes_release_and_grasp_history_in_eight_phase_values(self) -> None:
         self.update(lift=self.success["minimum_delta_z_m"], contact=(1.0, 1.0), target=(0.0, 0.0, 0.0))
         phase_state = self.state.observation()
-        self.assertEqual((1, 6), tuple(phase_state.shape))
+        self.assertEqual((1, 8), tuple(phase_state.shape))
         self.assertEqual(1.0, phase_state[0, 3].item())
+
+    def test_closed_finger_overlap_lift_without_opening_is_rejected(self) -> None:
+        for _ in range(self.state.required_lift_steps + 2):
+            self.update(lift=0.09, contact=(7.0, 4.0), gripper_open=0.001)
+        self.assertFalse(self.state.picked.item())
+        self.assertFalse(self.state.grasp_sequence_valid.item())
+
+    def test_opening_far_away_does_not_arm_grasp(self) -> None:
+        self.update(gripper_open=1.0, clearance=0.5)
+        self.assertFalse(self.state.pregrasp_opened.item())
+
+    def test_opening_during_contact_does_not_arm_grasp(self) -> None:
+        self.update(gripper_open=1.0, contact=(1.0, 1.0))
+        self.assertFalse(self.state.pregrasp_opened.item())
+
+    def test_one_finger_may_touch_before_bilateral_closure(self) -> None:
+        self.update(gripper_open=1.0)
+        self.update(gripper_open=0.6, contact=(1.0, 0.0))
+        for _ in range(self.state.required_lift_steps):
+            self.update(lift=0.09, gripper_open=0.5, contact=(1.0, 1.0))
+        self.assertTrue(self.state.picked.item())
+
+    def test_grasp_loss_requires_new_opening_before_regrasp(self) -> None:
+        self.establish_pick()
+        self.update(lift=0.09, gripper_open=0.0)
+        self.update(lift=0.09, contact=(1.0, 1.0), gripper_open=0.0)
+        self.assertFalse(self.state.grasp_sequence_valid.item())
+
+    def test_open_gripper_bilateral_contact_is_not_closure(self) -> None:
+        self.update(gripper_open=1.0)
+        for _ in range(self.state.required_lift_steps + 2):
+            self.update(lift=0.09, gripper_open=1.0, contact=(1.0, 1.0))
+        self.assertFalse(self.state.picked.item())
 
     def test_push_to_target_never_counts_as_pick_place(self) -> None:
         results = [self.controlled_release() for _ in range(self.state.required_stable_steps + 1)]
@@ -297,13 +336,13 @@ class PickPlaceContractTest(unittest.TestCase):
         errors = VALIDATOR.validate_pick_place_spec(broken)
         self.assertIn("observation.dimension must equal the sum of term_dimensions", errors)
 
-    def test_episode_phase_state_must_have_six_dimensions(self) -> None:
+    def test_episode_phase_state_must_have_eight_dimensions(self) -> None:
         broken = deepcopy(self.contract)
         phase_index = broken["observation"]["terms"].index("episode_phase_state")
         broken["observation"]["term_dimensions"][phase_index] = 5
         broken["observation"]["dimension"] = 38
         errors = VALIDATOR.validate_pick_place_spec(broken)
-        self.assertIn("observation.episode_phase_state must have dimension 6", errors)
+        self.assertIn("observation.episode_phase_state must have dimension 8", errors)
 
     def test_required_history_flag_cannot_be_disabled(self) -> None:
         broken = deepcopy(self.contract)
@@ -317,14 +356,15 @@ class PickPlaceContractTest(unittest.TestCase):
         errors = VALIDATOR.validate_pick_place_spec(broken)
         self.assertIn("success.requires_controlled_release_at_target must be true", errors)
 
-    def test_terminal_bonus_dominates_dense_plateau_with_discount(self) -> None:
+    def test_terminal_bonus_exceeds_potential_removed_at_termination(self) -> None:
         reward = self.contract["reward"]
-        maximum_dense_rate = sum(reward["positive_rates"].values())
-        dt = 1 / self.contract["control"]["policy_hz"]
-        gamma = reward["discount_gamma"]
+        maximum_potential = sum(reward["positive_rates"].values())
         bonus = reward["terminal_success_bonus"]
-        self.assertGreater(bonus, maximum_dense_rate * dt / (1 - gamma))
-        self.assertGreater(bonus * (1 - gamma), maximum_dense_rate * dt)
+        self.assertGreater(bonus, maximum_potential)
+        broken = deepcopy(self.contract)
+        broken["reward"]["terminal_success_bonus"] = maximum_potential
+        self.assertIn("reward.terminal_success_bonus must exceed the maximum weighted potential",
+                      VALIDATOR.validate_pick_place_spec(broken))
 
     def test_invalid_reward_and_phase_contracts_are_rejected(self) -> None:
         mutations = (

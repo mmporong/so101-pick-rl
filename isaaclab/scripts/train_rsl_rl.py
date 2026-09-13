@@ -31,6 +31,7 @@ from so101_pick_rl.run_contract import (
     PICK_PLACE_TASK_ID,
     contract_sha256,
     load_resume_binding,
+    load_grasp_training_gate,
     load_spec,
     run_binding,
 )
@@ -56,6 +57,7 @@ parser.add_argument("--save_interval", type=int, default=5)
 parser.add_argument("--run_name", default="smoke")
 parser.add_argument("--log_root", type=Path, default=ISAACLAB_PROJECT_DIR / "logs" / "rsl_rl")
 parser.add_argument("--resume_checkpoint", type=Path, default=None)
+parser.add_argument("--grasp_feasibility_report", type=Path, default=None)
 parser.add_argument("--evaluate_episodes", type=int, default=0)
 parser.add_argument("--evaluation_seed", type=int, default=0)
 parser.add_argument("--output", type=Path, required=True)
@@ -82,6 +84,13 @@ if args.video_dir is not None:
 started_at = datetime.now(timezone.utc)
 output_path = args.output.expanduser().resolve()
 command = subprocess.list2cmdline(sys.argv)
+try:
+    grasp_training_gate = load_grasp_training_gate(args.grasp_feasibility_report, args.task)
+except (ValueError, OSError, KeyError) as exc:
+    write_json(output_path, {"schema": "so101_pick_rl.windows_ppo.v1", "status": "blocked_grasp_feasibility",
+                            "classification": "not_run", "command": command,
+                            "started_at_utc": started_at.isoformat(), "error": str(exc)})
+    raise SystemExit(3)
 try:
     preflight_resources = enforce_resource_guard(
         args.max_baseline_gpu_util,
@@ -293,6 +302,7 @@ def main() -> int:
         "num_envs": args.num_envs,
         "max_iterations": args.max_iterations,
         "preflight_resources": preflight_resources,
+        "grasp_training_gate": grasp_training_gate,
         "git": git,
         "contract_sha256": task_contract_sha,
     }

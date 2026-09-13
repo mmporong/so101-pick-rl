@@ -15,13 +15,15 @@ class PickPlaceState:
         self.carry_valid = torch.zeros_like(self.picked)
         self.released = torch.zeros_like(self.picked)
         self.previous_release_ready = torch.zeros_like(self.picked)
+        self.pregrasp_opened = torch.zeros_like(self.picked)
+        self.grasp_sequence_valid = torch.zeros_like(self.picked)
         self.lift_steps = torch.zeros(num_envs, dtype=torch.long, device=device)
         self.stable_steps = torch.zeros_like(self.lift_steps)
 
     def reset(self, env_ids=None):
         ids = slice(None) if env_ids is None else env_ids
         for value in (self.picked, self.carry_valid, self.released, self.previous_release_ready,
-                      self.lift_steps, self.stable_steps):
+                      self.lift_steps, self.stable_steps, self.pregrasp_opened, self.grasp_sequence_valid):
             value[ids] = 0
 
     def update(self, *, lift_height_m, contact_forces_n, target_delta_m,
@@ -33,7 +35,16 @@ class PickPlaceState:
                   & torch.isfinite(gripper_open_fraction))
         contact = (contact_forces_n > cfg["contact_threshold_n"]).all(dim=1) & finite
         no_contact = (contact_forces_n < cfg["release_contact_threshold_n"]).all(dim=1) & finite
-        lifted = contact & (lift_height_m >= cfg["minimum_delta_z_m"])
+        near_cube = (ee_distance_m <= cfg["pregrasp_maximum_ee_distance_m"]) & finite
+        # An opening observed before contact is necessary, but does not prove
+        # collision geometry or mechanically valid enclosure of the object.
+        new_grasp = (self.pregrasp_opened & contact & near_cube
+                     & (gripper_open_fraction <= cfg["maximum_grasp_open_fraction"]))
+        self.grasp_sequence_valid = (self.grasp_sequence_valid & contact) | new_grasp
+        self.pregrasp_opened &= near_cube & ~new_grasp
+        self.pregrasp_opened |= (no_contact & near_cube
+                                & (gripper_open_fraction >= cfg["pregrasp_open_fraction"]))
+        lifted = self.grasp_sequence_valid & (lift_height_m >= cfg["minimum_delta_z_m"])
         self.lift_steps = torch.where(lifted, self.lift_steps + 1, 0)
         new_pick = self.lift_steps == self.required_lift_steps
         self.picked |= new_pick
@@ -68,4 +79,5 @@ class PickPlaceState:
         return torch.stack((self.picked.float(), self.carry_valid.float(), self.released.float(),
                             self.previous_release_ready.float(),
                             (self.lift_steps / self.required_lift_steps).clamp(max=1),
-                            (self.stable_steps / self.required_stable_steps).clamp(max=1)), dim=1)
+                            (self.stable_steps / self.required_stable_steps).clamp(max=1),
+                            self.pregrasp_opened.float(), self.grasp_sequence_valid.float()), dim=1)
