@@ -24,6 +24,7 @@ parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2])
 parser.add_argument("--max_steps", type=int, default=600)
 parser.add_argument("--width", type=int, default=960)
 parser.add_argument("--height", type=int, default=720)
+parser.add_argument("--grasp_audit", action="store_true", help="Record native contact points/separations without training")
 from isaaclab.app import AppLauncher
 AppLauncher.add_app_launcher_args(parser)
 args = parser.parse_args()
@@ -89,6 +90,7 @@ def main():
             self.directory, self.fps = directory, fps
             self.states, self.transitions = [], []
             self.writer = VideoWriter(directory / "rollout.mp4", args.width, args.height, fps)
+            self.audit_stream = (directory / "contacts.jsonl").open("x", encoding="utf-8") if args.grasp_audit else None
 
         def state(self, raw):
             def cpu(value):
@@ -106,6 +108,9 @@ def main():
                 "phase_state": cpu(raw.pick_place_state.observation()),
                 "gripper_open_fraction": cpu(mdp.gripper_open_fraction(raw)),
             }
+            if self.audit_stream is not None:
+                assert audit is not None
+                audit.write_sample(self.audit_stream, audit.sample(len(self.states)))
             # Render without a physics step. Warm-up and post-step frames use the same path.
             raw.sim.render()
             pixels = raw.render()
@@ -115,6 +120,13 @@ def main():
             if len(self.states) % 150 == 0 or bool(raw.reset_buf[0]):
                 Image.fromarray(pixels).save(self.directory / f"frame_{len(self.states):04d}.png")
             self.states.append(snapshot)
+
+        def close(self):
+            try:
+                self.writer.close()
+            finally:
+                if self.audit_stream is not None:
+                    self.audit_stream.close()
 
         def transition(self, raw):
             def cpu(value):
@@ -151,6 +163,13 @@ def main():
     env = gym.make(PICK_PLACE_TASK_ID, cfg=cfg, render_mode="rgb_array")
     wrapped = RslRlVecEnvWrapper(env, clip_actions=None)
     raw = wrapped.unwrapped
+    audit = None
+    if args.grasp_audit:
+        from so101_pick_rl.grasp_audit import GraspAudit
+        audit = GraspAudit(raw)
+        write_json(output / "contact_audit_schema.json", audit.metadata)
+        report["grasp_audit"] = {"schema_path": str(output / "contact_audit_schema.json"),
+                                 "sampling": audit.metadata["sampling"]}
     report["sidecar_binding"] = load_resume_binding(checkpoint, run_binding(
         PICK_PLACE_TASK_ID, int(wrapped.num_obs), int(wrapped.num_actions)))
     agent_path = checkpoint.parent / "params" / "agent.yaml"
@@ -195,7 +214,7 @@ def main():
                 if (step + 1) % 150 == 0:
                     print(f"CAPTURE seed={seed} step={step+1}", flush=True)
             raw.capture_context = None
-            context.writer.close()
+            context.close()
             arrays = aligned_arrays(context.states, context.transitions, fps)
             arrays["proposed_policy_actions"] = np.stack(proposed_actions)
             np.savez_compressed(directory / "trajectory.npz", **arrays)
@@ -219,7 +238,8 @@ def main():
                 "target_position_w": arrays["target_position_w"][0].tolist(),
                 "minimum_xy_error_m": float(np.linalg.norm(arrays["target_position_w"][:, :2] - arrays["cube_pose_w"][:, :2], axis=1).min()),
                 "files": {name: {"path": str(directory / name), "sha256": sha256_file(directory / name)}
-                          for name in ("rollout.mp4", "trajectory.npz")},
+                          for name in (("rollout.mp4", "trajectory.npz", "contacts.jsonl") if args.grasp_audit
+                                       else ("rollout.mp4", "trajectory.npz"))},
             }
             if summary["frames"] != summary["transitions"] + 1:
                 raise RuntimeError("Frame/transition alignment mismatch")
@@ -239,7 +259,7 @@ except BaseException as exc:
 finally:
     try:
         if context is not None:
-            context.writer.close()
+            context.close()
     finally:
         report["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
         report["resources"] = sampler.stop()

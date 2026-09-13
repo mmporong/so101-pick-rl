@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import hashlib
 from pathlib import Path
 
 from isaaclab.app import AppLauncher
@@ -20,8 +21,11 @@ def default_asset_path() -> Path:
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--asset", type=Path, default=None)
+parser.add_argument("--output", type=Path, default=None)
 AppLauncher.add_app_launcher_args(parser)
 args = parser.parse_args()
+if args.output is not None and args.output.exists():
+    raise FileExistsError(args.output)
 
 app_launcher = AppLauncher(args)
 simulation_app = app_launcher.app
@@ -40,12 +44,29 @@ def main() -> int:
 
     summary = {
         "asset": str(asset_path),
+        "asset_sha256": hashlib.sha256(asset_path.read_bytes()).hexdigest(),
         "default_prim": stage.GetDefaultPrim().GetPath().pathString,
         "meters_per_unit": stage.GetMetadata("metersPerUnit"),
         "up_axis": stage.GetMetadata("upAxis"),
         "prims": [],
+        "collision_prims": [],
+        "collision_scope": "Authored USD shapes and attributes; not PhysX cooked hulls or runtime penetration",
     }
-    for prim in stage.Traverse():
+    for prim in Usd.PrimRange(stage.GetPseudoRoot(), Usd.TraverseInstanceProxies()):
+        if prim.HasAPI(UsdPhysics.CollisionAPI):
+            collision = {"path": str(prim.GetPath()), "type": prim.GetTypeName(),
+                         "applied_schemas": list(prim.GetAppliedSchemas()), "attributes": {}, "relationships": {}}
+            for attr in prim.GetAttributes():
+                if attr.GetName().startswith(("physics:", "physx", "size", "radius", "height", "extent", "xformOp")):
+                    value = attr.Get()
+                    if value is not None:
+                        collision["attributes"][attr.GetName()] = {
+                            "value": value if isinstance(value, (str, bool, int, float)) else str(value),
+                            "authored": attr.HasAuthoredValueOpinion()}
+            for rel in prim.GetRelationships():
+                if rel.GetName().startswith(("physics:", "material:")):
+                    collision["relationships"][rel.GetName()] = [str(p) for p in rel.GetTargets()]
+            summary["collision_prims"].append(collision)
         is_joint = prim.IsA(UsdPhysics.Joint)
         is_rigid = prim.HasAPI(UsdPhysics.RigidBodyAPI)
         if not (is_joint or is_rigid):
@@ -78,6 +99,10 @@ def main() -> int:
         summary["prims"].append(row)
 
     print(json.dumps(summary, indent=2, ensure_ascii=False), flush=True)
+    if args.output is not None:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        with args.output.open("x", encoding="utf-8") as stream:
+            json.dump(summary, stream, indent=2, ensure_ascii=False)
     return 0
 
 
