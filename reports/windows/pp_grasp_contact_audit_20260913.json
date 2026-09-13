@@ -1,0 +1,146 @@
+{
+  "schema": "so101_pick_rl.grasp_contact_evidence.v1",
+  "status": "completed_diagnostic",
+  "conclusion": "deep_loaded_gripper_cube_overlap_observed_not_validated_mechanical_grasp",
+  "source_commit": "752868170542c658dd8403b389271502f4ef76c0",
+  "source_dirty": false,
+  "contract_sha256": "f4af446ce9644e558653da595d34b0c752dde974e3951051dee7d8d672dc52d3",
+  "checkpoint": {
+    "path": "isaaclab/logs/rsl_rl/so101_pick_place/2026-09-13_02-28-52_pp_cinematic_live1024/model_389.pt",
+    "sha256": "1c742432db9935047fdc5d678dbb524aad6cf3979928f167ef893fb3466f435f",
+    "preserved_hash_rechecked": true
+  },
+  "manifest": {
+    "path": "artifacts/grasp_audit_20260913_model389/manifest.json",
+    "sha256": "725b9f0ef018593b80e4c7daf9444fb057adb3eed234ead30381b788d76ba2e4",
+    "contents": "Contains each seed video, trajectory and contacts JSONL paths and SHA-256 hashes"
+  },
+  "asset_inventory": {
+    "path": "artifacts/grasp_audit_asset_20260913.json",
+    "sha256": "1de0f5873ba573bea740b760c12ac95734ca59505b7eb750bd3b1df6dadde87e",
+    "asset_sha256": "64a877c3b82cdc4a48ab8a1f321a2dd3ef7c55d4b10bce222b58c530d978ae58",
+    "finger_collision": "gripper/collisions and jaw/collisions Xforms have PhysicsCollisionAPI, PhysxMeshMergeCollisionAPI and convexDecomposition",
+    "cooked_hull_vertices": "not_read",
+    "robot_contact_rest_offsets": "not_authored_in_inventory_runtime_effective_values_not_measured"
+  },
+  "contact_schema": {
+    "path": "artifacts/grasp_audit_20260913_model389/contact_audit_schema.json",
+    "sha256": "732257d99ad437ca2bf890dca7c19fbda9927038fadf61cbbba51135fba6d472",
+    "binding": "Existing run schema bound here; future recorder manifests also bind schema SHA-256"
+  },
+  "protocol": {
+    "task": "SO101-PickPlace-v0",
+    "device": "cuda:0",
+    "num_envs": 1,
+    "seeds_in_sequence": [0, 1, 2],
+    "transitions_per_seed": 600,
+    "states_per_seed": 601,
+    "simulation_seconds_per_seed": 20,
+    "policy_hz": 30,
+    "physics_hz": 120,
+    "contact_sampling": "last physics substep at each policy boundary; initial state has no native contact sample",
+    "loaded_contact_filter_normal_force_n_gt": 0.2,
+    "threshold_scope": "Analysis filter for force-bearing contacts, not a new grasp acceptance threshold",
+    "training_updates": 0,
+    "reward_geometry_actuator_changes": false,
+    "formal_id_or_held_out_evaluation": "not_run"
+  },
+  "scenarios": [
+    {
+      "seed": 0,
+      "outcome": "lifted_not_transferred",
+      "first_postphysics_both_contact_seconds": 0.8333333333333334,
+      "open_fraction_at_first_both_contact": 0.0007999897352419794,
+      "maximum_open_fraction": 0.20694933831691742,
+      "first_code_pick_seconds": 1.5333333333333334,
+      "wrist_flex_at_code_pick_rad": -1.5536354780197144,
+      "released_observed": false,
+      "minimum_loaded_separation_m": {
+        "gripper_cube": -0.02541215904057026,
+        "jaw_cube": -0.009833666495978832,
+        "gripper_table": 0.00004221498966217041,
+        "jaw_table": null,
+        "cube_table": -0.0011599529534578323
+      },
+      "gripper_cube_deepest_contact_seconds": 0.8666666666666667,
+      "gripper_cube_deepest_contact_normal_force_n": 7.013365268707275,
+      "minimum_authored_vertex_table_clearance_m": 0.0007007577462031719,
+      "maximum_force_aggregation_error_n": 0.000004323076126411252
+    },
+    {
+      "seed": 1,
+      "outcome": "lifted_not_transferred",
+      "first_postphysics_both_contact_seconds": 0.8333333333333334,
+      "open_fraction_at_first_both_contact": 0.00007643926801392809,
+      "maximum_open_fraction": 0.24800251424312592,
+      "first_code_pick_seconds": 2.066666666666667,
+      "wrist_flex_at_code_pick_rad": -1.5415023565292358,
+      "released_observed": false,
+      "minimum_loaded_separation_m": {
+        "gripper_cube": -0.019680287688970566,
+        "jaw_cube": -0.01704113930463791,
+        "gripper_table": null,
+        "jaw_table": -0.00009344890713691711,
+        "cube_table": -0.0007009189575910568
+      },
+      "gripper_cube_deepest_contact_seconds": 1.0,
+      "gripper_cube_deepest_contact_normal_force_n": 5.922125339508057,
+      "minimum_authored_vertex_table_clearance_m": 0.0024892300798004807,
+      "maximum_force_aggregation_error_n": 0.0000031088888299279915
+    },
+    {
+      "seed": 2,
+      "outcome": "lifted_not_transferred",
+      "first_postphysics_both_contact_seconds": 0.8666666666666667,
+      "open_fraction_at_first_both_contact": 0.0009429048513993621,
+      "maximum_open_fraction": 0.22973504662513733,
+      "first_code_pick_seconds": 1.8,
+      "wrist_flex_at_code_pick_rad": -1.5420989990234375,
+      "released_observed": false,
+      "minimum_loaded_separation_m": {
+        "gripper_cube": -0.026014812290668488,
+        "jaw_cube": -0.008932968601584435,
+        "gripper_table": -0.000018052756786346436,
+        "jaw_table": -0.00010405480861663818,
+        "cube_table": -0.0012940149754285812
+      },
+      "gripper_cube_deepest_contact_seconds": 1.0666666666666667,
+      "gripper_cube_deepest_contact_normal_force_n": 3.9429385662078857,
+      "minimum_authored_vertex_table_clearance_m": 0.00045623354650901893,
+      "maximum_force_aggregation_error_n": 0.000006201329739496941
+    }
+  ],
+  "observer_control": {
+    "audit_path": "artifacts/grasp_audit_20260913_smoke/seed_0/trajectory.npz",
+    "without_audit_path": "artifacts/grasp_audit_20260913_control02/seed_0/trajectory.npz",
+    "transitions": 90,
+    "bitwise_equal_fields": ["joint_position_rad", "cube_pose_w", "proposed_policy_actions", "commanded_joint_target_rad", "finger_contact_force_n", "phase_state"],
+    "maximum_absolute_difference": 0.0,
+    "scope": "Same checkpoint, seed, initial state and capture protocol; not a general proof for all future runs",
+    "first_control_attempt": "artifacts/grasp_audit_20260913_control/manifest.json",
+    "first_control_status": "failed_before_simulation_CPU_resource_guard_89.3_percent_over_70_percent_preserved"
+  },
+  "verification": {
+    "cpu_tests_passed": 82,
+    "contract_unchanged": true,
+    "compile": "passed",
+    "artifact_hashes": "passed",
+    "contact_and_trajectory_alignment": "passed_601_states_each",
+    "contact_normals_force_reconstruction": "maximum_error_below_0.0000063_N",
+    "videos_full_decode": "passed_all_three",
+    "code_review": "COMMENT_no_blocking_findings_standalone_Isaac_import_resolution_gap",
+    "architecture_review": "WATCH_nonblocking_private_SDK_coupling_policy_rate_sampling_and_sequential_reset_limits",
+    "combined_review": "COMMENT_no_BLOCK_not_unqualified_merge_ready_approval"
+  },
+  "limits": [
+    "These are three sequential-reset diagnostic scenarios, not independent formal ID evaluation trials or a replay of the 1024-environment training video.",
+    "Initial NPZ contact observations in seeds 1 and 2 retain previous-step sensor values. Native contact JSONL deliberately omits state zero; all contact metrics exclude state zero. The first policy observation may therefore depend on the preceding episode.",
+    "Negative separation is the PhysX contact stream's solver-reported overlap. Shape/solver/actuator causes have not been isolated.",
+    "Authored mesh vertex clearance does not measure the cooked convex hull penetration and does not prove absence of finger-table collision.",
+    "A null pair minimum means no sampled contact point exceeded 0.2 N, not proof that the bodies never touched.",
+    "applied_joint_torque_nm in raw contact records is the IsaacLab implicit-actuator estimate, not measured PhysX joint torque.",
+    "No opening-sequence or physical grasp feasibility guarantee follows from the existing code-level picked flag.",
+    "The diagnostic reuses the private IsaacLab _physics_sim_view; SDK upgrades require renewed contact-stream regression checks.",
+    "MP4, checkpoints and raw trajectory/contact data remain local and Git-ignored."
+  ]
+}

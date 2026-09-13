@@ -169,6 +169,7 @@ def main():
         audit = GraspAudit(raw)
         write_json(output / "contact_audit_schema.json", audit.metadata)
         report["grasp_audit"] = {"schema_path": str(output / "contact_audit_schema.json"),
+                                 "schema_sha256": sha256_file(output / "contact_audit_schema.json"),
                                  "sampling": audit.metadata["sampling"]}
     report["sidecar_binding"] = load_resume_binding(checkpoint, run_binding(
         PICK_PLACE_TASK_ID, int(wrapped.num_obs), int(wrapped.num_actions)))

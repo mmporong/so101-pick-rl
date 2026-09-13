@@ -91,6 +91,7 @@ class GraspAudit:
                          "mesh_paths": [row[0] for row in self.meshes],
                          "table_center_m": self.table_center_m.tolist(), "table_size_m": self.table_size_m.tolist(),
                          "sampling": "30Hz policy boundary, contact stream from last 120Hz physics substep only",
+                         "torque_limit": "applied_joint_torque_nm is IsaacLab implicit-actuator estimated effort, not measured PhysX joint torque",
                          "geometry_limit": "Authored mesh vertices, not cooked convex decomposition hulls; vertex clearance is not exact mesh penetration",
                          "contact_limit": "PhysX reported signed separation; negative values are solver-reported overlap, not proof of real-world feasibility"}
 
