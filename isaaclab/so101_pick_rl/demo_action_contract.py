@@ -1,8 +1,10 @@
 """Absolute-target demonstration contract, independent of the legacy delta task.
 
-Recorded observations precede a physics step. ``target[t + 1]`` therefore labels
-the transition starting at ``obs[t]``. The final target was not recorded and is
-not fabricated. This module audits commands; it never clips or smooths them.
+The source recorder convention assigns ``target[t + 1]`` to the transition
+starting at ``obs[t]``. Numerical state alignment alone does not prove this
+command convention: source recorder provenance and replay must validate it
+before training. The missing final target is not fabricated. This module audits
+commands; it never clips or smooths them.
 """
 
 from __future__ import annotations
@@ -31,7 +33,10 @@ def _limits(lower, upper) -> tuple[np.ndarray, np.ndarray]:
 
 
 def aligned_targets(observed_q, recorded_target, post_step_q, *, atol: float = 1e-6) -> np.ndarray:
-    """Validate recorder alignment and return T-1 unmodified absolute commands."""
+    """Check state-stream alignment and apply the source target-index convention.
+
+    This does not certify that targets drove those states; replay is required.
+    """
     if not np.isfinite(atol) or atol < 0:
         raise ValueError("alignment tolerance must be finite and non-negative")
     observed = _matrix(observed_q, "observed_q")

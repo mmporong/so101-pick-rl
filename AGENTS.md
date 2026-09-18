@@ -10,6 +10,10 @@
   ACT, VLA와 실물 제어는 이번 학습 범위에 넣지 않는다.
 - Windows는 Isaac Sim 4.5.0, Isaac Lab 2.1.1, RSL-RL 2.3.3으로 학습한다.
 - Ubuntu는 MuJoCo 환경, 평가기, 결과 비교를 담당한다.
+- 시연 기반 별도 실험은 ASUS의 원본 Isaac Sim 5.1 / Isaac Lab 2.3 환경에서도
+  재생·BC·PPO를 실행할 수 있다. Windows 기준선과 결과를 분리하고, 원격 LeIsaac
+  원본/병행 작업은 수정하지 않는다. 새 실험 코드는 이 저장소의 `isaaclab/`에 두며,
+  기기별 실행 증거는 `reports/windows/` 또는 `reports/linux/`로 구분한다.
 - Isaac과 MuJoCo 코드는 이 저장소에 함께 둔다. 실물 SO-101와 IL 코드는 `$HOME/so101-mobile-manipulation`에 남긴다.
 - 실물 팔을 움직이는 명령을 이 저장소에 추가하거나 실행하지 않는다.
 
@@ -24,7 +28,9 @@
 
 - Isaac Lab 본체와 LeIsaac 원본을 직접 수정하지 않는다. 이 저장소를 외부 extension으로 유지한다.
 - SO-101 자산과 환경은 출처 commit, 라이선스, 변경 내역을 기록한 뒤 가져온다.
-- 관측 순서, 행동 단위, 성공 판정은 `common/task_spec.json`을 정본으로 사용한다.
+- 관측 순서, 행동 단위, 성공 판정은 태스크 ID별 계약을 정본으로 사용한다.
+  LiftCube는 `common/task_spec.json`, 기존 PickPlace는 `common/pick_place_spec.json`이다.
+  새 DemoBox는 별도 계약과 해시를 확정하기 전까지 학습 입력으로 연결하지 않는다.
 - 각도는 radian, 길이는 meter, 시간은 second로 저장한다. 화면 표시에서만 degree나 millimeter로 바꾼다.
 - 큐브를 손에 강제로 붙이는 로직은 학습과 평가에 사용하지 않는다. PhysX 또는 MuJoCo 접촉으로 파지가 성립해야 한다.
 - 튜토리얼 태스크를 실행한 결과와 SO-101 커스텀 태스크 결과를 섞지 않는다.
