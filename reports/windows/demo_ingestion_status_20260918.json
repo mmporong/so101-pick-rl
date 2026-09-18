@@ -1,0 +1,54 @@
+{
+  "schema": "so101_pick_rl.demo_ingestion_status.v1",
+  "date": "2026-09-18",
+  "status": "blocked_source_host_offline",
+  "native_goal_created": true,
+  "source_host": "asus",
+  "source_repo_commit_observed": "87253d50166349c7b4bcbeb9b30f65f3dd7e7ca2",
+  "source_worktree_dirty": true,
+  "source_hdf5_exists_observed": true,
+  "source_path": "/data/lim/leisaac/datasets/pick_cube_into_box_source_10_20260911.hdf5",
+  "numeric_schema_inspected_from": "/data/lim/leisaac/outputs/mimic_vision224_500_20260913/raw/shard_000.hdf5",
+  "source_runtime_observed": {
+    "isaacsim": "5.1.0.0",
+    "isaaclab": "2.3.0",
+    "torch": "2.7.0+cu128",
+    "physics_dt_s": 0.016666666666666666,
+    "decimation": 1
+  },
+  "existing_other_run_evidence": {
+    "path": "/data/lim/leisaac/outputs/evaluation/contract_hardening_20260918/replay_stable_release/evaluation.json",
+    "kind": "observed_other_run_not_executed_by_this_branch",
+    "episodes": ["demo_0", "demo_1", "demo_2"],
+    "success_count": 3,
+    "success_criteria_version": "stable_release_v2",
+    "normal_grasp_contact_audit_pass_claim": false,
+    "learned_policy_success_claim": false
+  },
+  "this_branch_execution": {
+    "source_data_transferred": false,
+    "actual_numeric_export": "not_run",
+    "physical_replay": "not_run",
+    "bc_training": "not_run",
+    "parallel_ppo_training": "not_run",
+    "real_robot_execution": "not_run"
+  },
+  "verification": {
+    "new_action_contract_tests": {"passed": 7, "failed": 0},
+    "new_numeric_export_tests": {"passed": 9, "failed": 0},
+    "sdk_full_suite": {
+      "tests": 166,
+      "failures": 1,
+      "test": "test_parallel_video.ParallelVideoTests.test_camera_starts_full_then_smoothly_reaches_detail",
+      "observation": "Existing camera endpoint exact equality differs by approximately 3e-15 under SDK Python; unrelated files left unchanged"
+    },
+    "system_python_limitation": "Python 3.14 has no h5py; HDF5 tests use existing Isaac Sim Python without a new global package installation"
+  },
+  "next": [
+    "Reconnect ASUS; inspect source availability and concurrent processes",
+    "Export successful numeric episodes to a new output, preserve originals and exclusion provenance",
+    "Read actual target bounds and discontinuity audit before deciding derived-label policy",
+    "Validate replay in the source-matched simulation stack before any training expansion",
+    "Implement paired state-action loader, state actor BC, actor-only warm start and actual parallel PPO"
+  ]
+}

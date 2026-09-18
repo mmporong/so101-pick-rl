@@ -4,7 +4,10 @@
 
 ## 프로젝트 경계
 
-- 1차 목표는 카메라 없는 상태 기반 PPO다. BC, ACT, VLA와 실물 제어는 1차 범위에 넣지 않는다.
+- 기본 목표는 카메라 없는 상태 기반 PPO다. 2026-09-18 사용자 승인에 따라 기존
+  LeIsaac 시연을 활용하는 state actor BC 초기화와 병렬 PPO를 별도 실험으로 허용한다.
+  기존 4cm/delta 과제는 보존하고, 원본 3cm/절대 목표각 과제는 별도 계약으로 검증한다.
+  ACT, VLA와 실물 제어는 이번 학습 범위에 넣지 않는다.
 - Windows는 Isaac Sim 4.5.0, Isaac Lab 2.1.1, RSL-RL 2.3.3으로 학습한다.
 - Ubuntu는 MuJoCo 환경, 평가기, 결과 비교를 담당한다.
 - Isaac과 MuJoCo 코드는 이 저장소에 함께 둔다. 실물 SO-101와 IL 코드는 `$HOME/so101-mobile-manipulation`에 남긴다.
