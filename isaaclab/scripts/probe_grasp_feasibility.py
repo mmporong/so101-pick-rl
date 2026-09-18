@@ -145,6 +145,54 @@ def bounded_accumulator_action(
     return raw_action, bounded_target, tracking_saturated
 
 
+def ramp_position(start_m, goal_m, elapsed_s: float, speed_m_s: float):
+    """Advance along the straight segment at constant target speed (zero selects a step)."""
+    if not math.isfinite(speed_m_s) or speed_m_s < 0 or not math.isfinite(elapsed_s) or elapsed_s < 0:
+        raise ValueError("ramp speed and elapsed time must be non-negative and finite")
+    if speed_m_s == 0:
+        return goal_m, True  # The diagnostic's original step-target mode.
+    distance_m = float(torch.linalg.vector_norm(goal_m - start_m))
+    fraction = min(1.0, speed_m_s * elapsed_s / distance_m) if distance_m > 0 else 1.0
+    return start_m + fraction * (goal_m - start_m), fraction >= 1.0
+
+
+def arm_delta_for_hold(delta_rad, freeze_targets):
+    """Keep the bounded target controller but request no additional arm motion."""
+    return torch.zeros_like(delta_rad) if freeze_targets else delta_rad
+
+
+def retained_posture_targets(arm_position_rad, tip_height_m, enabled):
+    """Snapshot the phase-start posture; later state mutation must not move this reference."""
+    if not enabled:
+        return None, 0.0
+    if tip_height_m is None or not math.isfinite(float(tip_height_m)):
+        raise ValueError("Retained posture requires a finite measured fingertip height difference")
+    return arm_position_rad.clone(), float(tip_height_m)
+
+
+def validate_retained_posture_mode(enabled, grasp_frame, level_fingertips):
+    if enabled and (grasp_frame != "fingertip-midpoint" or not level_fingertips):
+        raise ValueError("--retain-lift-posture requires --grasp-frame fingertip-midpoint and --level-fingertips")
+
+
+def closure_step_budget(joint_span_rad, fine_step_rad):
+    """Allow a full fine-mode traversal plus contact confirmation, without relaxing gates."""
+    if not math.isfinite(joint_span_rad) or joint_span_rad <= 0 or not math.isfinite(fine_step_rad) or fine_step_rad <= 0:
+        raise ValueError("Joint span and fine step must be finite and positive")
+    return max(250, math.ceil(joint_span_rad / fine_step_rad) + 10)
+
+
+def phase_decision(*, contact_lost, penetration_safe, condition_steps,
+                   elapsed_steps, minimum_steps, ramp_finished):
+    if contact_lost:
+        return "bilateral_contact_lost_after_latch"
+    if not penetration_safe:
+        return "penetration_guard_during_hold_or_carry"
+    if condition_steps >= 5 and elapsed_steps >= minimum_steps and ramp_finished:
+        return "complete"
+    return None
+
+
 def load_tip_offsets(report_path: Path) -> tuple[dict[str, list[float]], str]:
     """Load measured body-local fingertip offsets and bind them to their source bytes."""
     payload_bytes = report_path.read_bytes()
@@ -268,6 +316,14 @@ def _build_parser():
     parser.add_argument("--posture-gain", type=float, default=0.08)
     parser.add_argument("--pregrasp-height-m", type=float, default=0.10)
     parser.add_argument("--lift-height-m", type=float, default=0.11)
+    parser.add_argument("--grasp-height-offset-m", type=float, default=0.0,
+                        help="Diagnostic approach offset from initial cube center; not a calibrated pad frame")
+    parser.add_argument("--prelift-hold-seconds", type=float, default=0.0,
+                        help="Request zero arm deltas with latched gripper target before moving; zero preserves baseline")
+    parser.add_argument("--lift-speed-m-s", type=float, default=0.0,
+                        help="Straight-line lift target speed; zero preserves step-target baseline")
+    parser.add_argument("--retain-lift-posture", action="store_true",
+                        help="Anchor lift posture bias and measured tip height difference; requires fingertip-midpoint and --level-fingertips")
     parser.add_argument("--transport-height-m", type=float, default=0.12)
     for name, default in GRASP_GATE_LIMITS.items():
         parser.add_argument("--" + name.replace("_", "-"), type=float, default=default)
@@ -290,6 +346,12 @@ def _build_parser():
 
 def main() -> int:
     args = _build_parser().parse_args()
+    validate_retained_posture_mode(args.retain_lift_posture, args.grasp_frame, args.level_fingertips)
+    if not math.isfinite(args.grasp_height_offset_m):
+        raise ValueError("Grasp height offset must be finite")
+    if any(not math.isfinite(value) or value < 0 for value in
+           (args.prelift_hold_seconds, args.lift_speed_m_s)):
+        raise ValueError("Hold duration and lift speed must be finite and non-negative")
     validate_collision_offsets(args.cube_contact_offset_m, args.cube_rest_offset_m)
     if args.grasp_frame == "fingertip-midpoint" and args.tip_offset_report is None:
         raise ValueError("--tip-offset-report is required for fingertip-midpoint control")
@@ -323,6 +385,11 @@ def main() -> int:
         "output": str(args.output.resolve()),
         "trace": str(trace_path.resolve()),
         "gate_limits": {name: getattr(args, name) for name in GRASP_GATE_LIMITS},
+        "retention_experiment": {"prelift_hold_seconds": args.prelift_hold_seconds,
+                                 "lift_speed_m_s": args.lift_speed_m_s,
+                                 "grasp_height_offset_m": args.grasp_height_offset_m,
+                                 "retain_lift_posture": args.retain_lift_posture,
+                                 "classification": "diagnostic design settings; no physics or success threshold changes"},
         "gates": {
             "opened_near_cube_before_grasp": False,
             "cube_not_pushed_before_close": False,
@@ -580,6 +647,9 @@ def main() -> int:
             *,
             gripper_target_override_rad=None,
             gripper_control_mode="direct_delta",
+            freeze_arm_targets=False,
+            posture_reference_rad=None,
+            fingertip_height_target_m=0.0,
         ):
             control_position, task_jacobian, tip_state = control_state()
             task_error = requested_position - control_position
@@ -590,7 +660,7 @@ def main() -> int:
                     (task_jacobian, tip_state["leveling_jacobian"].unsqueeze(0)), dim=0
                 )
                 task_error = torch.cat(
-                    (task_error, -tip_state["moving_minus_fixed_tip_height_m"].unsqueeze(0))
+                    (task_error, (fingertip_height_target_m - tip_state["moving_minus_fixed_tip_height_m"]).unsqueeze(0))
                 )
             current_arm = robot.data.joint_pos[0, arm_ids]
             delta = damped_position_step(
@@ -600,9 +670,10 @@ def main() -> int:
                 gain=args.position_gain,
                 max_joint_step_rad=args.max_joint_step_rad,
                 joint_position_rad=current_arm,
-                reference_joint_position_rad=neutral_arm,
+                reference_joint_position_rad=(neutral_arm if posture_reference_rad is None else posture_reference_rad),
                 posture_gain=args.posture_gain,
             )
+            delta = arm_delta_for_hold(delta, freeze_arm_targets)
             current_ordered = robot.data.joint_pos[0, ordered_joint_ids]
             desired_delta = torch.zeros(len(action_joint_names), device=raw.device)
             desired_delta[arm_action_ids] = delta
@@ -737,6 +808,10 @@ def main() -> int:
             *,
             contact_latched_close=False,
             hold_latched_gripper=False,
+            freeze_arm_targets=False,
+            minimum_phase_steps=5,
+            ramp_speed_m_s=0.0,
+            retain_posture=False,
         ):
             nonlocal global_step, both_contact_observed, preclose_max_cube_motion
             nonlocal max_abs_wrist_flex, maximum_cube_lift, minimum_target_xy_error
@@ -749,8 +824,22 @@ def main() -> int:
             errors = []
             condition_steps = 0
             phase = {"name": name, "requested_position_w_m": requested_position.tolist()}
+            phase["maximum_steps"] = max_steps
             phase_last_control = control_state()[0].clone()
+            ramp_start_m = phase_last_control.clone()
+            start_tip_state = control_state()[2]
+            posture_reference, tip_height_target_m = retained_posture_targets(
+                robot.data.joint_pos[0, arm_ids],
+                start_tip_state["moving_minus_fixed_tip_height_m"] if start_tip_state is not None else None,
+                retain_posture)
+            phase["retained_posture_reference_rad"] = posture_reference.tolist() if posture_reference is not None else None
+            phase["fingertip_height_target_m"] = tip_height_target_m
+            phase["freeze_arm_targets"] = freeze_arm_targets
+            phase["ramp_speed_m_s"] = ramp_speed_m_s
+            phase["position_error_semantics"] = "distance to final goal, not ramp waypoint tracking error"
             for phase_step in range(max_steps):
+                commanded_position, ramp_finished = ramp_position(
+                    ramp_start_m, requested_position, (phase_step + 1) * raw.step_dt, ramp_speed_m_s)
                 latch_active_before_step = latched_gripper_target_rad is not None
                 if contact_latched_close:
                     gripper_delta_rad, target_override, gripper_control_mode = (
@@ -775,10 +864,13 @@ def main() -> int:
                     target_override = None
                     gripper_control_mode = "direct_delta"
                 action, task_jacobian, tip_state, controller_step = position_action(
-                    requested_position,
+                    commanded_position,
                     gripper_delta_rad,
                     gripper_target_override_rad=target_override,
                     gripper_control_mode=gripper_control_mode,
+                    freeze_arm_targets=freeze_arm_targets,
+                    posture_reference_rad=posture_reference,
+                    fingertip_height_target_m=tip_height_target_m,
                 )
                 if gripper_control_mode == "latched_hold":
                     controller_stats["latched_hold_steps"] += 1
@@ -806,6 +898,11 @@ def main() -> int:
                                 "phase": name,
                                 "phase_step": phase_step,
                                 "requested_control_position_w_m": requested_position.tolist(),
+                                "commanded_control_position_w_m": commanded_position.tolist(),
+                                "ramp_finished": ramp_finished,
+                                "last_pre_step_final_goal_position_error_m": pre_step_error,
+                                "last_pre_step_commanded_position_error_m": float(
+                                    torch.linalg.vector_norm(commanded_position - pre_step_control)),
                                 "last_pre_step_control_position_w_m": pre_step_control.tolist(),
                                 "issued_raw_action": action[0].tolist(),
                                 "joint_target_before_action_rad": accumulator_before.tolist(),
@@ -948,9 +1045,14 @@ def main() -> int:
                         "phase_step": phase_step,
                         "grasp_frame_mode": args.grasp_frame,
                         "requested_control_position_w_m": requested_position.tolist(),
+                        "commanded_control_position_w_m": commanded_position.tolist(),
+                        "ramp_finished": ramp_finished,
                         "achieved_control_position_w_m": control_position.tolist(),
                         "configured_ee_position_w_m": configured_ee_position.tolist(),
                         "control_position_error_m": error,
+                        "final_goal_position_error_m": error,
+                        "commanded_position_error_m": float(
+                            torch.linalg.vector_norm(commanded_position - control_position)),
                         "control_cube_distance_m": control_cube_distance,
                         "configured_ee_cube_distance_m": configured_ee_cube_distance,
                         "cube_position_w_m": cube_position.tolist(),
@@ -985,12 +1087,22 @@ def main() -> int:
                 )
                 GraspAudit.write_sample(trace_stream, audit_sample)
                 update_partial_report()
-                if contact_lost:
-                    phase["failure_reason"] = "bilateral_contact_lost_after_latch"
-                    break
+                penetration_safe = not hold_latched_gripper or (
+                    pair_penetration_bounded(all_pair_minimums, ("gripper_cube", "jaw_cube"),
+                                             args.max_allowed_penetration_m, sampling_valid=True)
+                    and pair_penetration_bounded(all_pair_minimums, ("gripper_table", "jaw_table"),
+                                                args.max_allowed_finger_table_penetration_m, sampling_valid=True)
+                )
                 condition_steps = condition_steps + 1 if completion(error, current_open, both_contact) else 0
-                if condition_steps >= 5:
+                decision = phase_decision(
+                    contact_lost=contact_lost, penetration_safe=penetration_safe,
+                    condition_steps=condition_steps, elapsed_steps=phase_step + 1,
+                    minimum_steps=minimum_phase_steps, ramp_finished=ramp_finished)
+                if decision == "complete":
                     phase["completion_condition_met"] = True
+                    break
+                if decision is not None:
+                    phase["failure_reason"] = decision
                     break
             if not phase.get("completion_condition_met") and not phase.get("environment_ended"):
                 phase.setdefault("failure_reason", "maximum_phase_steps_exhausted")
@@ -1012,6 +1124,7 @@ def main() -> int:
         # All targets are world-frame positions for the configured grasp-center frame.
         pregrasp = initial_cube + torch.tensor([0.0, 0.0, args.pregrasp_height_m], device=raw.device)
         descend = initial_cube.clone()
+        descend[2] += args.grasp_height_offset_m
         if not run_phase("open", initial_ee, +1.0, 80, lambda _e, opened, _c: opened >= 0.85):
             raise RuntimeError("Gripper did not open while holding the initial pose")
         if not run_phase("pregrasp", pregrasp, +1.0, 180, lambda e, _o, _c: e <= args.position_tolerance_m):
@@ -1024,7 +1137,7 @@ def main() -> int:
             "close",
             last_pose_target,
             -1.0,
-            250,
+            closure_step_budget(gripper_upper - gripper_lower, args.fine_gripper_step_rad),
             lambda _e, opened, contact: contact
             and opened <= success["maximum_grasp_open_fraction"],
             contact_latched_close=True,
@@ -1046,6 +1159,12 @@ def main() -> int:
             sampling_valid=global_step > 0,
         ):
             raise RuntimeError("Finger-table penetration guard failed before lift")
+        if args.prelift_hold_seconds > 0:
+            hold_steps = max(5, math.ceil(args.prelift_hold_seconds / raw.step_dt))
+            if not run_phase("stationary_hold", control_state()[0].clone(), 0.0, hold_steps,
+                             lambda _e, _o, contact: contact, hold_latched_gripper=True,
+                             freeze_arm_targets=True, minimum_phase_steps=hold_steps):
+                raise RuntimeError("Stationary grasp retention failed before lift")
         grasp_offset = control_state()[0] - cube.data.root_pos_w[0]
         lift = control_state()[0].clone()
         lift[2] += args.lift_height_m
@@ -1053,9 +1172,12 @@ def main() -> int:
             "lift",
             lift,
             0.0,
-            180,
+            (math.ceil(args.lift_height_m / args.lift_speed_m_s / raw.step_dt) + 180
+             if args.lift_speed_m_s > 0 else 180),
             lambda e, _o, _c: e <= args.position_tolerance_m,
             hold_latched_gripper=True,
+            ramp_speed_m_s=args.lift_speed_m_s,
+            retain_posture=args.retain_lift_posture,
         ):
             raise RuntimeError("Lift aborted or target was not reached with bilateral contact held")
         transport = target_position + grasp_offset

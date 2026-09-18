@@ -17,6 +17,78 @@ SPEC.loader.exec_module(PROBE)
 
 
 class GraspFeasibilityProbeTests(unittest.TestCase):
+    def test_retained_posture_requires_measured_tip_mode_and_state(self):
+        for frame, level in (("configured-jaw-frame", False), ("configured-jaw-frame", True),
+                             ("fingertip-midpoint", False)):
+            with self.assertRaises(ValueError):
+                PROBE.validate_retained_posture_mode(True, frame, level)
+            PROBE.validate_retained_posture_mode(False, frame, level)
+        PROBE.validate_retained_posture_mode(True, "fingertip-midpoint", True)
+        for height in (None, float("nan"), float("inf")):
+            with self.assertRaises(ValueError):
+                PROBE.retained_posture_targets(torch.zeros(2), height, True)
+
+    def test_retained_posture_is_a_snapshot_and_default_remains_neutral(self):
+        position = torch.tensor([.1, .2])
+        reference, height = PROBE.retained_posture_targets(position, .012, True)
+        position.zero_()
+        torch.testing.assert_close(reference, torch.tensor([.1, .2]))
+        self.assertEqual(height, .012)
+        self.assertEqual(PROBE.retained_posture_targets(position, .012, False), (None, 0.0))
+
+    def test_closure_budget_allows_early_contact_full_fine_traversal(self):
+        self.assertEqual(PROBE.closure_step_budget(1.8, .003), 610)
+        self.assertEqual(PROBE.closure_step_budget(1.8, .035), 250)
+        with self.assertRaises(ValueError):
+            PROBE.closure_step_budget(1.8, 0)
+
+    def test_vertical_ramp_keeps_xy_and_bounds_speed(self):
+        start = torch.tensor([0.1, 0.2, 0.02])
+        goal = start + torch.tensor([0.0, 0.0, 0.11])
+        next_position, finished = PROBE.ramp_position(start, goal, 0.5, 0.01)
+        torch.testing.assert_close(next_position, torch.tensor([0.1, 0.2, 0.025]))
+        self.assertFalse(finished)
+        final, finished = PROBE.ramp_position(start, goal, 20.0, 0.01)
+        torch.testing.assert_close(final, goal)
+        self.assertTrue(finished)
+
+    def test_ramp_rejects_invalid_speed_or_time(self):
+        for seconds, speed in ((-1, .01), (0, -.01), (1, float("nan"))):
+            with self.assertRaises(ValueError):
+                PROBE.ramp_position(torch.zeros(3), torch.ones(3), seconds, speed)
+
+    def test_zero_length_ramp_is_complete(self):
+        target, finished = PROBE.ramp_position(torch.zeros(3), torch.zeros(3), 0, .01)
+        torch.testing.assert_close(target, torch.zeros(3))
+        self.assertTrue(finished)
+
+    def test_default_step_target_and_arm_motion_are_unchanged(self):
+        goal = torch.ones(3)
+        target, finished = PROBE.ramp_position(torch.zeros(3), goal, .01, 0)
+        self.assertIs(target, goal)
+        self.assertTrue(finished)
+        delta = torch.tensor([.01, -.02, .03])
+        self.assertIs(PROBE.arm_delta_for_hold(delta, False), delta)
+        torch.testing.assert_close(PROBE.arm_delta_for_hold(delta, True), torch.zeros(3))
+        torch.testing.assert_close(delta, torch.tensor([.01, -.02, .03]))
+
+    def test_phase_requires_hold_duration_and_ramp_completion(self):
+        args = dict(contact_lost=False, penetration_safe=True, condition_steps=60,
+                    elapsed_steps=59, minimum_steps=60, ramp_finished=True)
+        self.assertIsNone(PROBE.phase_decision(**args))
+        args["elapsed_steps"] = 60
+        self.assertEqual(PROBE.phase_decision(**args), "complete")
+        args["ramp_finished"] = False
+        self.assertIsNone(PROBE.phase_decision(**args))
+
+    def test_phase_abort_precedes_completion(self):
+        args = dict(contact_lost=False, penetration_safe=True, condition_steps=60,
+                    elapsed_steps=60, minimum_steps=60, ramp_finished=True)
+        self.assertEqual(PROBE.phase_decision(**{**args, "contact_lost": True}),
+                         "bilateral_contact_lost_after_latch")
+        self.assertEqual(PROBE.phase_decision(**{**args, "penetration_safe": False}),
+                         "penetration_guard_during_hold_or_carry")
+
     def test_point_jacobian_accounts_for_rotational_offset(self):
         spatial = torch.zeros((6, 1), dtype=torch.float64)
         spatial[5, 0] = 1.0
