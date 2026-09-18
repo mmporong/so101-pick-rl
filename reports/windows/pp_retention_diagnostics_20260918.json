@@ -1,0 +1,574 @@
+{
+  "schema": "so101_pick_rl.retention_diagnostics.v1",
+  "date": "2026-09-18",
+  "classification": "scripted simulation diagnostics, not PPO or policy evaluation",
+  "status": "failed_physical_lift",
+  "source_commit": "80f5bdaf4b599e32cc3804702a4730ae53a4b5d1",
+  "contract_sha256": "fe1ad4d8d9df88a63649a8d9183d91c1b11f5c460cb6bd7bfacfc84583d4b929",
+  "training": "not_run",
+  "real_robot": "not_run",
+  "policy_evaluation": "not_run",
+  "validation": {
+    "contract": "PASS",
+    "cpu_tests": 136,
+    "cpu_result": "PASS",
+    "compile": "PASS",
+    "diff_check": "PASS",
+    "gpu": "two sequential single-environment cuda:0 diagnostics; simulator_error_free true, physical lift failed",
+    "parallel_smoke": "not rerun: task environment/reward unchanged; prior evidence recorded in pp_r3_staged_rewards_20260913.json",
+    "review": {
+      "code_reviewer": "COMMENT (non-blocking)",
+      "architect": "CLEAR",
+      "combined": "COMMENT",
+      "unresolved_new_issues": 0,
+      "static_analysis": "Pyright 1.1.414: 5 pre-existing external/dynamic typing errors in reviewed files; not a full static PASS",
+      "fixed_finding": "Retained posture rejects unsupported CLI combinations and missing/nonfinite measured fingertip height"
+    }
+  },
+  "comparison": {
+    "seed": 0,
+    "common_hold_seconds": 2,
+    "same_initial_cube_position": true,
+    "same_prelift_phase_summaries": true,
+    "changed_input": "lift_speed_m_s only (0 step target vs 0.01 m/s ramp); output paths differ",
+    "unchanged": "cube 0.04 m / 0.05 kg, physics, friction, actuator gains, task contract and penetration/success gates; retain_lift_posture false"
+  },
+  "clean_runs": [
+    {
+      "path": "artifacts/pp_retention10_clean_step_20260918.json",
+      "sha256": "ce43b4e703fe7545d79dd5dd6d9cb8f66c6e128cadbf976798c1ca0731c420bc",
+      "trace_path": "artifacts/grasp_feasibility/pp_retention10_clean_step_20260918.jsonl",
+      "trace_sha256": "514fd94d1f6dfad0a85165193be78f4ad2a1cf7bb92d3b1dec2542bc12c7d22d",
+      "source_commit": "80f5bdaf4b599e32cc3804702a4730ae53a4b5d1",
+      "source_dirty": false,
+      "status": "not_feasible_or_incomplete",
+      "error": "RuntimeError: Lift aborted or target was not reached with bilateral contact held",
+      "settings": {
+        "prelift_hold_seconds": 2,
+        "lift_speed_m_s": 0,
+        "grasp_height_offset_m": 0,
+        "retain_lift_posture": false,
+        "classification": "diagnostic design settings; no physics or success threshold changes"
+      },
+      "gates": {
+        "opened_near_cube_before_grasp": true,
+        "cube_not_pushed_before_close": true,
+        "bilateral_contact": true,
+        "finger_cube_penetration_bounded": true,
+        "finger_table_penetration_bounded": true,
+        "cube_lifted": false,
+        "cube_reached_target_xy": false,
+        "wrist_flex_bounded": true,
+        "controlled_release_observed": false,
+        "full_task_success": false,
+        "simulator_error_free": true
+      },
+      "phases": [
+        {
+          "name": "open",
+          "steps": 46,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "pregrasp",
+          "steps": 23,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "descend",
+          "steps": 21,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "close",
+          "steps": 106,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "stationary_hold",
+          "steps": 60,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "lift",
+          "steps": 4,
+          "complete": false,
+          "failure_reason": "bilateral_contact_lost_after_latch"
+        }
+      ],
+      "hold_samples": 60,
+      "hold_unique_commanded_targets": 1,
+      "hold_table_contact_samples": 60,
+      "minimum_finger_cube_separation_m": -0.000345831795129925,
+      "minimum_finger_table_separation_m": null,
+      "maximum_cube_lift_m": 0,
+      "contact_loss_event": {
+        "state_index": 260,
+        "phase": "lift",
+        "phase_step": 3,
+        "fixed_force_n": 0,
+        "moving_force_n": 0.11849194020032883
+      },
+      "last_hold_to_last_lift_control_delta_m": [
+        0.00244210846722126,
+        -0.02831825613975525,
+        -0.0021238811314105988
+      ],
+      "last_hold_to_last_lift_cube_delta_m": [
+        0.00008641183376312256,
+        -0.008101314306259155,
+        0.0000021774321794509888
+      ]
+    },
+    {
+      "path": "artifacts/pp_retention11_clean_ramp_20260918.json",
+      "sha256": "ef08f015031eb9eedb5989bcf0ef2ddb8d105f5ff90782861aa6c73e4f7989b0",
+      "trace_path": "artifacts/grasp_feasibility/pp_retention11_clean_ramp_20260918.jsonl",
+      "trace_sha256": "fcea822088720ba8328e492c6de50459f17782a788308cf6943daf1b18182f50",
+      "source_commit": "80f5bdaf4b599e32cc3804702a4730ae53a4b5d1",
+      "source_dirty": false,
+      "status": "not_feasible_or_incomplete",
+      "error": "RuntimeError: Lift aborted or target was not reached with bilateral contact held",
+      "settings": {
+        "prelift_hold_seconds": 2,
+        "lift_speed_m_s": 0.01,
+        "grasp_height_offset_m": 0,
+        "retain_lift_posture": false,
+        "classification": "diagnostic design settings; no physics or success threshold changes"
+      },
+      "gates": {
+        "opened_near_cube_before_grasp": true,
+        "cube_not_pushed_before_close": true,
+        "bilateral_contact": true,
+        "finger_cube_penetration_bounded": true,
+        "finger_table_penetration_bounded": true,
+        "cube_lifted": false,
+        "cube_reached_target_xy": false,
+        "wrist_flex_bounded": true,
+        "controlled_release_observed": false,
+        "full_task_success": false,
+        "simulator_error_free": true
+      },
+      "phases": [
+        {
+          "name": "open",
+          "steps": 46,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "pregrasp",
+          "steps": 23,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "descend",
+          "steps": 21,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "close",
+          "steps": 106,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "stationary_hold",
+          "steps": 60,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "lift",
+          "steps": 7,
+          "complete": false,
+          "failure_reason": "bilateral_contact_lost_after_latch"
+        }
+      ],
+      "hold_samples": 60,
+      "hold_unique_commanded_targets": 1,
+      "hold_table_contact_samples": 60,
+      "minimum_finger_cube_separation_m": -0.000345831795129925,
+      "minimum_finger_table_separation_m": null,
+      "maximum_cube_lift_m": 0,
+      "contact_loss_event": {
+        "state_index": 263,
+        "phase": "lift",
+        "phase_step": 6,
+        "fixed_force_n": 0,
+        "moving_force_n": 0.01094990223646164
+      },
+      "last_hold_to_last_lift_control_delta_m": [
+        0.00020261667668819427,
+        -0.00021883845329284668,
+        0.0012250207364559174
+      ],
+      "last_hold_to_last_lift_cube_delta_m": [
+        0.0003027915954589844,
+        -0.00010156631469726562,
+        0.0000015459954738616943
+      ]
+    }
+  ],
+  "prelift_loaded_contacts": {
+    "trace_state_index": 256,
+    "cube_position_w_m": [
+      -0.01677129976451397,
+      0.3026309311389923,
+      0.01999771222472191
+    ],
+    "contacts": {
+      "gripper_cube": [
+        {
+          "normal_force_n": 0.8361718058586121,
+          "point_w_m": [
+            -0.035168055444955826,
+            0.2892742455005646,
+            0.01818094402551651
+          ],
+          "normal_w": [
+            -0.991625964641571,
+            -0.12848129868507385,
+            -0.013046402484178543
+          ],
+          "separation_m": -0.00003234678661101498
+        }
+      ],
+      "jaw_cube": [
+        {
+          "normal_force_n": 0.8053194880485535,
+          "point_w_m": [
+            0.003985188901424408,
+            0.29567599296569824,
+            0.03996359556913376
+          ],
+          "normal_w": [
+            0.8672150373458862,
+            0.04930639639496803,
+            0.4954867959022522
+          ],
+          "separation_m": -0.0002959836274385452
+        }
+      ]
+    }
+  },
+  "exploratory_runs": [
+    {
+      "path": "artifacts/pp_retention05_hold_step_20260918.json",
+      "sha256": "8c586e326ac7ab15456f9e834f5f6c9eda160fb2cfd08482960d2872e0a99e7c",
+      "status": "not_feasible_or_incomplete",
+      "error": "RuntimeError: Lift aborted or target was not reached with bilateral contact held",
+      "source_commit": "6c34de202a12ae781a63207b355ff27ced75b468",
+      "source_dirty": true,
+      "settings": {
+        "prelift_hold_seconds": 2,
+        "lift_speed_m_s": 0,
+        "classification": "diagnostic design settings; no physics or success threshold changes"
+      },
+      "phases": [
+        {
+          "name": "open",
+          "steps": 46,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "pregrasp",
+          "steps": 23,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "descend",
+          "steps": 21,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "close",
+          "steps": 106,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "stationary_hold",
+          "steps": 60,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "lift",
+          "steps": 4,
+          "complete": false,
+          "failure_reason": "bilateral_contact_lost_after_latch"
+        }
+      ],
+      "min_finger_cube_separation_m": -0.000345831795129925,
+      "max_cube_lift_m": 0,
+      "full_success": false,
+      "simulator_error_free": true
+    },
+    {
+      "path": "artifacts/pp_retention06_hold_ramp_20260918.json",
+      "sha256": "8276698bf025929e1c14ace516340fe82ad7a1b17295112957b4805b67af32a7",
+      "status": "not_feasible_or_incomplete",
+      "error": "RuntimeError: Lift aborted or target was not reached with bilateral contact held",
+      "source_commit": "6c34de202a12ae781a63207b355ff27ced75b468",
+      "source_dirty": true,
+      "settings": {
+        "prelift_hold_seconds": 2,
+        "lift_speed_m_s": 0.01,
+        "classification": "diagnostic design settings; no physics or success threshold changes"
+      },
+      "phases": [
+        {
+          "name": "open",
+          "steps": 46,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "pregrasp",
+          "steps": 23,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "descend",
+          "steps": 21,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "close",
+          "steps": 106,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "stationary_hold",
+          "steps": 60,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "lift",
+          "steps": 7,
+          "complete": false,
+          "failure_reason": "bilateral_contact_lost_after_latch"
+        }
+      ],
+      "min_finger_cube_separation_m": -0.000345831795129925,
+      "max_cube_lift_m": 0,
+      "full_success": false,
+      "simulator_error_free": true
+    },
+    {
+      "path": "artifacts/pp_retention07_lower_ramp_20260918.json",
+      "sha256": "99fbe5367a1bc2ee9e7f9fab45febf9944b8369a615f8cce66d65fef78b388cf",
+      "status": "not_feasible_or_incomplete",
+      "error": "RuntimeError: Bilateral finger contact was not established and maintained during closure",
+      "source_commit": "6c34de202a12ae781a63207b355ff27ced75b468",
+      "source_dirty": true,
+      "settings": {
+        "prelift_hold_seconds": 2,
+        "lift_speed_m_s": 0.01,
+        "grasp_height_offset_m": -0.008,
+        "classification": "diagnostic design settings; no physics or success threshold changes"
+      },
+      "phases": [
+        {
+          "name": "open",
+          "steps": 46,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "pregrasp",
+          "steps": 23,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "descend",
+          "steps": 27,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "close",
+          "steps": 250,
+          "complete": false,
+          "failure_reason": "maximum_phase_steps_exhausted"
+        }
+      ],
+      "min_finger_cube_separation_m": -0.0007946142577566206,
+      "max_cube_lift_m": 0,
+      "full_success": false,
+      "simulator_error_free": true
+    },
+    {
+      "path": "artifacts/pp_retention08_lower_budget_20260918.json",
+      "sha256": "606a67d8ef32178c404abab71a142f1baf6d16f4ec33d30169b3b9629ec67a42",
+      "status": "not_feasible_or_incomplete",
+      "error": "RuntimeError: Lift aborted or target was not reached with bilateral contact held",
+      "source_commit": "6c34de202a12ae781a63207b355ff27ced75b468",
+      "source_dirty": true,
+      "settings": {
+        "prelift_hold_seconds": 2,
+        "lift_speed_m_s": 0.01,
+        "grasp_height_offset_m": -0.008,
+        "classification": "diagnostic design settings; no physics or success threshold changes"
+      },
+      "phases": [
+        {
+          "name": "open",
+          "steps": 46,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "pregrasp",
+          "steps": 23,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "descend",
+          "steps": 27,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "close",
+          "steps": 356,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "stationary_hold",
+          "steps": 60,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "lift",
+          "steps": 2,
+          "complete": false,
+          "failure_reason": "bilateral_contact_lost_after_latch"
+        }
+      ],
+      "min_finger_cube_separation_m": -0.0007946142577566206,
+      "max_cube_lift_m": 0,
+      "full_success": false,
+      "simulator_error_free": true
+    },
+    {
+      "path": "artifacts/pp_retention09_posture_ramp_20260918.json",
+      "sha256": "b51e88a69018ed89833b19698453d199a28dcf9eddd2cec2634bbbc1e232ad4a",
+      "status": "not_feasible_or_incomplete",
+      "error": "RuntimeError: Lift aborted or target was not reached with bilateral contact held",
+      "source_commit": "6c34de202a12ae781a63207b355ff27ced75b468",
+      "source_dirty": true,
+      "settings": {
+        "prelift_hold_seconds": 2,
+        "lift_speed_m_s": 0.01,
+        "grasp_height_offset_m": 0,
+        "retain_lift_posture": true,
+        "classification": "diagnostic design settings; no physics or success threshold changes"
+      },
+      "phases": [
+        {
+          "name": "open",
+          "steps": 46,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "pregrasp",
+          "steps": 23,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "descend",
+          "steps": 21,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "close",
+          "steps": 106,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "stationary_hold",
+          "steps": 60,
+          "complete": true,
+          "failure_reason": null
+        },
+        {
+          "name": "lift",
+          "steps": 6,
+          "complete": false,
+          "failure_reason": "bilateral_contact_lost_after_latch"
+        }
+      ],
+      "min_finger_cube_separation_m": -0.000345831795129925,
+      "max_cube_lift_m": 0,
+      "full_success": false,
+      "simulator_error_free": true
+    }
+  ],
+  "findings": [
+    {
+      "kind": "observed",
+      "text": "Both clean runs hold identical joint targets for 60 steps (2 seconds), with cube-table contact in every hold sample; this is table-supported retention, not airborne force closure."
+    },
+    {
+      "kind": "observed",
+      "text": "Step lift loses bilateral contact at step 4; ramp lift at step 7. Both have zero maximum cube lift relative to initial position and no full task success."
+    },
+    {
+      "kind": "observed",
+      "text": "Ramp reduces large lateral control-point motion, but cube remains on table. Slower lift alone does not solve grasp."
+    },
+    {
+      "kind": "observed",
+      "text": "Loaded fixed-finger contact is at z=0.01818 m; loaded moving-jaw contact at z=0.03996 m near cube top, with normal Z=0.49549."
+    },
+    {
+      "kind": "inference",
+      "confidence": "moderate",
+      "text": "Asymmetric side/top-edge contact and uncertain inner-pad frame are a higher-priority investigation than increasing force/friction. Exact cooked-hull mismatch and sole root cause are not yet proved."
+    },
+    {
+      "kind": "observed",
+      "text": "Exploratory -8 mm height run initially timed out closing; a budget covering the full fine-close joint span made close and hold pass, but lift still lost contact at step 2. Height-only tuning did not solve the issue."
+    },
+    {
+      "kind": "observed",
+      "text": "Exploratory retained-posture variant lost contact at lift step 6. It retains a posture-bias reference and one tip-height scalar, not full orientation and not zero posture gain."
+    }
+  ],
+  "limitations": [
+    "One seed and one environment per comparison; not generalization or policy-success evidence.",
+    "Exploratory runs are dirty development snapshots; only clean_runs bind the final committed source.",
+    "Contact audit samples the last physics substep at 30 Hz, not every 120 Hz contact.",
+    "The full sequence never reached transport/release; no claim that physical pick-place or learned penetration exploitation is fixed.",
+    "Source commit remains the executable evidence anchor; later documentation commit does not rebind run provenance."
+  ],
+  "next_required_work": [
+    "Establish opposing inner-pad contact frames and verify contact points/normals lie on appropriate cube side interiors, rather than relying only on mesh-tip midpoint.",
+    "Then retest table-supported grasp, slow airborne retention, transport, opening/release and retreat under unchanged penetration guards.",
+    "Resume revision 3 scratch PPO only after the complete physical feasibility gate passes on a clean source commit. Do not tune friction/force or lower success thresholds to hide the failure."
+  ]
+}
