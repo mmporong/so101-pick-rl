@@ -1,0 +1,57 @@
+{
+  "schema": "so101_pick_rl.demo_transfer.v1",
+  "date": "2026-09-19",
+  "status": "transfer_verified",
+  "local_root": "artifacts/demo_warmstart_20260919",
+  "source_host": "asus",
+  "source_repository_commit": "87253d50166349c7b4bcbeb9b30f65f3dd7e7ca2",
+  "source_repository_dirty": true,
+  "originals_opened_read_only": true,
+  "remote_export_directory": "/tmp/so101-demo-20260919-BqiseR",
+  "datasets": [
+    {
+      "file": "source10_numeric.hdf5",
+      "bytes": 3302824,
+      "episodes": 10,
+      "frames": 5640,
+      "excluded_episode": "demo_0",
+      "exclusion_reason": "success=false",
+      "sha256": "1e0109e41fad6096633f9e63b48c96a2c8c80e7a3eb77ac71880266fa0a5d742"
+    },
+    {
+      "file": "mimic500_numeric.hdf5",
+      "bytes": 169520480,
+      "episodes": 500,
+      "frames": 277447,
+      "excluded_episodes": 0,
+      "sha256": "f41e3bb0b6fc03f5ff8f899c05a38d24407407a130697dfdb6a802e4cb22beae"
+    }
+  ],
+  "dataset_verification": {
+    "remote_local_sha256_match": true,
+    "episode_frame_counts_match": true,
+    "source_stat_unchanged_during_export": true,
+    "pre_post_joint_state_alignment_pass": true,
+    "training_ready": false,
+    "physics_replay_validated_by_this_run": false,
+    "rgb_included": false
+  },
+  "source_snapshot": {
+    "directory": "source_snapshot",
+    "files_verified": 154,
+    "excluded_from_snapshot_hash": ["__pycache__", "*.pyc"],
+    "hash_scheme": "SHA256 of sorted relative UTF-8 path, NUL, and raw SHA256 digest of each file",
+    "sha256": "f2beebb591b0ef2894f5f2bc73621d1e4c52a62940ea233da27e1ff40d924a2f",
+    "remote_local_match": true,
+    "includes": ["LeIsaac source", "SO101 USD", "table_with_cube assets", "replay_joint_contract.py", "LICENSE"]
+  },
+  "constraints": {
+    "no_further_notebook_training_by_this_agent": true,
+    "user_notebook_work_may_start": true,
+    "source_simulation_stack": "Isaac Sim 5.1 / Isaac Lab 2.3",
+    "windows_simulation_stack": "Isaac Sim 4.5 / Isaac Lab 2.1.1",
+    "cross_version_replay_still_required": true
+  },
+  "bc_training": "not_run",
+  "parallel_ppo_training": "not_run"
+}
