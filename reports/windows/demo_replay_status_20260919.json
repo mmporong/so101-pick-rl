@@ -1,0 +1,103 @@
+{
+  "schema": "so101_pick_rl.demo_replay_progress.v1",
+  "date": "2026-09-19",
+  "status": "candidate_replay_found_full_phase_gate_pending",
+  "training_run": false,
+  "bc_status": "not_run",
+  "ppo_status": "not_run",
+  "normal_grasp_gate_pass": false,
+  "artifact_root": "artifacts/demo_warmstart_20260919",
+  "source10_sha256_unchanged": "1e0109e41fad6096633f9e63b48c96a2c8c80e7a3eb77ac71880266fa0a5d742",
+  "mimic500_sha256_unchanged": "f41e3bb0b6fc03f5ff8f899c05a38d24407407a130697dfdb6a802e4cb22beae",
+  "execution_scope": {
+    "host": "Windows",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "isaac_sim": "4.5.0",
+    "isaaclab_repository_tag": "v2.1.1",
+    "isaaclab_package_metadata_version": "0.41.3",
+    "torch": "2.7.0+cu128",
+    "num_envs": 1,
+    "physics_dt_s": 0.016666666666666666,
+    "notebook_gpu_used": false,
+    "real_robot_executed": false
+  },
+  "runs": [
+    {
+      "directory": "replay_diagnostics3",
+      "report_sha256": "7c088dcbf61e36277f5c172782ecbd2807a135b5613f3958a8eacbd759fe41df",
+      "episodes": [0, 1, 12],
+      "source_episodes": ["demo_0", "demo_1", "demo_2"],
+      "stable_box_release_count": 3,
+      "placement_and_diagnostic_pass_count": 0,
+      "target_policy": "bounded-derived",
+      "additional_terminal_hold_steps": 0
+    },
+    {
+      "directory": "replay_wrist70_screen10",
+      "report_sha256": "ca8f1da26c040c09fb5fb24648a3893aab958984d49c64a3742bbb5de8daa3f3",
+      "episodes": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "stable_box_release_count": 4,
+      "placement_and_diagnostic_pass_count": 1,
+      "wrist_flex_command_limit_deg": 70,
+      "additional_terminal_hold_steps": 60,
+      "solver_position_iterations_requested": 4
+    },
+    {
+      "directory": "replay_wrist70_solver16_screen10",
+      "report_sha256": "b879de0e47530b921cec5e601c103c5c1dd203c788cee48fc61127bbeb418d4b",
+      "episodes": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "stable_box_release_count": 4,
+      "placement_and_diagnostic_pass_count": 1,
+      "wrist_flex_command_limit_deg": 70,
+      "additional_terminal_hold_steps": 60,
+      "solver_position_iterations_requested": 16,
+      "improvement_observed": false
+    },
+    {
+      "directory": "replay_candidate_capture",
+      "report_sha256": "738e4c1957590e8e6b3174a94490a707bc2410449b72fd8c53d2f0c694fadfe2",
+      "episodes": [1],
+      "stable_box_release_count": 1,
+      "placement_and_diagnostic_pass_count": 1,
+      "recorded_horizon_stable_box_release": false,
+      "recorded_transitions": 220,
+      "additional_terminal_hold_steps": 60,
+      "state_action_rows": 280,
+      "pre_step_state_dimension": 34,
+      "state_action_alignment": "PASS",
+      "code_snapshot_hashes": "PASS",
+      "maximum_abs_wrist_flex_deg": 70.25454716118577,
+      "max_cube_lift_m": 0.1616944670677185,
+      "maximum_stable_seconds": 1.3833333333333333,
+      "maximum_finger_cube_penetration_m": 0.0007395064458250999,
+      "maximum_finger_table_penetration_m": 0.0005792975425720215
+    }
+  ],
+  "numeric_audit": {
+    "mimic_episodes": 500,
+    "target_alignment": "target[1:] for T-1 transitions",
+    "continuity_definition": "L2 norm of np.diff(target, axis=0), threshold 1 rad",
+    "raw_discontinuous_episodes": 107,
+    "joint_bounded_discontinuous_episodes": 97,
+    "recorded_episodes_with_maximum_wrist_at_most_75_deg": 0,
+    "physics_quality_not_implied": true
+  },
+  "validation": {
+    "targeted_tests_passed": 26,
+    "contract_validation": "PASS",
+    "full_suite_total": 176,
+    "full_suite_passed": 175,
+    "full_suite_failures": ["test_parallel_video.ParallelVideoTests.test_camera_starts_full_then_smoothly_reaches_detail: pre-existing exact float equality mismatch"],
+    "committed_geometry_helper_compatibility_tests": "10 PASS against HEAD helper, without unrelated dirty additions",
+    "final_replay_exit_code": 0,
+    "independent_agent_review": "unavailable: agent thread limit; separate local review and verification performed"
+  },
+  "limitations": [
+    "Scripted development replays, not trained policies or held-out evaluation",
+    "3-case and 10-case groups are different and are not a controlled success-rate comparison",
+    "A diagnostic pass does not validate the entire open-approach-close-carry-controlled-release sequence",
+    "Source and derived numeric data, checkpoints and videos remain outside Git",
+    "Initial probes saved results but required terminating shutdown-stalled child processes; later clean shutdown verified",
+    "Do not train from altered targets paired with original observations"
+  ]
+}
