@@ -95,6 +95,8 @@ def audit_targets(target, lower, upper, *, maximum_step_norm_rad: float = 1.0) -
 def validate_source_timing(env_args: dict) -> None:
     """The initial demo-aligned experiment preserves source 60 Hz, no resampling."""
     sim_args = env_args.get("sim_args", {})
+    if "dt" not in sim_args or "decimation" not in sim_args:
+        raise ValueError("missing source timing metadata: dt and decimation are required")
     if sim_args.get("decimation") != 1 or isinstance(sim_args.get("decimation"), bool):
         raise ValueError("source decimation must be 1")
     dt = sim_args.get("dt")

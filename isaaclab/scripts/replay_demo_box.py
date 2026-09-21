@@ -49,6 +49,9 @@ def main():
     parser.add_argument("--dataset", type=Path, required=True)
     parser.add_argument("--snapshot", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--sequence-gate", type=Path,
+                        default=ROOT / "configs/evaluation/demo_box_replay_gate_v2.json",
+                        help="Versioned sequence audit; does not alter executed targets")
     parser.add_argument("--episodes", type=int, nargs="+", default=[0, 1, 2])
     parser.add_argument("--target-policy", choices=["reject", "bounded-derived"], default="reject")
     parser.add_argument("--max-steps", type=int, default=0, help="0 replays all recorded T-1 transitions")
@@ -100,7 +103,7 @@ def main():
     snapshot = args.snapshot.resolve()
     robot_path = snapshot / "assets/robots/so101_follower.usd"
     scene_path = snapshot / "assets/scenes/table_with_cube/scene.usd"
-    gate_path = ROOT / "configs/evaluation/demo_box_replay_gate.json"
+    gate_path = args.sequence_gate.resolve()
     geometry_path = ROOT / "configs/isaaclab/demo_box_pad_geometry.json"
     gate_cfg = json.loads(gate_path.read_text(encoding="utf-8"))
     gate_cfg["physics_dt_s"] /= args.physics_substeps
@@ -163,6 +166,13 @@ def main():
     save()
     app = None
     try:
+        # Reject missing timing before starting Kit; never infer source timing
+        # from the current scene or a different dataset's metadata.
+        with h5py.File(dataset, "r") as preflight:
+            for index in args.episodes:
+                source_index = int(preflight[f"data/demo_{index}"].attrs["source_index"])
+                metadata = preflight[f"source_metadata/source_{source_index:04d}/data_attrs"]
+                validate_source_timing(json.loads(metadata.attrs["env_args"]))
         launcher = AppLauncher(args)
         app = launcher.app
         import torch
@@ -457,11 +467,19 @@ def main():
                     "clipped_values": int(np.count_nonzero(derived != commands)),
                     "maximum_command_adjustment_rad": float(np.abs(derived - commands).max()),
                     "max_lift_m": max_lift, "stable_box_release": first_success is not None,
+                    "outcomes": {
+                        "source_stable_release_criterion_pass": first_success is not None,
+                        "sequence_audit_pass": gate.report()["normal_grasp_gate_pass"],
+                        "hardware_validated": False,
+                        "training_ready": False,
+                        "source_criterion_scope": "configured stable_release_v2 on this rollout, not generation-version equivalence",
+                    },
                     "first_stable_release_step": first_success, "maximum_stable_seconds": max_stable * sim_cfg.dt,
                     "minimum_separation_m": separation_min, "normal_grasp_gate_pass": gate.report()["normal_grasp_gate_pass"],
                     "termination": ("sequence_pass" if gate.report()["normal_grasp_gate_pass"] else
                                     "sequence_failure" if gate.failures else
                                     "correction_budget_exhausted" if controller and controller.active else "recorded_horizon_end"),
+                    "termination_scope": "sequence_audit_not_source_task_or_process_exit",
                     "sequence_gate": gate.report(),
                     "placement_controller": {"active": controller.active, "done": controller.done,
                         "phase_history": controller.history, "final_phase": controller.phase,
@@ -471,6 +489,7 @@ def main():
                 with (args.output_dir / f"demo_{index}_trace.jsonl").open("x", encoding="utf-8") as stream:
                     for record in records:
                         stream.write(json.dumps(record, allow_nan=False) + "\n")
+                result["trace_sha256"] = sha256(args.output_dir / f"demo_{index}_trace.jsonl")
                 report["results"].append(result)
                 save()
                 print(json.dumps({k: result[k] for k in ("episode", "termination", "total_executed_steps",

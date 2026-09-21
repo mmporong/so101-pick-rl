@@ -91,6 +91,17 @@ class DemoSequenceGate:
     """One episode, no smoothing across missed contacts or failure recovery."""
     def __init__(self, cfg, initial_cube_position_m):
         self.cfg = cfg
+        schema = cfg.get("schema")
+        if schema == "so101_pick_rl.demo_box_sequence_gate.v1":
+            self.orientation_mode = cfg.get("orientation_mode", "legacy_wrist_angle")
+            valid = self.orientation_mode == "legacy_wrist_angle"
+        elif schema == "so101_pick_rl.demo_box_sequence_gate.v2":
+            self.orientation_mode = cfg.get("orientation_mode")
+            valid = self.orientation_mode == "world_approach_axis"
+        else:
+            valid = False
+        if not valid:
+            raise ValueError("unsupported sequence schema/orientation mode")
         self.initial_cube_m = np.asarray(initial_cube_position_m, dtype=float)
         if self.initial_cube_m.shape != (3,) or not np.isfinite(self.initial_cube_m).all():
             raise ValueError("invalid initial cube position")
@@ -108,11 +119,17 @@ class DemoSequenceGate:
         f, cfg = feature, self.cfg
         if not f["penetration_safe"]:
             self.failures.add("penetration_limit")
-        if not f["wrist_safe"]:
+        if self.orientation_mode == "legacy_wrist_angle" and not f["wrist_safe"]:
             self.failures.add("wrist_limit")
         if not f["hand_box_clear"]:
             self.failures.add("loaded_hand_box_collision")
         near = f["distance_m"] <= cfg["pregrasp_maximum_distance_m"]
+        if self.orientation_mode == "world_approach_axis":
+            axis_z = float(f["approach_world_z"])
+            if not math.isfinite(axis_z) or abs(axis_z) > 1 + 1e-6:
+                raise ValueError("invalid world approach axis")
+            if (near or f["bilateral"]) and axis_z >= 0:
+                self.failures.add("upward_gripper_approach")
         if not self.grasped:
             self.opened &= near
         # Arm opening before processing this sample's grasp, never after it.
@@ -159,6 +176,7 @@ class DemoSequenceGate:
 
     def report(self):
         return {"schema": "so101_pick_rl.demo_box_sequence_result.v1", "samples": self.samples,
+                "orientation_mode": self.orientation_mode,
                 "events": dict(self.events), "failures": sorted(self.failures),
                 "picked": self.picked, "released": self.released,
                 "stable_seconds": self.stable_steps * self.cfg["physics_dt_s"],

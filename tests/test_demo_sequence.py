@@ -96,6 +96,56 @@ class SequenceTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 DemoSequenceGate(self.cfg, position)
 
+    def use_world_axis_gate(self):
+        self.cfg = json.loads((ROOT / "configs/evaluation/demo_box_replay_gate_v2.json").read_text())
+        self.gate = DemoSequenceGate(self.cfg, [0, 0, 0])
+
+    def test_world_axis_does_not_reject_high_wrist_downward_grasp(self):
+        self.use_world_axis_gate()
+        self.gate.update(self.feature(wrist_safe=False))
+        for _ in range(12):
+            self.gate.update(self.feature(wrist_safe=False, opposing_sides=True, bilateral=True,
+                no_contact=False, opened=False, lift_m=.09, approach_world_z=-.7))
+        self.assertTrue(self.gate.picked)
+        self.assertFalse(self.gate.failures)
+
+    def test_world_axis_rejects_upward_near_approach_and_loaded_carry(self):
+        for update in (dict(approach_world_z=.1),
+                       dict(approach_world_z=.1, distance_m=.2, bilateral=True)):
+            self.use_world_axis_gate()
+            self.gate.update(self.feature(**update))
+            self.assertIn("upward_gripper_approach", self.gate.failures)
+
+    def test_world_axis_far_unloaded_reset_is_not_grasp_posture(self):
+        self.use_world_axis_gate()
+        self.gate.update(self.feature(approach_world_z=1., distance_m=.3))
+        self.assertFalse(self.gate.failures)
+
+    def test_world_axis_invalid_measurement_rejected(self):
+        for z in (float("nan"), float("inf"), 1.1):
+            self.use_world_axis_gate()
+            with self.assertRaises(ValueError):
+                self.gate.update(self.feature(approach_world_z=z))
+
+    def test_schema_and_orientation_mode_must_agree(self):
+        self.use_world_axis_gate()
+        for bad in (dict(self.cfg, orientation_mode="legacy_wrist_angle"),
+                    dict(self.cfg, schema="unknown"),
+                    {k:v for k,v in self.cfg.items() if k != "orientation_mode"},
+                    dict(self.cfg, schema="so101_pick_rl.demo_box_sequence_gate.v1")):
+            with self.assertRaises(ValueError):
+                DemoSequenceGate(bad, [0,0,0])
+
+    def test_v2_keeps_other_thresholds_and_rejects_unsupported_release(self):
+        original = self.cfg.copy()
+        self.use_world_axis_gate()
+        for key, value in original.items():
+            if key not in ("schema", "threshold_provenance"):
+                self.assertEqual(self.cfg[key], value)
+        self.establish_pick()
+        self.gate.update(self.feature(lift_m=.09, gripper_opening=True))
+        self.assertIn("unsupported_or_fast_release", self.gate.failures)
+
     def test_supported_but_fast_release_never_passes(self):
         self.establish_pick()
         self.gate.update(self.feature(bilateral=True, no_contact=False, at_rest=True, above_box=True,
