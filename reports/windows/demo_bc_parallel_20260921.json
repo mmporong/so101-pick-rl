@@ -1,0 +1,208 @@
+{
+  "schema": "so101_pick_rl.demo_bc_parallel_milestone.v1",
+  "date": "2026-09-21",
+  "status": "parallel_runtime_and_bc_pipeline_validated_policy_gate_not_met",
+  "task_id": "SO101-DemoBox-Abs-v0",
+  "task_contract_sha256": "0a966c45f6a84a3cfc07e7c8fa46582ec95c855c994439a518a3bb1ab87ee08c",
+  "source_commit": "06f3fd2b4b90e2466a94f324e398577c0fcfe81c",
+  "execution_dirty": true,
+  "execution_scope": "Local Windows RTX3060. No notebook, real robot, or PPO updates.",
+  "results": {
+    "smoke": [
+      {
+        "num_envs": 1,
+        "status": "passed",
+        "transitions": 180,
+        "checks": {
+          "observation_shape": true,
+          "observation_finite": true,
+          "source_initial_state_and_local_coordinates": true,
+          "env_origins_distinct": true,
+          "collision_filter_enabled": true,
+          "cuda_batch": true,
+          "invalid_action_rejected_before_step": true,
+          "finite_step_observations": true,
+          "previous_target_matches_executed_command": true,
+          "joint_motion_observed": true,
+          "repeat_reset_matches_initial": true
+        },
+        "wall_seconds": 1.8268643000046723,
+        "transitions_per_second": 98.52948574206614,
+        "initial_observation_max_abs_error": 0,
+        "report": "artifacts/demo_warmstart_20260921/batch_smoke1_32/report.json",
+        "report_sha256": "7638838ca05aabfc23e5dc04b9a223691fd4cf6b7d5afd5fbab6c611800a74f7"
+      },
+      {
+        "num_envs": 64,
+        "status": "passed",
+        "transitions": 11520,
+        "checks": {
+          "observation_shape": true,
+          "observation_finite": true,
+          "source_initial_state_and_local_coordinates": true,
+          "env_origins_distinct": true,
+          "collision_filter_enabled": true,
+          "cuda_batch": true,
+          "invalid_action_rejected_before_step": true,
+          "finite_step_observations": true,
+          "previous_target_matches_executed_command": true,
+          "joint_motion_observed": true,
+          "repeat_reset_matches_initial": true
+        },
+        "wall_seconds": 1.5907524999929592,
+        "transitions_per_second": 7241.8556626822765,
+        "initial_observation_max_abs_error": 5.364418029785156e-7,
+        "report": "artifacts/demo_warmstart_20260921/batch_smoke64_33/report.json",
+        "report_sha256": "cfc5dcb2861d65a62507406a9794377b27091fa763df7e37baff0df5ec90f7e3"
+      }
+    ],
+    "bc": [
+      {
+        "epochs": 4,
+        "status": "passed",
+        "counts": {
+          "episodes": 500,
+          "validation": 40826,
+          "train": 164855
+        },
+        "final_loss": {
+          "epoch": 4,
+          "train_mse": 0.0008689460394957668,
+          "validation_mse": 0.0008482338049162645
+        },
+        "training_seconds": 1.4931456000194885,
+        "checkpoint": {
+          "path": "C:\\Users\\LIMMM\\so101-pick-rl\\artifacts\\demo_warmstart_20260921\\bc_prefix4_34\\demo_bc.pt",
+          "sha256": "3d601644a5f6dbbf3374cc375a3e7eff15c1346c30786a951c6149b6df8db2a1",
+          "size_bytes": 90893
+        },
+        "report": "artifacts/demo_warmstart_20260921/bc_prefix4_34/report.json",
+        "report_sha256": "4ef13ead633314667bbecf6e5c6fd7e97e6ea391a4a57cbfb632a3c2360713f0"
+      },
+      {
+        "epochs": 20,
+        "status": "passed",
+        "counts": {
+          "episodes": 500,
+          "validation": 40826,
+          "train": 164855
+        },
+        "final_loss": {
+          "epoch": 20,
+          "train_mse": 0.0004756846973677236,
+          "validation_mse": 0.0005039225846879886
+        },
+        "training_seconds": 6.3167724999948405,
+        "checkpoint": {
+          "path": "C:\\Users\\LIMMM\\so101-pick-rl\\artifacts\\demo_warmstart_20260921\\bc_prefix20_36\\demo_bc.pt",
+          "sha256": "fe06d5fb92bdaff76b6718517a9d8741dfc43f49f72542f81e128582dccc4318",
+          "size_bytes": 90893
+        },
+        "report": "artifacts/demo_warmstart_20260921/bc_prefix20_36/report.json",
+        "report_sha256": "82896db51c839a55049eed5147d64c40853c1988bacc4a2302f2bbc59358a641"
+      }
+    ],
+    "closed_loop": [
+      {
+        "checkpoint_sha256": "fe06d5fb92bdaff76b6718517a9d8741dfc43f49f72542f81e128582dccc4318",
+        "summary": {
+          "train_shard_reset": {
+            "episodes": 32,
+            "lift_8cm_0_2s": 1,
+            "source_stable_release": 0
+          },
+          "validation_shard_reset": {
+            "episodes": 32,
+            "lift_8cm_0_2s": 0,
+            "source_stable_release": 0
+          }
+        },
+        "num_envs": 64,
+        "control_steps": 900,
+        "report": "artifacts/demo_warmstart_20260921/bc_rollout20_37/report.json",
+        "report_sha256": "c12a5c251fc0b32fe85bacb6394e09a1e29afa5e84209c290cbfc599c84e8077",
+        "evaluator_sha256": "475a5ef8eca44dea59a947f4d8270c35bbc8082c0f4d986d6dad66a27e62e1ff"
+      },
+      {
+        "checkpoint_sha256": "3d601644a5f6dbbf3374cc375a3e7eff15c1346c30786a951c6149b6df8db2a1",
+        "summary": {
+          "train_shard_reset": {
+            "episodes": 32,
+            "lift_8cm_0_2s": 0,
+            "source_stable_release": 0
+          },
+          "validation_shard_reset": {
+            "episodes": 32,
+            "lift_8cm_0_2s": 0,
+            "source_stable_release": 0
+          }
+        },
+        "num_envs": 64,
+        "control_steps": 900,
+        "report": "artifacts/demo_warmstart_20260921/bc_rollout4_38/report.json",
+        "report_sha256": "e1dd394af23f74ea3f6c88b05ccc94be977be3f17416f37fdce56a3aef9deb7e",
+        "evaluator_sha256": "475a5ef8eca44dea59a947f4d8270c35bbc8082c0f4d986d6dad66a27e62e1ff"
+      }
+    ]
+  },
+  "offline_baseline": {
+    "kind": "same_validation_rows_copy_previous_target_clipped_to_action_range",
+    "formula": "mean((clip(2*(obs[:,12:18]-lower)/(upper-lower)-1,-1,1)-normalized_next_target)**2)",
+    "mse": 0.0007784667146257115,
+    "four_epoch_mse_to_baseline_ratio": 1.0896210253593395,
+    "twenty_epoch_mse_to_baseline_ratio": 0.6473270730044128,
+    "measured_by": "read-only SDK Python audit on same load_bc_dataset output",
+    "interpretation": "4 epochs did not beat the previous-command copy baseline; 20 epochs did, but closed-loop lift remained 1/64"
+  },
+  "data": {
+    "dataset": "artifacts/demo_warmstart_20260919/mimic500_numeric.hdf5",
+    "sha256": "f41e3bb0b6fc03f5ff8f899c05a38d24407407a130697dfdb6a802e4cb22beae",
+    "source_shard_timing_verified": 20,
+    "source_episodes": 500,
+    "train_transitions": 164855,
+    "validation_transitions": 40826,
+    "release_and_later_transitions_excluded": 27642,
+    "purpose": "approach_grasp_carry_prefix_only",
+    "contact_validity_of_training_rows": "not_certified",
+    "original_demo_lineage": "unknown"
+  },
+  "verification": {
+    "contract_validator": "passed legacy LiftCube and PickPlace contracts; separate DemoBox validated by strict load_contract and tests",
+    "demo_related_tests": {
+      "run": 72,
+      "passed": 72
+    },
+    "full_suite": {
+      "run": 231,
+      "passed": 230,
+      "failed": 1,
+      "existing_failure": "test_parallel_video.ParallelVideoTests.test_camera_starts_full_then_smoothly_reaches_detail: exact-float endpoint 15.839191898578662 != 15.839191898578665",
+      "log": "artifacts/demo_warmstart_20260921/full_tests_bc_final.log"
+    },
+    "review": "native executor read-only cross-review of evaluator and BC/smoke integration: no critical finding; narrowed source-shard coverage and non-sequence source criterion retained as limitations",
+    "code_hash_binding": "Both smoke reports bind current contract, runtime, BC module, action contract and smoke script; both compared rollouts use same final evaluator hash",
+    "git_diff_check": "passed"
+  },
+  "limitations": [
+    "64 environments share one Isaac Sim process on one GPU, not 64 separate sessions",
+    "BC optimizer consumes offline minibatches; the 64-env runs are simulator smoke and policy evaluation, not parallel PPO training",
+    "Smoke repeats one recorded initial state with translated origins; closed-loop evaluation uses 64 recorded initial states",
+    "Fixed evaluation IDs 0..31 and 400..431 cover only source shards 0,1,16,17, not the full train/validation distribution",
+    "8cm/0.2s lift is geometric evidence only; opposing contact and penetration have not been audited for BC rollouts",
+    "Source stable release is an independent state predicate, not supported gentle pick-and-place success",
+    "Full sequence audit not run; hardware not tested; full pick-and-place success is not claimed",
+    "All recordings/checkpoints remain ignored local artifacts; only code and compact evidence summary are committed",
+    "4-epoch rollout35 is superseded by rollout38 after predicate extraction into a tested helper; no trials selected by success"
+  ],
+  "assessment": {
+    "confirmed": "Dataset loading, target/prestate alignment, CUDA batched stepping, strict provenance gating and BC optimization execute. Low offline loss does not establish robust grasp.",
+    "not_established": "Data scarcity, simulation version mismatch, or physical impossibility as sole failure cause",
+    "working_hypothesis": "Closed-loop distribution shift and command-persistence bias remain candidates; need phase-level rollout/contact diagnostics to distinguish them",
+    "next_experiment": [
+      "Measure approach, closure, opposing contact, lift and loss-of-contact events on fixed BC rollouts before changing rewards",
+      "Compare short phase-conditioned initialization and demo-state reset curriculum against this fixed BC baseline; preserve physical contacts and reject penetration",
+      "Add on-policy PPO recovery/reward path with separated full-sequence audit; never mix offline demonstration rows into PPO on-policy rollout buffers",
+      "Re-evaluate the same fixed cases plus a separately fixed broader reset set before claiming improvement"
+    ]
+  }
+}
