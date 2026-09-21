@@ -1,0 +1,14 @@
+{
+  "schema": "so101_pick_rl.demo_box_pad_geometry.v1",
+  "classification": "authored CAD inner-face centers and shaft axis, not calibrated hardware or cooked PhysX hulls",
+  "measured_at": "2026-09-18",
+  "unit": "m",
+  "valid_for": "64a877c3b82cdc4a48ab8a1f321a2dd3ef7c55d4b10bce222b58c530d978ae58",
+  "source_report": "reports/windows/pp_pad_frame_candidate_20260918.json",
+  "source_report_sha256": "fa85d48cb1567d88b17c8a973fddd83d1cd606e0072fd7d23ccdc8b7f5891091",
+  "mesh_extraction_sha256": "af8afc9680f7e2ec63e18064c158f86e9ed75a70ba34a9e9e667007d84e2ce32",
+  "body_order": ["gripper", "jaw"],
+  "pad_offsets_m": [[-0.009899999946355756, -0.00022008127617568276, -0.08922962798078521], [-0.01030000019157193, -0.06680549258543435, 0.018897664494315444]],
+  "inward_normals": [[1, 0, 0], [-1, 0, 0]],
+  "approach_axis_gripper_local": [0, 0, -1]
+}

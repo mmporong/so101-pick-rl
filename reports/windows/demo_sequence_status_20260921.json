@@ -1,0 +1,1024 @@
+{
+  "schema": "so101_pick_rl.demo_sequence_status.v1",
+  "date": "2026-09-21",
+  "purpose": "development diagnostics, not policy success-rate evaluation",
+  "bc": "not_run",
+  "parallel_ppo": "not_run",
+  "runs": [
+    {
+      "run": "controlled_place01",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place01/report.json",
+      "report_sha256": "f314c63aae5c6d7226b8bc8dcfc12559dc97699d7609040ff780d2d99446054a",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": null,
+      "box_offset_xy_m": null,
+      "physics_substeps": null,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 1480,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 1480,
+            "events": {
+              "open_approach_step": 38,
+              "grasp_step": 130,
+              "qualified_pick_step": 149
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "0884b6cc480415cfa2f95bda28f0226a01ea186e592912d5081434fdc0f1c931"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place02",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place02/report.json",
+      "report_sha256": "65b6fdc7e9f0e27b789b857b7889b16197fa2bfc6e9a46435f1b609fc9fe898d",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": null,
+      "box_offset_xy_m": null,
+      "physics_substeps": null,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 2680,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 2680,
+            "events": {
+              "open_approach_step": 38,
+              "grasp_step": 130,
+              "qualified_pick_step": 149
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "a0a21dcc5b41474d0f900ecc7f28df02b54dfdc4a629945a78f11ffc790ee101"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place03",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place03/report.json",
+      "report_sha256": "39952c9f4c00a28930f6f09871cf7f8a470c46255bea1d9a7de2c6efc46438f1",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": null,
+      "box_offset_xy_m": null,
+      "physics_substeps": null,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 2680,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 2680,
+            "events": {
+              "open_approach_step": 38,
+              "grasp_step": 130,
+              "qualified_pick_step": 149
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "8201f232c192eb06c646f656e7fd3d387664fb94eb35161099abfecbe829ade1"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place04",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place04/report.json",
+      "report_sha256": "760dbb2ee05609fe043c410e2643dd146fb1e0b6d1e922719dadc619148a95c6",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": null,
+      "box_offset_xy_m": null,
+      "physics_substeps": null,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 2680,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 2680,
+            "events": {
+              "open_approach_step": 38,
+              "grasp_step": 130,
+              "qualified_pick_step": 149
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "e90b318e62783b80824aeb8b21f0d8228399258250f907043ad143bf9618953a"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place05_tgs",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place05_tgs/report.json",
+      "report_sha256": "297febc913fbac81472e22e32f9f9bc4093657eb3364038553ef0a8097865357",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": null,
+      "box_offset_xy_m": null,
+      "physics_substeps": null,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 2680,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 2680,
+            "events": {
+              "open_approach_step": 38,
+              "grasp_step": 130,
+              "qualified_pick_step": 149
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "ca022cbdc10170324080fe19f2ae5f6a06da5b1374a5730315bb7f663d7a4a8e"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place06_lower_tilt",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place06_lower_tilt/report.json",
+      "report_sha256": "e75a3608777d004ea9d85d77041e997184e0393862969436e371971ddacee406",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": null,
+      "box_offset_xy_m": null,
+      "physics_substeps": null,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 2680,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 2680,
+            "events": {
+              "open_approach_step": 38,
+              "grasp_step": 130,
+              "qualified_pick_step": 149
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "59769b269a6fd3a42de8ebfd0f7c9f7d2f83e058015f54334d50858bbdd52dc1"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place07_offset",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place07_offset/report.json",
+      "report_sha256": "0739b4939303e02c5f8b24617efcb5f893f47690a48039d4d0b99ad0b1624da8",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": null,
+      "box_offset_xy_m": null,
+      "physics_substeps": null,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 2680,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 2680,
+            "events": {
+              "open_approach_step": 38,
+              "grasp_step": 130,
+              "qualified_pick_step": 149
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "9d287566023306dc0c7689d4137e6dd062dac609684f01af247b7da3f31763fe"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place08_clearance",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place08_clearance/report.json",
+      "report_sha256": "ae3cef7e4a7b1266a2c3474fb82120cb1be8dede6b67490cb144631d83ec9d80",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": null,
+      "box_offset_xy_m": null,
+      "physics_substeps": null,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 2680,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 2680,
+            "events": {
+              "open_approach_step": 38,
+              "grasp_step": 130,
+              "qualified_pick_step": 149
+            },
+            "failures": [
+              "grasp_lost_before_supported_placement",
+              "penetration_limit",
+              "unsupported_or_fast_release"
+            ],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "6d103a75c3fc0d4c2338a6485f5f1e58370dd89dc7311a0c7a31c0951f9cc80f"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place09_nearbox",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place09_nearbox/report.json",
+      "report_sha256": "34c2721df7a7a4bf256d436986dec8445546382a8e6388c8afc459298113411f",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": null,
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "physics_substeps": null,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 2680,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 2680,
+            "events": {
+              "open_approach_step": 38,
+              "grasp_step": 130,
+              "qualified_pick_step": 149
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "a71f8e0f2f652fbdf45e0a8e70745406051fe68b357c5b0139bd7048d6ca823e"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place10_limit_ik",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place10_limit_ik/report.json",
+      "report_sha256": "9f62085957c7e911d8a5c0aa156964225ab60042371dde61d0d7c823ba75ed37",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "e5ac9009a55c5e8d7ff1a54d1d25f78a7e4ab54fbf0584cbaa15ead0145e2441",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "physics_substeps": 1,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 2680,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 2680,
+            "events": {
+              "open_approach_step": 38,
+              "grasp_step": 130,
+              "qualified_pick_step": 149
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "55c01a18ed01f56af2e1426a82fc5ab7656cc8dd4f5a2606c759d4233d385ff4"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place11_240hz",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place11_240hz/report.json",
+      "report_sha256": "b3cef88d1c64a57de9ec910b44dd3c5bf493820e8e78b81d81263851a013f890",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 10720,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 10720,
+            "events": {
+              "open_approach_step": 153,
+              "grasp_step": 519,
+              "qualified_pick_step": 598
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "ac57a0ae25d5498282e505cf1111152613929a7cfaa8a7e49306357045f7dc7a"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place12_supported_effort",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place12_supported_effort/report.json",
+      "report_sha256": "2b1278c24a1b7d92cf9d4e0ee6912aa8025d68308ae08be7e3b110b7b661dfa6",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "e5ac9009a55c5e8d7ff1a54d1d25f78a7e4ab54fbf0584cbaa15ead0145e2441",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "physics_substeps": 1,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 2680,
+          "termination": null,
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 2680,
+            "events": {
+              "open_approach_step": 38,
+              "grasp_step": 130,
+              "qualified_pick_step": 149
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "a3e95354c0341bfeeafeddd69261d5306b857d85cc849ad2fd5a603c0d1cb819"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place13_supported_240hz",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place13_supported_240hz/report.json",
+      "report_sha256": "535f592e338fa73a3adcf37a9cbfec3091edb21a3ac30756f3181423c5d9c3e2",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 3106,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 3106,
+            "events": {
+              "open_approach_step": 153,
+              "grasp_step": 519,
+              "qualified_pick_step": 598
+            },
+            "failures": [
+              "grasp_lost_before_supported_placement"
+            ],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "3a36d5d45873c90dfc3398ca9c1a6159f4757fd697669ac3e82fb781b56e8391"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place14_pgs",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place14_pgs/report.json",
+      "report_sha256": "5ad54fb0e478227f289a97a8052aaed1516f083b0a37dfdb0daad285a1fe903a",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 514,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 514,
+            "events": {
+              "open_approach_step": 153
+            },
+            "failures": [
+              "penetration_limit"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "0ab78b7ef5d3566272845a384fae6574ad8a8d50683f46d70e9b96bd9eec04f8"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place15_pgs16",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place15_pgs16/report.json",
+      "report_sha256": "103d200c0207ead6e23d5468f4973f9f0843b2a0fdaa9dd58891028e3d909e40",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 514,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 514,
+            "events": {
+              "open_approach_step": 153
+            },
+            "failures": [
+              "penetration_limit"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "0ab78b7ef5d3566272845a384fae6574ad8a8d50683f46d70e9b96bd9eec04f8"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place16_tgs_velocity0",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place16_tgs_velocity0/report.json",
+      "report_sha256": "adf3f8802c2338f67097fcc5ad6a17d08ca608ddffde356058f9405f36e8cbef",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 3021,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 3021,
+            "events": {
+              "open_approach_step": 153,
+              "grasp_step": 518,
+              "qualified_pick_step": 598
+            },
+            "failures": [
+              "grasp_lost_before_supported_placement"
+            ],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "e4111f41c8085293f71bbbb50a47884bbdeba45b2f33f3d0660cf4f41c4c9153"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place17_cube_level",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place17_cube_level/report.json",
+      "report_sha256": "7186b073d016f03537103e41d57c278067ec5633ee784e7215054f8165684382",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 10720,
+          "termination": "correction_budget_exhausted",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 10720,
+            "events": {
+              "open_approach_step": 153,
+              "grasp_step": 519,
+              "qualified_pick_step": 598
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "068f6ba836be6d794fb60ac2870180e7b5d422b0ff4a8017c13eb946a3d39220"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place18_near_level",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place18_near_level/report.json",
+      "report_sha256": "43d4257a6bfd3eb1cf9bcbecb0b45877b8fd51bd255736984ec55eecaf507ae3",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.08,
+        -0.08
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 537,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 537,
+            "events": {
+              "open_approach_step": 153
+            },
+            "failures": [
+              "cube_pushed_before_grasp"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "77b6ec70af2fe5275797236f0eda705255ae90827c67853b18140db5a4f16c58"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place19_reachable_corner",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place19_reachable_corner/report.json",
+      "report_sha256": "84fde9a93c88c245c5bebc76800b3ba45916d0ceae5fb808c017aa8fb4eededc",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.08
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 10720,
+          "termination": "correction_budget_exhausted",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 10720,
+            "events": {
+              "open_approach_step": 153,
+              "grasp_step": 519,
+              "qualified_pick_step": 598
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "84f6cb3e6d511b06882217911ff5c5cf1edaf0ca31e0ddabadee701857a0149c"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place20_flat_velocity0",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place20_flat_velocity0/report.json",
+      "report_sha256": "8be135f6bab789faeb2d138d119d72ade346a5c65cafaafeacdd4dac24bae48a",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.08
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 10720,
+          "termination": "correction_budget_exhausted",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 10720,
+            "events": {
+              "open_approach_step": 153,
+              "grasp_step": 518,
+              "qualified_pick_step": 598
+            },
+            "failures": [],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "59be85f8dcfc0b319738fbc7d5e25bb37b19c44384e0f388b6de89a744bfbbd6"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place21_weight_support",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place21_weight_support/report.json",
+      "report_sha256": "df72bce98fd836cf5e8c3637d541ef2f90202cf31ca3dca1e71f89c1825635d6",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.08
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 4562,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 4562,
+            "events": {
+              "open_approach_step": 153,
+              "grasp_step": 518,
+              "qualified_pick_step": 598
+            },
+            "failures": [
+              "grasp_lost_before_supported_placement"
+            ],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "3f36bd20969b299352cb66bc45d431ca56b07909ce1c1b2f0e039cb72fd67a2d"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place22_tgs64",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place22_tgs64/report.json",
+      "report_sha256": "5ba35d7a1fb604bc3b5d136dcd9e3d9cdbe11505fd306f0d66f413661ab06219",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.08
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 5291,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 5291,
+            "events": {
+              "open_approach_step": 153,
+              "grasp_step": 518,
+              "qualified_pick_step": 598
+            },
+            "failures": [
+              "grasp_lost_before_supported_placement"
+            ],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "fe67c2b77b50230e3cb9c8122f5e467d68e16854c7ec7c87951271e85073ba10"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place23_slow_open",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place23_slow_open/report.json",
+      "report_sha256": "420ab94bef5adab0028b6f8d9e87149b402de85bd5fac75d75b8ba9da6f1d846",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.08
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": null,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 7148,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 7148,
+            "events": {
+              "open_approach_step": 153,
+              "grasp_step": 518,
+              "qualified_pick_step": 598
+            },
+            "failures": [
+              "grasp_lost_before_supported_placement"
+            ],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "30d6b8277e5b4986f4c8d91357861ef9058fe6017761654ad7166099f5133d9e"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place24_shallow_grasp",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place24_shallow_grasp/report.json",
+      "report_sha256": "28585c4f8ee09eb54667f30ebd0f6e8ccb45d92799d911e28d56b48aef50fa63",
+      "code_snapshots_verified": true,
+      "gate_sha256": "3067f7a6164fad076afb1b0aa25a46c007dcee8dd8029835dc03bbfccf763c20",
+      "effective_gate_sha256": "fa2372948699be9c94ecb4149c300a4edf39594bacf0fcfb1b34e61fed8b9ab3",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.08
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": 0.006,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 535,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 535,
+            "events": {
+              "open_approach_step": 153,
+              "grasp_step": 457
+            },
+            "failures": [
+              "cube_pushed_before_grasp"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "c45a0fc1bdc874e5e72f0e12a871dcd34e40851f48707cc5a175686a592038d0"
+        }
+      ]
+    },
+    {
+      "run": "controlled_place25_shallow3mm",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place25_shallow3mm/report.json",
+      "report_sha256": "6da0cf00676afd5b20e345da48d4318c0959440d381f69192ee0a4aeb9ca4bcb",
+      "code_snapshots_verified": true,
+      "gate_sha256": "9c06c6f8b7a7a1e86fe2d8ae2325a88a601dff2977965974e692112f94a2e19f",
+      "effective_gate_sha256": "66b4dc5313303ac8a4fea4b4190653552a2367aad0de6c9d6c71a6e475af18b8",
+      "box_offset_xy_m": [
+        -0.05,
+        -0.08
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": 0.003,
+      "results": [
+        {
+          "episode": "demo_1",
+          "steps": 534,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 534,
+            "events": {
+              "open_approach_step": 153,
+              "grasp_step": 471
+            },
+            "failures": [
+              "cube_pushed_before_grasp"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "c57b390bc7afd92745b194a83a9f8b35a56249e46ca0037ee9f8352ed23350b7"
+        }
+      ]
+    },
+    {
+      "run": "cross_demo26",
+      "report_path": "artifacts/demo_warmstart_20260921/cross_demo26/report.json",
+      "report_sha256": "d3bbb6c70598f1518caebc0324153610e2771ede98f88c9db1efe6fd5f9454d6",
+      "code_snapshots_verified": true,
+      "gate_sha256": "9c06c6f8b7a7a1e86fe2d8ae2325a88a601dff2977965974e692112f94a2e19f",
+      "effective_gate_sha256": "66b4dc5313303ac8a4fea4b4190653552a2367aad0de6c9d6c71a6e475af18b8",
+      "box_offset_xy_m": [
+        0,
+        0
+      ],
+      "physics_substeps": 4,
+      "grasp_height_offset_m": 0,
+      "results": [
+        {
+          "episode": "demo_0",
+          "steps": 67,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 67,
+            "events": {},
+            "failures": [
+              "penetration_limit"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "f9f2c4e338d118a3c12f68d58f19bd5fa2cde017e061a7dca0fef3640d477f53"
+        },
+        {
+          "episode": "demo_2",
+          "steps": 2027,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 2027,
+            "events": {
+              "open_approach_step": 1239
+            },
+            "failures": [
+              "cube_pushed_before_grasp"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "74ff547b2a3502081d62e90bff6d504aa1eaed15b5b18cd8116c7992fe85f184"
+        },
+        {
+          "episode": "demo_12",
+          "steps": 1137,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 1137,
+            "events": {
+              "open_approach_step": 533
+            },
+            "failures": [
+              "cube_pushed_before_grasp"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "22a2fc91603caff6f24f1a20a46d3f1e59781ff16d5d855404e98de2c14a2810"
+        },
+        {
+          "episode": "demo_23",
+          "steps": 1412,
+          "termination": "sequence_failure",
+          "sequence_gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 1412,
+            "events": {
+              "open_approach_step": 706
+            },
+            "failures": [
+              "cube_pushed_before_grasp"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "266348283433e6ac71680bda181dc96cdfc09a013d570f8bf1a8f596d7b46121"
+        }
+      ]
+    }
+  ]
+}

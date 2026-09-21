@@ -1,0 +1,954 @@
+{
+  "schema": "so101_pick_rl.demo_sequence_status.v1",
+  "date": "2026-09-19",
+  "purpose": "development diagnostics, not independent policy evaluation",
+  "training": {
+    "bc": "not_run",
+    "parallel_ppo": "not_run",
+    "demo_box_training_contract": "not_finalized"
+  },
+  "source_data_unchanged": {
+    "source10_sha256": "1e0109e41fad6096633f9e63b48c96a2c8c80e7a3eb77ac71880266fa0a5d742",
+    "mimic500_sha256": "f41e3bb0b6fc03f5ff8f899c05a38d24407407a130697dfdb6a802e4cb22beae"
+  },
+  "acceptance": "Full open-grasp-lift-supported-release-retreat-stability sequence; no threshold relaxation",
+  "all_completed_trial_code_snapshots_verified": true,
+  "runs": [
+    {
+      "run": "controlled_place01",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place01/report.json",
+      "report_sha256": "f314c63aae5c6d7226b8bc8dcfc12559dc97699d7609040ff780d2d99446054a",
+      "trace_sha256": "0884b6cc480415cfa2f95bda28f0226a01ea186e592912d5081434fdc0f1c931",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.016666666666666666,
+      "box_offset_xy_m": [
+        0,
+        0
+      ],
+      "place_offset_xy_m": [
+        0,
+        0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": null,
+      "level_cube": false,
+      "samples": 1480,
+      "final_phase": "align_closed",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 1480,
+        "events": {
+          "open_approach_step": 38,
+          "grasp_step": 130,
+          "qualified_pick_step": 149
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_cube": -0.000515044666826725,
+        "gripper_table": -5.418061846285127e-05,
+        "jaw_table": -0.0005792975425720215,
+        "jaw_cube": -0.0005112439393997192
+      },
+      "final_cube_xyz": [
+        0.5803287029266357,
+        -0.34968236088752747,
+        0.1450532078742981
+      ]
+    },
+    {
+      "run": "controlled_place02",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place02/report.json",
+      "report_sha256": "65b6fdc7e9f0e27b789b857b7889b16197fa2bfc6e9a46435f1b609fc9fe898d",
+      "trace_sha256": "a0a21dcc5b41474d0f900ecc7f28df02b54dfdc4a629945a78f11ffc790ee101",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.016666666666666666,
+      "box_offset_xy_m": [
+        0,
+        0
+      ],
+      "place_offset_xy_m": [
+        0,
+        0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": null,
+      "level_cube": false,
+      "samples": 2680,
+      "final_phase": "align_settle",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 2680,
+        "events": {
+          "open_approach_step": 38,
+          "grasp_step": 130,
+          "qualified_pick_step": 149
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_cube": -0.000515044666826725,
+        "gripper_table": -5.418061846285127e-05,
+        "jaw_table": -0.0005792975425720215,
+        "jaw_cube": -0.0005112439393997192
+      },
+      "final_cube_xyz": [
+        0.580086886882782,
+        -0.3525528609752655,
+        0.1421428620815277
+      ]
+    },
+    {
+      "run": "controlled_place03",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place03/report.json",
+      "report_sha256": "39952c9f4c00a28930f6f09871cf7f8a470c46255bea1d9a7de2c6efc46438f1",
+      "trace_sha256": "8201f232c192eb06c646f656e7fd3d387664fb94eb35161099abfecbe829ade1",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.016666666666666666,
+      "box_offset_xy_m": [
+        0,
+        0
+      ],
+      "place_offset_xy_m": [
+        0,
+        0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": null,
+      "level_cube": false,
+      "samples": 2680,
+      "final_phase": "lower_closed",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 2680,
+        "events": {
+          "open_approach_step": 38,
+          "grasp_step": 130,
+          "qualified_pick_step": 149
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_cube": -0.000515044666826725,
+        "gripper_table": -5.418061846285127e-05,
+        "jaw_table": -0.0005792975425720215,
+        "jaw_cube": -0.0005112439393997192,
+        "gripper_box": -4.6338427637238055e-05
+      },
+      "final_cube_xyz": [
+        0.5888672471046448,
+        -0.348585844039917,
+        0.09282609075307846
+      ]
+    },
+    {
+      "run": "controlled_place04",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place04/report.json",
+      "report_sha256": "760dbb2ee05609fe043c410e2643dd146fb1e0b6d1e922719dadc619148a95c6",
+      "trace_sha256": "e90b318e62783b80824aeb8b21f0d8228399258250f907043ad143bf9618953a",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.016666666666666666,
+      "box_offset_xy_m": [
+        0,
+        0
+      ],
+      "place_offset_xy_m": [
+        0,
+        0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": null,
+      "level_cube": false,
+      "samples": 2680,
+      "final_phase": "align_closed",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 2680,
+        "events": {
+          "open_approach_step": 38,
+          "grasp_step": 130,
+          "qualified_pick_step": 149
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_cube": -0.000515044666826725,
+        "gripper_table": -5.418061846285127e-05,
+        "jaw_table": -0.0005792975425720215,
+        "jaw_cube": -0.0005112439393997192
+      },
+      "final_cube_xyz": [
+        0.5800405740737915,
+        -0.34995490312576294,
+        0.14398957788944244
+      ]
+    },
+    {
+      "run": "controlled_place05_tgs",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place05_tgs/report.json",
+      "report_sha256": "297febc913fbac81472e22e32f9f9bc4093657eb3364038553ef0a8097865357",
+      "trace_sha256": "ca022cbdc10170324080fe19f2ae5f6a06da5b1374a5730315bb7f663d7a4a8e",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.016666666666666666,
+      "box_offset_xy_m": [
+        0,
+        0
+      ],
+      "place_offset_xy_m": [
+        0,
+        0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": true,
+      "supported_gripper_effort_limit_nm": null,
+      "level_cube": false,
+      "samples": 2680,
+      "final_phase": "align_closed",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 2680,
+        "events": {
+          "open_approach_step": 38,
+          "grasp_step": 130,
+          "qualified_pick_step": 149
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_cube": -0.000508696713950485,
+        "gripper_table": -2.491474151611328e-05,
+        "jaw_table": -0.0007183551788330078,
+        "jaw_cube": -0.0004188874736428261
+      },
+      "final_cube_xyz": [
+        0.5800981521606445,
+        -0.3499396741390228,
+        0.1446981132030487
+      ]
+    },
+    {
+      "run": "controlled_place06_lower_tilt",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place06_lower_tilt/report.json",
+      "report_sha256": "e75a3608777d004ea9d85d77041e997184e0393862969436e371971ddacee406",
+      "trace_sha256": "59769b269a6fd3a42de8ebfd0f7c9f7d2f83e058015f54334d50858bbdd52dc1",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.016666666666666666,
+      "box_offset_xy_m": [
+        0,
+        0
+      ],
+      "place_offset_xy_m": [
+        0,
+        0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": true,
+      "supported_gripper_effort_limit_nm": null,
+      "level_cube": false,
+      "samples": 2680,
+      "final_phase": "lower_closed",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 2680,
+        "events": {
+          "open_approach_step": 38,
+          "grasp_step": 130,
+          "qualified_pick_step": 149
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_cube": -0.000508696713950485,
+        "gripper_table": -2.491474151611328e-05,
+        "jaw_table": -0.0007183551788330078,
+        "jaw_cube": -0.0004188874736428261,
+        "gripper_box": -0.0007704512099735439,
+        "cube_box": 0.0010638961102813482,
+        "jaw_box": 0.006499477196484804
+      },
+      "final_cube_xyz": [
+        0.5706691145896912,
+        -0.3421570956707001,
+        0.07590488344430923
+      ]
+    },
+    {
+      "run": "controlled_place07_offset",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place07_offset/report.json",
+      "report_sha256": "0739b4939303e02c5f8b24617efcb5f893f47690a48039d4d0b99ad0b1624da8",
+      "trace_sha256": "9d287566023306dc0c7689d4137e6dd062dac609684f01af247b7da3f31763fe",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.016666666666666666,
+      "box_offset_xy_m": [
+        0,
+        0
+      ],
+      "place_offset_xy_m": [
+        0.02,
+        0.015
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": null,
+      "level_cube": false,
+      "samples": 2680,
+      "final_phase": "lower_closed",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 2680,
+        "events": {
+          "open_approach_step": 38,
+          "grasp_step": 130,
+          "qualified_pick_step": 149
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_cube": -0.000515044666826725,
+        "gripper_table": -5.418061846285127e-05,
+        "jaw_table": -0.0005792975425720215,
+        "jaw_cube": -0.0005112439393997192,
+        "gripper_box": -2.6538968086242676e-05,
+        "cube_box": 0.00515278335660696
+      },
+      "final_cube_xyz": [
+        0.5958423018455505,
+        -0.3312892019748688,
+        0.08054202795028687
+      ]
+    },
+    {
+      "run": "controlled_place08_clearance",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place08_clearance/report.json",
+      "report_sha256": "ae3cef7e4a7b1266a2c3474fb82120cb1be8dede6b67490cb144631d83ec9d80",
+      "trace_sha256": "6d103a75c3fc0d4c2338a6485f5f1e58370dd89dc7311a0c7a31c0951f9cc80f",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.016666666666666666,
+      "box_offset_xy_m": [
+        0,
+        0
+      ],
+      "place_offset_xy_m": [
+        0.02,
+        0.035
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": null,
+      "level_cube": false,
+      "samples": 2680,
+      "final_phase": "open_supported",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 2680,
+        "events": {
+          "open_approach_step": 38,
+          "grasp_step": 130,
+          "qualified_pick_step": 149
+        },
+        "failures": [
+          "grasp_lost_before_supported_placement",
+          "penetration_limit",
+          "unsupported_or_fast_release"
+        ],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_cube": -0.009821935556828976,
+        "gripper_table": -5.418061846285127e-05,
+        "jaw_table": -0.0005792975425720215,
+        "jaw_cube": -0.014134750701487064,
+        "jaw_box": -0.0010031573474407196,
+        "gripper_box": -7.405850283248583e-06,
+        "cube_box": -1.2341782166913617e-05
+      },
+      "final_cube_xyz": [
+        0.6213548183441162,
+        -0.340923935174942,
+        0.06457696855068207
+      ]
+    },
+    {
+      "run": "controlled_place09_nearbox",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place09_nearbox/report.json",
+      "report_sha256": "34c2721df7a7a4bf256d436986dec8445546382a8e6388c8afc459298113411f",
+      "trace_sha256": "a71f8e0f2f652fbdf45e0a8e70745406051fe68b357c5b0139bd7048d6ca823e",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.016666666666666666,
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "place_offset_xy_m": [
+        0.0,
+        0.0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": null,
+      "level_cube": false,
+      "samples": 2680,
+      "final_phase": "align_closed",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 2680,
+        "events": {
+          "open_approach_step": 38,
+          "grasp_step": 130,
+          "qualified_pick_step": 149
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_cube": -0.000515044666826725,
+        "gripper_table": -5.418061846285127e-05,
+        "jaw_table": -0.0005792975425720215,
+        "jaw_cube": -0.0005112439393997192
+      },
+      "final_cube_xyz": [
+        0.5672943592071533,
+        -0.3605356812477112,
+        0.24787427484989166
+      ]
+    },
+    {
+      "run": "controlled_place10_limit_ik",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place10_limit_ik/report.json",
+      "report_sha256": "9f62085957c7e911d8a5c0aa156964225ab60042371dde61d0d7c823ba75ed37",
+      "trace_sha256": "55c01a18ed01f56af2e1426a82fc5ab7656cc8dd4f5a2606c759d4233d385ff4",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.016666666666666666,
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "place_offset_xy_m": [
+        0.0,
+        0.0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": null,
+      "level_cube": false,
+      "samples": 2680,
+      "final_phase": "support_closed",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 2680,
+        "events": {
+          "open_approach_step": 38,
+          "grasp_step": 130,
+          "qualified_pick_step": 149
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_cube": -0.000515044666826725,
+        "gripper_table": -5.418061846285127e-05,
+        "jaw_table": -0.0005792975425720215,
+        "jaw_cube": -0.0005112439393997192,
+        "gripper_box": -1.9778552086791024e-05,
+        "cube_box": -2.3717902877251618e-06,
+        "jaw_box": 0.004332583397626877
+      },
+      "final_cube_xyz": [
+        0.5299014449119568,
+        -0.4001138508319855,
+        0.06985151022672653
+      ]
+    },
+    {
+      "run": "controlled_place11_240hz",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place11_240hz/report.json",
+      "report_sha256": "b3cef88d1c64a57de9ec910b44dd3c5bf493820e8e78b81d81263851a013f890",
+      "trace_sha256": "ac57a0ae25d5498282e505cf1111152613929a7cfaa8a7e49306357045f7dc7a",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.004166666666666667,
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "place_offset_xy_m": [
+        0.0,
+        0.0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": null,
+      "level_cube": false,
+      "samples": 10720,
+      "final_phase": "support_closed",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 10720,
+        "events": {
+          "open_approach_step": 153,
+          "grasp_step": 519,
+          "qualified_pick_step": 598
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_table": -1.3768672943115234e-05,
+        "gripper_cube": -3.2980922696879134e-05,
+        "jaw_table": -7.486343383789062e-05,
+        "jaw_cube": -5.589798092842102e-05,
+        "gripper_box": 0.00017287601076532155,
+        "cube_box": -1.79571679836954e-06
+      },
+      "final_cube_xyz": [
+        0.5301162004470825,
+        -0.39982038736343384,
+        0.06785553693771362
+      ]
+    },
+    {
+      "run": "controlled_place12_supported_effort",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place12_supported_effort/report.json",
+      "report_sha256": "2b1278c24a1b7d92cf9d4e0ee6912aa8025d68308ae08be7e3b110b7b661dfa6",
+      "trace_sha256": "a3e95354c0341bfeeafeddd69261d5306b857d85cc849ad2fd5a603c0d1cb819",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.016666666666666666,
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "place_offset_xy_m": [
+        0.0,
+        0.0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": 0.02,
+      "level_cube": false,
+      "samples": 2680,
+      "final_phase": "support_closed",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 2680,
+        "events": {
+          "open_approach_step": 38,
+          "grasp_step": 130,
+          "qualified_pick_step": 149
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_cube": -0.000515044666826725,
+        "gripper_table": -5.418061846285127e-05,
+        "jaw_table": -0.0005792975425720215,
+        "jaw_cube": -0.0005112439393997192,
+        "gripper_box": -2.1712647139793262e-05,
+        "cube_box": -7.828339221305214e-06,
+        "jaw_box": 0.004300102591514587
+      },
+      "final_cube_xyz": [
+        0.529961347579956,
+        -0.400134414434433,
+        0.06980530917644501
+      ]
+    },
+    {
+      "run": "controlled_place13_supported_240hz",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place13_supported_240hz/report.json",
+      "report_sha256": "535f592e338fa73a3adcf37a9cbfec3091edb21a3ac30756f3181423c5d9c3e2",
+      "trace_sha256": "3a36d5d45873c90dfc3398ca9c1a6159f4757fd697669ac3e82fb781b56e8391",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.004166666666666667,
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "place_offset_xy_m": [
+        0.0,
+        0.0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": 0.02,
+      "level_cube": false,
+      "samples": 3106,
+      "final_phase": "open_supported",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 3106,
+        "events": {
+          "open_approach_step": 153,
+          "grasp_step": 519,
+          "qualified_pick_step": 598
+        },
+        "failures": [
+          "grasp_lost_before_supported_placement"
+        ],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_table": -1.3768672943115234e-05,
+        "gripper_cube": -3.2980922696879134e-05,
+        "jaw_table": -7.486343383789062e-05,
+        "jaw_cube": -5.589798092842102e-05,
+        "gripper_box": 0.00017890160961542279,
+        "cube_box": -1.79571679836954e-06
+      },
+      "final_cube_xyz": [
+        0.5299539566040039,
+        -0.3999585211277008,
+        0.06783030927181244
+      ]
+    },
+    {
+      "run": "controlled_place14_pgs",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place14_pgs/report.json",
+      "report_sha256": "5ad54fb0e478227f289a97a8052aaed1516f083b0a37dfdb0daad285a1fe903a",
+      "trace_sha256": "0ab78b7ef5d3566272845a384fae6574ad8a8d50683f46d70e9b96bd9eec04f8",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.004166666666666667,
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "place_offset_xy_m": [
+        0.0,
+        0.0
+      ],
+      "solver_type": "pgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": 0.02,
+      "level_cube": false,
+      "samples": 514,
+      "final_phase": "recorded_transition",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 514,
+        "events": {
+          "open_approach_step": 153
+        },
+        "failures": [
+          "penetration_limit"
+        ],
+        "picked": false,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_table": -3.963708513765596e-05,
+        "gripper_cube": -6.166752427816391e-05,
+        "jaw_table": -0.000341951847076416,
+        "jaw_cube": -0.0013918166514486074
+      },
+      "final_cube_xyz": [
+        0.3587098717689514,
+        -0.4142604470252991,
+        0.056156888604164124
+      ]
+    },
+    {
+      "run": "controlled_place15_pgs16",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place15_pgs16/report.json",
+      "report_sha256": "103d200c0207ead6e23d5468f4973f9f0843b2a0fdaa9dd58891028e3d909e40",
+      "trace_sha256": "0ab78b7ef5d3566272845a384fae6574ad8a8d50683f46d70e9b96bd9eec04f8",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.004166666666666667,
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "place_offset_xy_m": [
+        0.0,
+        0.0
+      ],
+      "solver_type": "pgs",
+      "position_iterations_requested": 16,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": 0.02,
+      "level_cube": false,
+      "samples": 514,
+      "final_phase": "recorded_transition",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 514,
+        "events": {
+          "open_approach_step": 153
+        },
+        "failures": [
+          "penetration_limit"
+        ],
+        "picked": false,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_table": -3.963708513765596e-05,
+        "gripper_cube": -6.166752427816391e-05,
+        "jaw_table": -0.000341951847076416,
+        "jaw_cube": -0.0013918166514486074
+      },
+      "final_cube_xyz": [
+        0.3587098717689514,
+        -0.4142604470252991,
+        0.056156888604164124
+      ]
+    },
+    {
+      "run": "controlled_place16_tgs_velocity0",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place16_tgs_velocity0/report.json",
+      "report_sha256": "adf3f8802c2338f67097fcc5ad6a17d08ca608ddffde356058f9405f36e8cbef",
+      "trace_sha256": "e4111f41c8085293f71bbbb50a47884bbdeba45b2f33f3d0660cf4f41c4c9153",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.004166666666666667,
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "place_offset_xy_m": [
+        0.0,
+        0.0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": 0,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": 0.02,
+      "level_cube": false,
+      "samples": 3021,
+      "final_phase": "open_supported",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 3021,
+        "events": {
+          "open_approach_step": 153,
+          "grasp_step": 518,
+          "qualified_pick_step": 598
+        },
+        "failures": [
+          "grasp_lost_before_supported_placement"
+        ],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_table": -1.3768672943115234e-05,
+        "gripper_cube": -3.270898014307022e-05,
+        "jaw_table": -9.369850158691406e-05,
+        "jaw_cube": -3.96212562918663e-05,
+        "gripper_box": 8.850609447108582e-05,
+        "cube_box": -2.9692446332774125e-06
+      },
+      "final_cube_xyz": [
+        0.5299515724182129,
+        -0.39988973736763,
+        0.06778661161661148
+      ]
+    },
+    {
+      "run": "controlled_place17_cube_level",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place17_cube_level/report.json",
+      "report_sha256": "7186b073d016f03537103e41d57c278067ec5633ee784e7215054f8165684382",
+      "trace_sha256": "068f6ba836be6d794fb60ac2870180e7b5d422b0ff4a8017c13eb946a3d39220",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.004166666666666667,
+      "box_offset_xy_m": [
+        -0.05,
+        -0.05
+      ],
+      "place_offset_xy_m": [
+        0.0,
+        0.0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": 0.02,
+      "level_cube": true,
+      "samples": 10720,
+      "final_phase": "support_closed",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 10720,
+        "events": {
+          "open_approach_step": 153,
+          "grasp_step": 519,
+          "qualified_pick_step": 598
+        },
+        "failures": [],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "gripper_table": -1.3768672943115234e-05,
+        "gripper_cube": -3.2980922696879134e-05,
+        "jaw_table": -7.486343383789062e-05,
+        "jaw_cube": -5.589798092842102e-05,
+        "cube_box": 2.7087226044386625e-06,
+        "gripper_box": 0.0005249257665127516
+      },
+      "final_cube_xyz": [
+        0.5300968289375305,
+        -0.39984050393104553,
+        0.06796619296073914
+      ]
+    },
+    {
+      "run": "controlled_place18_near_level",
+      "report_path": "artifacts/demo_warmstart_20260919/controlled_place18_near_level/report.json",
+      "report_sha256": "43d4257a6bfd3eb1cf9bcbecb0b45877b8fd51bd255736984ec55eecaf507ae3",
+      "trace_sha256": "77b6ec70af2fe5275797236f0eda705255ae90827c67853b18140db5a4f16c58",
+      "code_snapshots_verified": true,
+      "physics_dt_s": 0.004166666666666667,
+      "box_offset_xy_m": [
+        -0.08,
+        -0.08
+      ],
+      "place_offset_xy_m": [
+        0.0,
+        0.0
+      ],
+      "solver_type": "tgs",
+      "position_iterations_requested": 4,
+      "max_velocity_iterations_override": null,
+      "external_forces_every_iteration": false,
+      "supported_gripper_effort_limit_nm": 0.02,
+      "level_cube": true,
+      "samples": 537,
+      "final_phase": "recorded_transition",
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 537,
+        "events": {
+          "open_approach_step": 153
+        },
+        "failures": [
+          "cube_pushed_before_grasp"
+        ],
+        "picked": false,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "minimum_separation_m": {
+        "jaw_box": -8.38589039631188e-06,
+        "gripper_table": -1.3768672943115234e-05,
+        "gripper_cube": -2.3618340492248535e-06
+      },
+      "final_cube_xyz": [
+        0.3711366355419159,
+        -0.41773131489753723,
+        0.06144630163908005
+      ]
+    }
+  ],
+  "limitations": [
+    "One repeatedly adjusted development episode; no success-rate estimate",
+    "Authored pad geometry is not hardware calibration or cooked collision geometry",
+    "Shifted-box experiments are separate conditions, not original-box success",
+    "All correction is scripted position-target control, not learned policy behavior"
+  ]
+}
