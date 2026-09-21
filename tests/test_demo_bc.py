@@ -92,6 +92,21 @@ def add_source_metadata(output, *source_indices):
 
 
 class DemoBCTests(unittest.TestCase):
+    def test_residual_contract_factory_and_parent_physics(self):
+        import torch
+        root = Path(__file__).resolve().parents[1]
+        base, _ = load_contract(root / "common/demo_box_spec.json")
+        variant, _ = load_contract(root / "common/demo_box_residual_spec.json")
+        for key in ("action", "observation", "control", "scene", "dataset", "success"):
+            self.assertEqual(base[key], variant[key])
+        model = build_policy(variant, np.zeros(34), np.ones(34))
+        obs = torch.zeros((2, 34))
+        result = model(obs)
+        lower = torch.tensor(variant["action"]["lower_rad"])
+        upper = torch.tensor(variant["action"]["upper_rad"])
+        expected = (2 * (obs[:, 12:18] - lower) / (upper - lower) - 1).clamp(-1, 1)
+        torch.testing.assert_close(result, expected)
+
     def test_repository_contract_is_strictly_bound_by_raw_file_hash(self):
         path = Path(__file__).resolve().parents[1] / "common" / "demo_box_spec.json"
         expected = file_sha256(path)

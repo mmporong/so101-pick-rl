@@ -104,7 +104,7 @@ def main() -> int:
     expected_dataset_sha = contract["dataset"]["expected_sha256"]
     if dataset_sha != expected_dataset_sha:
         raise ValueError(f"dataset SHA-256 mismatch: expected {expected_dataset_sha}, got {dataset_sha}")
-    smoke_reports = verify_smoke_reports(args.smoke_report, contract_sha)
+    smoke_reports = verify_smoke_reports(args.smoke_report, contract_sha, args.contract)
     dataset = load_bc_dataset(dataset_path, contract)
 
     device = torch.device(args.device)
@@ -118,7 +118,7 @@ def main() -> int:
     mean, std = fit_observation_normalizer(dataset.train_observations)
     train_obs = normalize_observations(dataset.train_observations, mean, std)
     validation_obs = normalize_observations(dataset.validation_observations, mean, std)
-    model = build_policy().to(device)
+    model = build_policy(contract, mean, std).to(device)
     if device.type == "cuda":
         torch.cuda.reset_peak_memory_stats(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
@@ -172,7 +172,8 @@ def main() -> int:
         "num_envs": 0,
         "epochs": args.epochs,
         "architecture": [34, 128, 128, 6],
-        "output_activation": "tanh",
+        "output_activation": contract["policy"]["output_activation"],
+        "policy_variant": contract["policy"].get("variant", "absolute"),
         "purpose": "original_source_task_approach_grasp_carry_prefix_initialization",
         "supported_placement_training_eligible": False,
     }
@@ -213,6 +214,7 @@ def main() -> int:
         "seed": args.seed,
         "epochs": args.epochs,
         "batch_size": args.batch_size,
+        "policy_variant": contract["policy"].get("variant", "absolute"),
         "learning_rate": args.learning_rate,
         "device": str(device),
         "runtime": {
@@ -252,6 +254,8 @@ def main() -> int:
             "size_bytes": checkpoint_path.stat().st_size,
         },
         "implementation": {
+            "residual_module_sha256": file_sha256(ISAACLAB_DIR / "so101_pick_rl/demo_bc_residual.py")
+                if contract["policy"].get("variant") == "previous_target_residual" else None,
             "module": {
                 "path": str((ISAACLAB_DIR / "so101_pick_rl" / "demo_bc.py").resolve()),
                 "sha256": file_sha256(ISAACLAB_DIR / "so101_pick_rl" / "demo_bc.py"),

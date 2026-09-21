@@ -62,6 +62,8 @@ def main():
     code_paths = [Path(__file__), ROOT / "isaaclab/so101_pick_rl/demo_box_runtime.py",
                   ROOT / "isaaclab/so101_pick_rl/demo_bc.py", ROOT / "isaaclab/so101_pick_rl/demo_action_contract.py",
                   args.contract]
+    if contract["policy"].get("variant") == "previous_target_residual":
+        code_paths.append(ROOT / "isaaclab/so101_pick_rl/demo_bc_residual.py")
     report = {
         "schema": "so101_pick_rl.demo_box_smoke.v1", "status": "running",
         "kind": "batched_source_command_interface_smoke", "training": False,

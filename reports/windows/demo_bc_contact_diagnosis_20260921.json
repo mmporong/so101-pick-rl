@@ -1,0 +1,788 @@
+{
+  "schema": "so101_pick_rl.demo_bc_contact_diagnosis.v1",
+  "date": "2026-09-21",
+  "status": "bounded_diagnosis_and_residual_ablation_complete_not_promoted_as_success_policy",
+  "execution_commit": "5e36bedab6de0549523cc51f5552937b68228ca8",
+  "execution_dirty": true,
+  "scope": "Windows GPU simulation and offline BC only; no PPO updates or hardware movement",
+  "contract": {
+    "base": "common/demo_box_spec.json",
+    "base_sha256": "0a966c45f6a84a3cfc07e7c8fa46582ec95c855c994439a518a3bb1ab87ee08c",
+    "variant": "common/demo_box_residual_spec.json",
+    "variant_sha256": "3a525d2409861c94e14d6ce7c89b60eb08315d596cd5612a1d43ab5ce7ed3a8e"
+  },
+  "experiment": {
+    "changed": "Previous-target skip connection plus zero-initialized residual head and final action clamp; same normalized absolute joint-target interface",
+    "unchanged": [
+      "164855 train and 40826 validation transitions",
+      "source-shard split",
+      "34D observations",
+      "20 epochs seed0 Adam1e-3 batch1024",
+      "60Hz physics, geometry, actuator limits and full sequence thresholds"
+    ],
+    "output_formula": "clip(previous_target_normalized + MLP(normalized_observation), -1, 1)",
+    "raw_source_targets": "Never modified or clipped for BC labels; actor output clamp is declared in the residual policy contract"
+  },
+  "findings": {
+    "confirmed": [
+      "Source command replay on demo1/12 produced opposing loaded contacts and lifted cube in this runtime; general physical impossibility is not supported",
+      "Absolute BC20 on three predetermined resets 1/12/400 had zero bilateral contact steps",
+      "Residual formulation reduced early gripper bias on recorded validation states but did not establish robust physical performance",
+      "Same fixed64 residual evaluation had 2 geometric lifts and 2 source stable-release hits; both selected hits failed the full sequence gate",
+      "Parallel contact instrumentation reproduced all64 maximum_lift, lift_hold, release_hold and predicate results exactly; one-env reruns did not",
+      "Episode30 at env30 had 5 penetration-unsafe samples plus hand-box collision and pre-grasp cube-push failures",
+      "Episode412 at env44 had 14 penetration-unsafe samples, hand-box collision, lost grasp before support, and unsupported or fast release"
+    ],
+    "inference": [
+      "Early arm/gripper prediction bias can accumulate through previous-target feedback; it is a candidate mechanism, not the sole proven cause",
+      "World-state-only observations require the small MLP to learn forward kinematics; explicit gripper-relative cube position is a grounded next ablation, not yet a validated fix"
+    ],
+    "not_established": [
+      "Insufficient dataset quantity as sole cause",
+      "Simulator version as sole cause",
+      "Any hardware-safe or full normal pick-and-place success",
+      "Independent held-out generalization"
+    ]
+  },
+  "offline_comparison": {
+    "scope": "First up to60 accepted prefix transitions per fixed episode: train IDs0..31, validation400..431; recorded states, not online rollout states",
+    "metrics": {
+      "absolute": {
+        "train": {
+          "rows": 1884,
+          "normalized_mse": 0.000723539968021214,
+          "true_arm_step_norm_rad": 0.12970384464009188,
+          "predicted_arm_step_norm_rad": 0.09498651047121374,
+          "true_gripper_signed_delta_rad": 0.001578075253866138,
+          "predicted_gripper_signed_delta_rad": -0.0048990680384954095,
+          "true_gripper_abs_delta_rad": 0.004194287917803453,
+          "predicted_gripper_abs_delta_rad": 0.014262364452223841
+        },
+        "validation": {
+          "rows": 1920,
+          "normalized_mse": 0.0008767484105192125,
+          "true_arm_step_norm_rad": 0.13230618579586215,
+          "predicted_arm_step_norm_rad": 0.10112816675288779,
+          "true_gripper_signed_delta_rad": -0.00017440926946234078,
+          "predicted_gripper_signed_delta_rad": -0.005311186771918956,
+          "true_gripper_abs_delta_rad": 0.0035431384329784638,
+          "predicted_gripper_abs_delta_rad": 0.013489327264251557
+        }
+      },
+      "residual": {
+        "train": {
+          "rows": 1884,
+          "normalized_mse": 0.0004678893892560154,
+          "true_arm_step_norm_rad": 0.12970384464009188,
+          "predicted_arm_step_norm_rad": 0.1010239925645315,
+          "true_gripper_signed_delta_rad": 0.001578075253866138,
+          "predicted_gripper_signed_delta_rad": 0.0014431223923540239,
+          "true_gripper_abs_delta_rad": 0.004194287917803453,
+          "predicted_gripper_abs_delta_rad": 0.005646102158446522
+        },
+        "validation": {
+          "rows": 1920,
+          "normalized_mse": 0.0005691822152584791,
+          "true_arm_step_norm_rad": 0.13230618579586215,
+          "predicted_arm_step_norm_rad": 0.1000878472815336,
+          "true_gripper_signed_delta_rad": -0.00017440926946234078,
+          "predicted_gripper_signed_delta_rad": -0.0002570233931115162,
+          "true_gripper_abs_delta_rad": 0.0035431384329784638,
+          "predicted_gripper_abs_delta_rad": 0.004530872065774289
+        }
+      }
+    },
+    "validation_mse_all_rows": {
+      "absolute20": 0.0005039225846879886,
+      "residual20": 0.0003967953792296006
+    }
+  },
+  "rollout_comparison": {
+    "fixed_episodes": "0..31 plus400..431",
+    "environment_count": 64,
+    "steps_per_environment": 900,
+    "absolute20": {
+      "lift_8cm_0_2s": 1,
+      "source_stable_release": 0,
+      "evidence": "artifacts/demo_warmstart_20260921/bc_rollout20_37/report.json"
+    },
+    "residual20": {
+      "lift_8cm_0_2s": 2,
+      "source_stable_release": 2,
+      "evidence": "artifacts/demo_warmstart_20260921/residual_rollout20_44/report.json"
+    },
+    "normal_sequence_success": "Not demonstrated; both residual source-success candidates audited and failed",
+    "candidate_selection": "30 and412 selected after diagnostic hits; not a fresh unbiased evaluation sample",
+    "original_demo_lineage": "unknown; source-shard validation is not independent original-demo holdout"
+  },
+  "artifacts": [
+    {
+      "name": "bc_contact20_39",
+      "path": "artifacts/demo_warmstart_20260921/bc_contact20_39/report.json",
+      "sha256": "84adb3c8f1753b4f44ec401771f6c1ee2cbeaa3b7a017974d2aef50b4cc9e24e",
+      "status": "completed",
+      "num_envs": 1,
+      "contact_results": [
+        {
+          "episode": 1,
+          "phase_steps": {
+            "near": 46,
+            "near_open": 21,
+            "bilateral": 0,
+            "opposing": 0,
+            "valid_grasp": 0,
+            "valid_lift": 0,
+            "penetration_unsafe": 1
+          },
+          "minimum_pad_cube_distance_m": 0.027360223890985202,
+          "maximum_lift_m": 0,
+          "gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 900,
+            "orientation_mode": "world_approach_axis",
+            "events": {
+              "open_approach_step": 20
+            },
+            "failures": [
+              "loaded_hand_box_collision",
+              "penetration_limit"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "c497b7f13530babb57fe0c488007964a0dcf1782069d563c053ab46248a53ceb"
+        },
+        {
+          "episode": 12,
+          "phase_steps": {
+            "near": 47,
+            "near_open": 0,
+            "bilateral": 0,
+            "opposing": 0,
+            "valid_grasp": 0,
+            "valid_lift": 0,
+            "penetration_unsafe": 2
+          },
+          "minimum_pad_cube_distance_m": 0.03360326562163639,
+          "maximum_lift_m": 0,
+          "gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 900,
+            "orientation_mode": "world_approach_axis",
+            "events": {},
+            "failures": [
+              "loaded_hand_box_collision",
+              "penetration_limit"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "ecedb576665d54da66f29cd02da48b694ea5deac91e7ffa3274470dad3d82b3a"
+        },
+        {
+          "episode": 400,
+          "phase_steps": {
+            "near": 715,
+            "near_open": 715,
+            "bilateral": 0,
+            "opposing": 0,
+            "valid_grasp": 0,
+            "valid_lift": 0,
+            "penetration_unsafe": 0
+          },
+          "minimum_pad_cube_distance_m": 0.04689897626600904,
+          "maximum_lift_m": 0,
+          "gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 900,
+            "orientation_mode": "world_approach_axis",
+            "events": {
+              "open_approach_step": 157
+            },
+            "failures": [
+              "loaded_hand_box_collision"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "8dff408e7480ceda784d60d53a911842a7849b84917eb7136f61df6ac5c1a8b1"
+        }
+      ]
+    },
+    {
+      "name": "source_contact_40",
+      "path": "artifacts/demo_warmstart_20260921/source_contact_40/report.json",
+      "sha256": "5fc099dbd5c7a2f8be13e09773c2a3b6d381e87422836f60d80f77e0653c23e0",
+      "status": "completed",
+      "num_envs": 1,
+      "contact_results": [
+        {
+          "episode": 1,
+          "phase_steps": {
+            "near": 139,
+            "near_open": 96,
+            "bilateral": 51,
+            "opposing": 22,
+            "valid_grasp": 22,
+            "valid_lift": 20,
+            "penetration_unsafe": 0
+          },
+          "minimum_pad_cube_distance_m": 0.0005099771231535862,
+          "maximum_lift_m": 0.1459845006465912,
+          "gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 220,
+            "orientation_mode": "world_approach_axis",
+            "events": {
+              "open_approach_step": 39,
+              "grasp_step": 153,
+              "qualified_pick_step": 164
+            },
+            "failures": [
+              "cube_pushed_before_grasp",
+              "grasp_lost_before_supported_placement",
+              "unsupported_or_fast_release"
+            ],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "7b67d928808917ba0755f3473f61aef50e8e290a95ad51aedb179a1fbe760167"
+        },
+        {
+          "episode": 12,
+          "phase_steps": {
+            "near": 500,
+            "near_open": 246,
+            "bilateral": 255,
+            "opposing": 179,
+            "valid_grasp": 179,
+            "valid_lift": 115,
+            "penetration_unsafe": 1
+          },
+          "minimum_pad_cube_distance_m": 0.003206993526947757,
+          "maximum_lift_m": 0.11777104437351227,
+          "gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 675,
+            "orientation_mode": "world_approach_axis",
+            "events": {
+              "open_approach_step": 109,
+              "grasp_step": 287,
+              "qualified_pick_step": 436
+            },
+            "failures": [
+              "cube_pushed_before_grasp",
+              "grasp_lost_before_supported_placement",
+              "loaded_hand_box_collision",
+              "penetration_limit",
+              "unsupported_or_fast_release"
+            ],
+            "picked": true,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "1cca9dd8f52d769a85f172df6200db1b7008838c3b9ecb3bb125399290896fc4"
+        }
+      ]
+    },
+    {
+      "name": "residual_smoke1_41",
+      "path": "artifacts/demo_warmstart_20260921/residual_smoke1_41/report.json",
+      "sha256": "9b245bce8555f92f6341d267ec7f268c7e04e57711d28574589edb9175981242",
+      "status": "passed",
+      "num_envs": 1,
+      "checks": {
+        "observation_shape": true,
+        "observation_finite": true,
+        "source_initial_state_and_local_coordinates": true,
+        "env_origins_distinct": true,
+        "collision_filter_enabled": true,
+        "cuda_batch": true,
+        "invalid_action_rejected_before_step": true,
+        "finite_step_observations": true,
+        "previous_target_matches_executed_command": true,
+        "joint_motion_observed": true,
+        "repeat_reset_matches_initial": true
+      }
+    },
+    {
+      "name": "residual_smoke64_42",
+      "path": "artifacts/demo_warmstart_20260921/residual_smoke64_42/report.json",
+      "sha256": "4a3f038950ecb135044d0b43ab27e7f5b2d78798f14bb9bf063b244485c06118",
+      "status": "passed",
+      "num_envs": 64,
+      "checks": {
+        "observation_shape": true,
+        "observation_finite": true,
+        "source_initial_state_and_local_coordinates": true,
+        "env_origins_distinct": true,
+        "collision_filter_enabled": true,
+        "cuda_batch": true,
+        "invalid_action_rejected_before_step": true,
+        "finite_step_observations": true,
+        "previous_target_matches_executed_command": true,
+        "joint_motion_observed": true,
+        "repeat_reset_matches_initial": true
+      }
+    },
+    {
+      "name": "bc_residual20_43",
+      "path": "artifacts/demo_warmstart_20260921/bc_residual20_43/report.json",
+      "sha256": "2489647858aa1670ab17354f43090e596ba4343eb28931b92645bab5c8ae54b8",
+      "status": "passed",
+      "num_envs": null,
+      "checkpoint": {
+        "path": "C:\\Users\\LIMMM\\so101-pick-rl\\artifacts\\demo_warmstart_20260921\\bc_residual20_43\\demo_bc.pt",
+        "sha256": "fa9abf455aa28c4a8e4da9569fa8c1fc25b8ce3281b55f694911539b1649e773",
+        "size_bytes": 92540
+      },
+      "epochs": 20,
+      "validation_mse": 0.0003967953792296006
+    },
+    {
+      "name": "residual_rollout20_44",
+      "path": "artifacts/demo_warmstart_20260921/residual_rollout20_44/report.json",
+      "sha256": "2f690b340932e97a99f58a945281258c112082c8a36ae337e5cb5793bd3ca958",
+      "status": "completed",
+      "num_envs": 64,
+      "summary": {
+        "train_shard_reset": {
+          "episodes": 32,
+          "lift_8cm_0_2s": 1,
+          "source_stable_release": 1
+        },
+        "validation_shard_reset": {
+          "episodes": 32,
+          "lift_8cm_0_2s": 1,
+          "source_stable_release": 1
+        }
+      }
+    },
+    {
+      "name": "residual_contact20_45",
+      "path": "artifacts/demo_warmstart_20260921/residual_contact20_45/report.json",
+      "sha256": "6138d94f50642e27afd8f6e81f249f99a176f14caf8db15a29927547442a60b5",
+      "status": "completed",
+      "num_envs": 1,
+      "contact_results": [
+        {
+          "episode": 1,
+          "phase_steps": {
+            "near": 0,
+            "near_open": 0,
+            "bilateral": 0,
+            "opposing": 0,
+            "valid_grasp": 0,
+            "valid_lift": 0,
+            "penetration_unsafe": 1
+          },
+          "minimum_pad_cube_distance_m": 0.24267085428121277,
+          "maximum_lift_m": 0,
+          "gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 900,
+            "orientation_mode": "world_approach_axis",
+            "events": {},
+            "failures": [
+              "loaded_hand_box_collision",
+              "penetration_limit"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "d9834afa60d3a56334ccfa1664c3b285f6e85a7050c30a0dad1ae1e7ae9a06f0"
+        },
+        {
+          "episode": 12,
+          "phase_steps": {
+            "near": 282,
+            "near_open": 40,
+            "bilateral": 0,
+            "opposing": 0,
+            "valid_grasp": 0,
+            "valid_lift": 0,
+            "penetration_unsafe": 1
+          },
+          "minimum_pad_cube_distance_m": 0.0363230364360374,
+          "maximum_lift_m": 0,
+          "gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 900,
+            "orientation_mode": "world_approach_axis",
+            "events": {
+              "open_approach_step": 718
+            },
+            "failures": [
+              "cube_pushed_before_grasp",
+              "loaded_hand_box_collision",
+              "penetration_limit"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "133b6e36fbe59ed1f1ca52792a52b04df6d533f56c8d686d26b85b1267b2bf03"
+        },
+        {
+          "episode": 400,
+          "phase_steps": {
+            "near": 533,
+            "near_open": 533,
+            "bilateral": 0,
+            "opposing": 0,
+            "valid_grasp": 0,
+            "valid_lift": 0,
+            "penetration_unsafe": 0
+          },
+          "minimum_pad_cube_distance_m": 0.015846815367255622,
+          "maximum_lift_m": 0,
+          "gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 900,
+            "orientation_mode": "world_approach_axis",
+            "events": {
+              "open_approach_step": 136
+            },
+            "failures": [],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "2edfe6275850497306d8a51675aad04c9ab29ff1cbd72ef08c8fa05bbae5b5dd"
+        }
+      ]
+    },
+    {
+      "name": "residual_candidate_contacts_46",
+      "path": "artifacts/demo_warmstart_20260921/residual_candidate_contacts_46/report.json",
+      "sha256": "ded11459c59bf0249eafb33b38a333498c3f181f5cd70f56cd7a30a1727356cd",
+      "status": "completed",
+      "num_envs": 1,
+      "contact_results": [
+        {
+          "episode": 30,
+          "phase_steps": {
+            "near": 702,
+            "near_open": 2,
+            "bilateral": 634,
+            "opposing": 0,
+            "valid_grasp": 0,
+            "valid_lift": 0,
+            "penetration_unsafe": 2
+          },
+          "minimum_pad_cube_distance_m": 0.0039139244115439726,
+          "maximum_lift_m": 0.05102621763944626,
+          "gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 900,
+            "orientation_mode": "world_approach_axis",
+            "events": {
+              "open_approach_step": 256
+            },
+            "failures": [
+              "cube_pushed_before_grasp",
+              "loaded_hand_box_collision",
+              "penetration_limit"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "fd755250ce42eb7ed92e4fe746b5710b16f65d14f1938934d94f60657f3a5fa5"
+        },
+        {
+          "episode": 412,
+          "phase_steps": {
+            "near": 823,
+            "near_open": 782,
+            "bilateral": 0,
+            "opposing": 0,
+            "valid_grasp": 0,
+            "valid_lift": 0,
+            "penetration_unsafe": 1
+          },
+          "minimum_pad_cube_distance_m": 0.026280482190026683,
+          "maximum_lift_m": 0,
+          "gate": {
+            "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+            "samples": 900,
+            "orientation_mode": "world_approach_axis",
+            "events": {
+              "open_approach_step": 120
+            },
+            "failures": [
+              "cube_pushed_before_grasp",
+              "loaded_hand_box_collision",
+              "penetration_limit"
+            ],
+            "picked": false,
+            "released": false,
+            "stable_seconds": 0,
+            "normal_grasp_gate_pass": false,
+            "real_robot_validated": false
+          },
+          "trace_sha256": "48067577dacaf6dc1f0ec2e4506ca0b7d5f50644e42a095e4f2a1f0e1a817745"
+        }
+      ]
+    }
+  ],
+  "parallel_contact_verification": {
+    "name": "residual_parallel_contacts_47",
+    "path": "artifacts/demo_warmstart_20260921/residual_parallel_contacts_47/report.json",
+    "sha256": "7087906e214005d4da275484d1c5f1f7a75f593f7e7653987ce84ab949586851",
+    "status": "completed",
+    "num_envs": 64,
+    "selected_results": [
+      {
+        "episode": 30,
+        "environment_index": 30,
+        "source_index": 1,
+        "phase_steps": {
+          "near": 492,
+          "near_open": 309,
+          "bilateral": 351,
+          "opposing": 297,
+          "valid_grasp": 295,
+          "valid_lift": 100,
+          "penetration_unsafe": 5
+        },
+        "first_phase_step": {
+          "penetration_unsafe": 8,
+          "near": 99,
+          "bilateral": 200,
+          "opposing": 224,
+          "valid_grasp": 224,
+          "near_open": 245,
+          "valid_lift": 413
+        },
+        "minimum_pad_cube_distance_m": 0.0010222417441387002,
+        "minimum_gap_m": -0.009629909149158527,
+        "maximum_lift_m": 0.23442482948303223,
+        "sequence_gate": {
+          "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+          "samples": 900,
+          "orientation_mode": "world_approach_axis",
+          "events": {
+            "open_approach_step": 574
+          },
+          "failures": [
+            "cube_pushed_before_grasp",
+            "loaded_hand_box_collision",
+            "penetration_limit"
+          ],
+          "picked": false,
+          "released": false,
+          "stable_seconds": 0,
+          "normal_grasp_gate_pass": false,
+          "real_robot_validated": false
+        },
+        "trace_sha256": "ec137e3fff7dceaf57a721856b75df343eb1549977487fe037b8764abd4ed9ef"
+      },
+      {
+        "episode": 412,
+        "environment_index": 44,
+        "source_index": 16,
+        "phase_steps": {
+          "near": 506,
+          "near_open": 48,
+          "bilateral": 237,
+          "opposing": 139,
+          "valid_grasp": 128,
+          "valid_lift": 52,
+          "penetration_unsafe": 14
+        },
+        "first_phase_step": {
+          "penetration_unsafe": 33,
+          "near": 77,
+          "bilateral": 240,
+          "near_open": 279,
+          "opposing": 306,
+          "valid_grasp": 306,
+          "valid_lift": 472
+        },
+        "minimum_pad_cube_distance_m": 0.005924698025084177,
+        "minimum_gap_m": 0.031025574273494432,
+        "maximum_lift_m": 0.23310071229934692,
+        "sequence_gate": {
+          "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+          "samples": 900,
+          "orientation_mode": "world_approach_axis",
+          "events": {
+            "open_approach_step": 282,
+            "grasp_step": 306,
+            "qualified_pick_step": 433
+          },
+          "failures": [
+            "cube_pushed_before_grasp",
+            "grasp_lost_before_supported_placement",
+            "loaded_hand_box_collision",
+            "penetration_limit",
+            "unsupported_or_fast_release"
+          ],
+          "picked": true,
+          "released": false,
+          "stable_seconds": 0,
+          "normal_grasp_gate_pass": false,
+          "real_robot_validated": false
+        },
+        "trace_sha256": "201e1a3519e3a45ab581426aaf9b9c2310a523ed366701a68078d91545ad4b35"
+      }
+    ],
+    "summary": {
+      "train_shard_reset": {
+        "episodes": 32,
+        "lift_8cm_0_2s": 1,
+        "source_stable_release": 1
+      },
+      "validation_shard_reset": {
+        "episodes": 32,
+        "lift_8cm_0_2s": 1,
+        "source_stable_release": 1
+      }
+    },
+    "contract_sha256": "3a525d2409861c94e14d6ce7c89b60eb08315d596cd5612a1d43ab5ce7ed3a8e",
+    "checkpoint_sha256": "fa9abf455aa28c4a8e4da9569fa8c1fc25b8ce3281b55f694911539b1649e773"
+  },
+  "parallel_contact_depth_diagnostics": {
+    "30": {
+      "first_failure_step": {
+        "penetration_limit": 8,
+        "loaded_hand_box_collision": 13,
+        "cube_pushed_before_grasp": 202
+      },
+      "minimum_contact_separations": {
+        "gripper_box": {
+          "minimum_separation_m": -0.007273372728377581,
+          "step": 8
+        },
+        "jaw_table": {
+          "minimum_separation_m": -0.0011573433876037598,
+          "step": 161
+        },
+        "gripper_table": {
+          "minimum_separation_m": -0.00002115964707627427,
+          "step": 233
+        },
+        "jaw_cube": {
+          "minimum_separation_m": -0.0010938243940472603,
+          "step": 245
+        },
+        "gripper_cube": {
+          "minimum_separation_m": -0.0011648336658254266,
+          "step": 602
+        },
+        "jaw_box": {
+          "minimum_separation_m": -0.0009935806738212705,
+          "step": 629
+        },
+        "cube_box": {
+          "minimum_separation_m": -0.0006454456597566605,
+          "step": 616
+        }
+      }
+    },
+    "412": {
+      "first_failure_step": {
+        "loaded_hand_box_collision": 7,
+        "penetration_limit": 33,
+        "cube_pushed_before_grasp": 183,
+        "grasp_lost_before_supported_placement": 535,
+        "unsupported_or_fast_release": 537
+      },
+      "minimum_contact_separations": {
+        "gripper_box": {
+          "minimum_separation_m": -0.0022886316291987896,
+          "step": 33
+        },
+        "jaw_box": {
+          "minimum_separation_m": -0.00044637807877734303,
+          "step": 628
+        },
+        "gripper_table": {
+          "minimum_separation_m": -0.0012205839157104492,
+          "step": 758
+        },
+        "jaw_table": {
+          "minimum_separation_m": -0.0013933777809143066,
+          "step": 287
+        },
+        "jaw_cube": {
+          "minimum_separation_m": -0.0017364260274916887,
+          "step": 307
+        },
+        "gripper_cube": {
+          "minimum_separation_m": -0.000316031277179718,
+          "step": 263
+        },
+        "cube_box": {
+          "minimum_separation_m": -0.0000011738070497813169,
+          "step": 580
+        }
+      }
+    }
+  },
+  "next_observation_candidate": {
+    "status": "read_only_feasibility_checked_not_implemented",
+    "feature": "cube_in_gripper_frame.xyz (3 extra dimensions)",
+    "availability": "finite obs/ee_frame_state in all500 episodes; derived for all205681 accepted transitions",
+    "source_definition": "ee_frame_state is gripper-origin pose in robot-root frame; target0 has no offset. Source grasp point uses separate jaw-offset target1.",
+    "offline_transform": "T_GC = inverse(T_RG) * inverse(T_WR) * T_WC",
+    "runtime_transform": "T_GC = inverse(T_WG) * T_WC",
+    "quaternion_order": "wxyz",
+    "important_constraint": "Do not subtract robot-frame EEF position from world-frame cube position. Gripper origin is about9cm from pad region; zero origin distance is not the grasp target.",
+    "source_files": [
+      "artifacts/demo_warmstart_20260919/source_snapshot/leisaac/leisaac/tasks/template/single_arm_env_cfg.py",
+      "artifacts/demo_warmstart_20260919/source_snapshot/leisaac/leisaac/enhance/envs/mdp/observations.py",
+      "artifacts/demo_warmstart_20260919/source_snapshot/leisaac/leisaac/tasks/pick_cube_into_box/pick_cube_into_box_mimic_env_cfg.py"
+    ],
+    "next_gate": "Freeze a separate37D contract, verify offline/runtime feature equality on source resets, then compare same fixed cases before any promotion",
+    "phase_label_warning": "Do not use future lift/release outcomes as online policy inputs"
+  },
+  "verification": {
+    "targeted_tests": {
+      "run": 83,
+      "passed": 83
+    },
+    "full_suite": {
+      "run": 242,
+      "passed": 241,
+      "failed": 1,
+      "existing_failure": "test_camera_starts_full_then_smoothly_reaches_detail exact float endpoint mismatch",
+      "log": "artifacts/demo_warmstart_20260921/phase_final_tests.log"
+    },
+    "residual_smoke_num_envs": [
+      1,
+      64
+    ],
+    "read_only_cross_review": "Code-reviewer APPROVE: no blocking critical/high/medium findings; 21 targeted SDK tests and py_compile passed, all9 artifact hashes and all64 paired metrics verified. Residual implementation/main integration also cross-reviewed.",
+    "nonblocking_limitations": [
+      "checkpoint normalization duplicated in top-level and residual buffers; parallel audit checks equality, earlier evaluators rely on training provenance",
+      "SDK AppLauncher standalone --help behavior with required args is limited; full execution was verified"
+    ],
+    "physics_audit_limit": "CAD pad geometry and PhysX estimates are not calibrated hardware evidence"
+  },
+  "decision": "Preserve original and experimental checkpoints. Do not promote residual20 as a normal pick-and-place solution; do not claim PPO training. Keep failure evidence and advance to relative-geometry validation."
+}

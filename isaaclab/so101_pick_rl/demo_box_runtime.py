@@ -32,6 +32,7 @@ class DemoBoxRuntime:
         device: str = "cuda:0",
         *,
         contract_path: Path | None = None,
+        enable_contact_sensors: bool = False,
     ) -> None:
         if isinstance(num_envs, bool) or not isinstance(num_envs, int) or num_envs <= 0:
             raise ValueError("num_envs must be a positive integer")
@@ -94,7 +95,7 @@ class DemoBoxRuntime:
                 prim_path="{ENV_REGEX_NS}/Robot",
                 spawn=sim_utils.UsdFileCfg(
                     usd_path=str(robot_path),
-                    activate_contact_sensors=False,
+                    activate_contact_sensors=enable_contact_sensors,
                     rigid_props=sim_utils.RigidBodyPropertiesCfg(disable_gravity=False),
                     articulation_props=sim_utils.ArticulationRootPropertiesCfg(
                         enabled_self_collisions=True,

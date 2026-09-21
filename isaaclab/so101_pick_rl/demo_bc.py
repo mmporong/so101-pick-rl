@@ -120,9 +120,17 @@ def load_contract(path: str | Path, expected_sha256: str | None = None) -> tuple
             or split.get("unit") != "whole_source_shard"):
         raise ValueError("contract dataset filters or deterministic split do not match the BC adapter")
     policy = contract.get("policy", {})
+    variant = policy.get("variant", "absolute")
+    output_valid = (
+        (variant == "absolute" and policy.get("output_activation") == "tanh")
+        or (variant == "previous_target_residual"
+            and policy.get("output_activation") == "clipped_previous_target_residual"
+            and policy.get("residual_scale") == 1.0
+            and policy.get("zero_initialized_output_head") is True)
+    )
     if (policy.get("architecture") != [34, 128, 128, 6]
             or policy.get("hidden_activation") != "relu"
-            or policy.get("output_activation") != "tanh"
+            or not output_valid
             or policy.get("loss") != "normalized_action_mse"):
         raise ValueError("contract policy does not match the fixed BC model")
     return contract, sha256
@@ -364,7 +372,7 @@ def normalize_observations(observations: Any, mean: Any, std: Any) -> np.ndarray
     return ((observations - mean) / std).astype(np.float32)
 
 
-def verify_smoke_reports(paths: list[str | Path], contract_sha256: str) -> list[dict[str, Any]]:
+def verify_smoke_reports(paths: list[str | Path], contract_sha256: str, contract_path: str | Path | None = None) -> list[dict[str, Any]]:
     if len(paths) != 2:
         raise ValueError("exactly two smoke reports are required")
     reports = []
@@ -380,7 +388,8 @@ def verify_smoke_reports(paths: list[str | Path], contract_sha256: str) -> list[
             raise ValueError("smoke reports must contain one unique 1-env and 64-env result")
         code_sha256 = report.get("code_sha256")
         required_code = {
-            "common/demo_box_spec.json": contract_sha256,
+            str(Path(contract_path).resolve().relative_to(REPOSITORY_ROOT)).replace("\\", "/")
+            if contract_path else "common/demo_box_spec.json": contract_sha256,
             "isaaclab/scripts/smoke_demo_box.py": file_sha256(REPOSITORY_ROOT / "isaaclab/scripts/smoke_demo_box.py"),
             "isaaclab/so101_pick_rl/demo_box_runtime.py": file_sha256(
                 REPOSITORY_ROOT / "isaaclab/so101_pick_rl/demo_box_runtime.py"
@@ -392,6 +401,9 @@ def verify_smoke_reports(paths: list[str | Path], contract_sha256: str) -> list[
                 REPOSITORY_ROOT / "isaaclab/so101_pick_rl/demo_action_contract.py"
             ),
         }
+        if contract_path and load_contract(contract_path)[0]["policy"].get("variant") == "previous_target_residual":
+            required_code["isaaclab/so101_pick_rl/demo_bc_residual.py"] = file_sha256(
+                REPOSITORY_ROOT / "isaaclab/so101_pick_rl/demo_bc_residual.py")
         if not isinstance(code_sha256, dict) or any(
             code_sha256.get(name) != digest for name, digest in required_code.items()
         ):
@@ -403,9 +415,14 @@ def verify_smoke_reports(paths: list[str | Path], contract_sha256: str) -> list[
     return reports
 
 
-def build_policy():
-    """Construct the fixed 34→128→128→6 tanh model lazily."""
+def build_policy(contract=None, mean=None, std=None):
+    """Build the baseline or explicitly contracted residual actor lazily."""
     import torch
+
+    if contract is not None and contract["policy"].get("variant") == "previous_target_residual":
+        from .demo_bc_residual import build_residual_policy
+        return build_residual_policy(mean, std, contract["action"]["lower_rad"],
+                                     contract["action"]["upper_rad"], contract["policy"]["residual_scale"])
 
     return torch.nn.Sequential(
         torch.nn.Linear(OBSERVATION_DIMENSION, 128),

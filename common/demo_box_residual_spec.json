@@ -1,0 +1,164 @@
+{
+  "schema": "so101_pick_rl.demo_box_training_contract.v1",
+  "task_id": "SO101-DemoBox-Abs-v0",
+  "scope": "State BC prefix initialization and batched simulation baseline, not a complete PPO task",
+  "units": {
+    "angle": "radian",
+    "length": "meter",
+    "time": "second"
+  },
+  "observation": {
+    "dimension": 34,
+    "ordered_fields": [
+      {
+        "name": "q",
+        "dimension": 6
+      },
+      {
+        "name": "dq",
+        "dimension": 6
+      },
+      {
+        "name": "previous_target",
+        "dimension": 6
+      },
+      {
+        "name": "cube_pose",
+        "dimension": 7
+      },
+      {
+        "name": "cube_velocity",
+        "dimension": 6
+      },
+      {
+        "name": "box_position",
+        "dimension": 3
+      }
+    ],
+    "position_frame": "environment_local",
+    "quaternion_order": "wxyz",
+    "velocity_frame": "world_axes_envs_are_translation_only",
+    "previous_target": "last executed absolute command, initialized from source obs/joint_pos_target[0]",
+    "normalization": "per_dimension mean/std fitted on training split only, std below 1e-6 replaced by 1"
+  },
+  "action": {
+    "dimension": 6,
+    "type": "normalized_absolute_joint_targets",
+    "joint_names": [
+      "shoulder_pan",
+      "shoulder_lift",
+      "elbow_flex",
+      "wrist_flex",
+      "wrist_roll",
+      "gripper"
+    ],
+    "lower_rad": [
+      -1.9198598861694336,
+      -1.7453298568725586,
+      -1.7453298568725586,
+      -1.65805983543396,
+      -2.792530059814453,
+      -0.17453300952911377
+    ],
+    "upper_rad": [
+      1.9198598861694336,
+      1.7453298568725586,
+      1.5707998275756836,
+      1.65805983543396,
+      2.792530059814453,
+      1.7453298568725586
+    ],
+    "mapping": "lower + (action + 1) * (upper - lower) / 2",
+    "normalized_range": [
+      -1,
+      1
+    ],
+    "out_of_range": "reject_no_clipping",
+    "extra_wrist_limit": null
+  },
+  "control": {
+    "dt": 0.016666666666666666,
+    "decimation": 1,
+    "gripper_effort_policy": "source_nearest_rigid_object"
+  },
+  "scene": {
+    "cube_edge_m": 0.03,
+    "environment_spacing_m": 8,
+    "robot_sha256": "64a877c3b82cdc4a48ab8a1f321a2dd3ef7c55d4b10bce222b58c530d978ae58",
+    "scene_sha256": "654443f27a55bdf8ce07bd8fb1c60dec14bd7de230304056c185b4f90fb05cbc",
+    "physics": {
+      "solver": "tgs",
+      "robot_position_iterations": 4,
+      "robot_velocity_iterations": 4,
+      "external_forces_every_iteration": false
+    },
+    "box_walls": "kinematic contact-audit-compatible source-scene variant",
+    "physical_state_writes": "reset_only",
+    "cube_attachment": false
+  },
+  "dataset": {
+    "expected_sha256": "f41e3bb0b6fc03f5ff8f899c05a38d24407407a130697dfdb6a802e4cb22beae",
+    "source": "preserved mimic500_numeric.hdf5",
+    "read_only": true,
+    "input_action_field": "obs/joint_pos_target[t+1]",
+    "prestate": "obs[t], initial rigid states at t=0, states[t-1] thereafter",
+    "raw_eef_actions_used": false,
+    "transition_filter": {
+      "reject_out_of_bounds": true,
+      "maximum_target_step_l2_rad": 1
+    },
+    "prefix_filter": {
+      "first_lift_m": 0.08,
+      "opening_delta_rad": 0.03,
+      "exclude_first_open_after_lift_and_all_later": true
+    },
+    "split": {
+      "train_source_index": [
+        0,
+        15
+      ],
+      "validation_source_index": [
+        16,
+        19
+      ],
+      "unit": "whole_source_shard",
+      "original_demo_lineage": "unknown",
+      "independent_policy_holdout": false
+    }
+  },
+  "policy": {
+    "architecture": [
+      34,
+      128,
+      128,
+      6
+    ],
+    "hidden_activation": "relu",
+    "output_activation": "clipped_previous_target_residual",
+    "variant": "previous_target_residual",
+    "residual_scale": 1.0,
+    "zero_initialized_output_head": true,
+    "formula": "clip(previous_target_normalized + residual_scale * MLP(normalized_observation), -1, 1)",
+    "loss": "normalized_action_mse",
+    "purpose": "approach_grasp_carry_prefix_initialization"
+  },
+  "success": {
+    "source_stable_release": "diagnostic only; does not prove supported gentle placement",
+    "full_sequence_gate": "configs/evaluation/demo_box_replay_gate_v2.json",
+    "full_sequence_gate_required_for_pick_and_place_claim": true,
+    "bc_loss_is_policy_success": false,
+    "hardware_validated": false
+  },
+  "training_gate": {
+    "required_smoke_num_envs": [
+      1,
+      64
+    ],
+    "same_contract_sha256": true,
+    "policy_rollout_evaluation": "separate_from_offline_loss"
+  },
+  "derived_from": {
+    "path": "common/demo_box_spec.json",
+    "sha256": "0a966c45f6a84a3cfc07e7c8fa46582ec95c855c994439a518a3bb1ab87ee08c"
+  }
+}

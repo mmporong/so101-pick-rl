@@ -79,6 +79,8 @@ def main():
         "code_sha256": {p: file_sha256(ROOT / p) for p in
                         ("isaaclab/scripts/evaluate_demo_bc.py", "isaaclab/so101_pick_rl/demo_bc.py", "isaaclab/so101_pick_rl/demo_box_runtime.py")},
     }
+    if contract["policy"].get("variant") == "previous_target_residual":
+        report["code_sha256"]["isaaclab/so101_pick_rl/demo_bc_residual.py"] = file_sha256(ROOT / "isaaclab/so101_pick_rl/demo_bc_residual.py")
     def save():
         (args.output_dir / "report.json").write_text(json.dumps(report, indent=2, allow_nan=False), encoding="utf-8")
     save()
@@ -92,11 +94,11 @@ def main():
         checkpoint = torch.load(args.checkpoint, map_location=runtime.device, weights_only=True)
         if checkpoint["contract_sha256"] != digest or checkpoint["dataset_sha256"] != report["dataset_sha256"]:
             raise ValueError("checkpoint embedded hashes do not match inputs")
-        policy = build_policy().to(runtime.device).eval()
-        policy.load_state_dict(checkpoint["model_state_dict"])
         mean, std = checkpoint["observation_mean"], checkpoint["observation_std"]
         if mean.shape != (34,) or std.shape != (34,) or not torch.isfinite(mean).all() or not torch.isfinite(std).all() or not (std > 0).all():
             raise ValueError("invalid checkpoint observation normalizer")
+        policy = build_policy(contract, mean, std).to(runtime.device).eval()
+        policy.load_state_dict(checkpoint["model_state_dict"])
         state = {kind: {name: {field: torch.as_tensor(np.concatenate([s[kind][name][field] for s in states]), device=runtime.device)
                                for field in entity}
                         for name, entity in entities.items()} for kind, entities in states[0].items()}
