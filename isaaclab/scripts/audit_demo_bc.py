@@ -19,6 +19,9 @@ from so101_pick_rl.demo_bc import load_contract, file_sha256, build_policy
 from so101_pick_rl.demo_action_contract import aligned_targets, normalize_targets, validate_source_timing
 from so101_pick_rl.demo_sequence import DemoSequenceGate, sequence_features
 from so101_pick_rl.grasp_audit import unpack_contacts
+from so101_pick_rl.demo_reset_bootstrap import (
+    controller_action, reset_bootstrap_metadata, validate_reset_bootstrap,
+)
 
 
 def phase_flags(feature, cfg):
@@ -43,9 +46,11 @@ def main():
     parser.add_argument("--episodes", nargs="+", type=int, default=[1, 12, 400])
     parser.add_argument("--steps", type=int, default=900)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--reset-bootstrap", choices=("none", "home-open-one-step"), default="none")
     from isaaclab.app import AppLauncher
     AppLauncher.add_app_launcher_args(parser)
     args = parser.parse_args()
+    validate_reset_bootstrap(args.reset_bootstrap, args.controller)
     if args.steps < 1 or len(set(args.episodes)) != len(args.episodes) or min(args.episodes) < 0:
         raise ValueError("invalid steps or episode selection")
     contract_path = args.contract
@@ -76,12 +81,14 @@ def main():
               "task_contract_sha256": digest, "dataset_sha256": contract["dataset"]["expected_sha256"],
               "episodes": args.episodes, "steps_requested": args.steps, "num_envs": 1,
               "training": False, "hardware_validated": False, "results": [],
+              "reset_bootstrap": reset_bootstrap_metadata(args.reset_bootstrap, args.controller),
               "git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
               "git_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True))}
     code = args.output_dir / "code"
     code.mkdir()
     paths = [Path(__file__), contract_path, geometry_path, gate_path] + [ROOT / "isaaclab/so101_pick_rl" / name for name in
-            ("demo_bc.py", "demo_box_runtime.py", "demo_sequence.py", "demo_action_contract.py", "demo_replay_metrics.py", "grasp_audit.py")]
+            ("demo_bc.py", "demo_box_runtime.py", "demo_sequence.py", "demo_action_contract.py", "demo_replay_metrics.py", "grasp_audit.py",
+             "demo_reset_bootstrap.py")]
     if contract["policy"].get("variant") == "previous_target_residual":
         paths.append(ROOT / "isaaclab/so101_pick_rl/demo_bc_residual.py")
     report["code_sha256"] = {}
@@ -150,7 +157,10 @@ def main():
                         pre = {"joint_position_rad": obs[0, :6].cpu().tolist(), "previous_target_rad": obs[0, 12:18].cpu().tolist(),
                                "box_position_w_m": box.data.root_pos_w[0].cpu().tolist()}
                         if actions is None:
-                            action = model((obs - mean) / std)
+                            action = controller_action(
+                                args.reset_bootstrap, step, obs, mean, std, model,
+                                contract["action"]["lower_rad"], contract["action"]["upper_rad"],
+                            )
                         else:
                             action = torch.as_tensor(actions[step:step+1], dtype=torch.float32, device=runtime.device)
                         obs = runtime.step(action)

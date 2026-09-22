@@ -26,6 +26,7 @@ from so101_pick_rl.demo_action_contract import validate_source_timing  # noqa: E
 from so101_pick_rl.demo_bc import build_policy, file_sha256, load_contract  # noqa: E402
 from so101_pick_rl.demo_sequence import DemoSequenceGate, sequence_features  # noqa: E402
 from so101_pick_rl.grasp_audit import unpack_contacts  # noqa: E402
+from so101_pick_rl.demo_reset_bootstrap import controller_action, reset_bootstrap_metadata  # noqa: E402
 
 
 def fixed_episode_ids() -> list[int]:
@@ -56,6 +57,7 @@ def _snapshot_paths(contract_path: Path) -> dict[str, Path]:
         "isaaclab/so101_pick_rl/demo_action_contract.py": ROOT / "isaaclab/so101_pick_rl/demo_action_contract.py",
         "isaaclab/so101_pick_rl/demo_replay_metrics.py": ROOT / "isaaclab/so101_pick_rl/demo_replay_metrics.py",
         "isaaclab/so101_pick_rl/grasp_audit.py": ROOT / "isaaclab/so101_pick_rl/grasp_audit.py",
+        "isaaclab/so101_pick_rl/demo_reset_bootstrap.py": ROOT / "isaaclab/so101_pick_rl/demo_reset_bootstrap.py",
         "configs/isaaclab/demo_box_pad_geometry.json": ROOT / "configs/isaaclab/demo_box_pad_geometry.json",
         "configs/evaluation/demo_box_replay_gate_v2.json": ROOT / "configs/evaluation/demo_box_replay_gate_v2.json",
         "contract.json": contract_path,
@@ -72,6 +74,7 @@ def main() -> int:
     parser.add_argument("--training-report", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--selected-episodes", nargs="+", type=int, default=[30, 412])
+    parser.add_argument("--reset-bootstrap", choices=("none", "home-open-one-step"), default="none")
     help_requested = any(argument in ("-h", "--help") for argument in sys.argv[1:])
     from isaaclab.app import AppLauncher
     AppLauncher.add_app_launcher_args(parser)
@@ -174,6 +177,7 @@ def main() -> int:
         "git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
         "git_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True)),
         "state_write_scope": "one_initial_reset_for_all_64_environments",
+        "reset_bootstrap": reset_bootstrap_metadata(args.reset_bootstrap),
         "limitations": [
             "selected traces instrument only their original environment indices inside the same 64-environment rollout",
             "the result discriminates instrumentation or batching sensitivity but does not infer that a one-environment failure invalidates 64 environments",
@@ -304,7 +308,11 @@ def main() -> int:
                 max_normalized_observation = torch.maximum(
                     max_normalized_observation, normalized.abs().max(dim=1).values
                 )
-                observation = runtime.step(policy(normalized))
+                action = controller_action(
+                    args.reset_bootstrap, step, observation, mean, std, policy,
+                    contract["action"]["lower_rad"], contract["action"]["upper_rad"],
+                )
+                observation = runtime.step(action)
                 lift, release = diagnostic_flags(observation, initial_z)
                 peak_lift = torch.maximum(peak_lift, lift)
                 lift_run = torch.where(lift >= 0.08, lift_run + 1, 0)

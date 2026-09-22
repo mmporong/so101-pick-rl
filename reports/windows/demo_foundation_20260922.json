@@ -1,0 +1,375 @@
+{
+  "schema": "so101_pick_rl.demo_foundation_status.v1",
+  "date": "2026-09-22",
+  "status": "partial_root_cause_verified_full_task_unresolved",
+  "artifacts": {
+    "foundation": {
+      "path": "artifacts/demo_warmstart_20260922/foundation_53.json",
+      "sha256": "21cb62690a381ecf8df28cc20f16bcffd2f0636780bc12f45bbc0b793900eab0"
+    },
+    "bootstrap_single": {
+      "path": "artifacts/demo_warmstart_20260922/reset_contact_49/report.json",
+      "sha256": "aa9d23dd05d223459c8e68183aa793a75894f48399ad9d9b372a4b94f475e7af"
+    },
+    "bootstrap_parallel": {
+      "path": "artifacts/demo_warmstart_20260922/reset_parallel_50/report.json",
+      "sha256": "bd7035ef323a71a43ea8b64293f71f4993d54d7253c3bb2d74f7ef75e3e99e3d"
+    },
+    "bootstrap_candidates": {
+      "path": "artifacts/demo_warmstart_20260922/reset_candidates_51/report.json",
+      "sha256": "5d0b42f76c0d7f0078557a01fa4c067a9098d77ed76627370073dd501b51aa11"
+    },
+    "no_bootstrap_control": {
+      "path": "artifacts/demo_warmstart_20260922/reset_none_control_52/report.json",
+      "sha256": "5aa3525325452d61d366c78fb5ed54280241f583f15b059681356e57047cdd22"
+    },
+    "previous_parallel": {
+      "path": "artifacts/demo_warmstart_20260921/residual_parallel_contacts_47/report.json",
+      "sha256": "7087906e214005d4da275484d1c5f1f7a75f593f7e7653987ce84ab949586851"
+    }
+  },
+  "foundation": {
+    "episodes": 500,
+    "zero_joint_reset_episodes": 500,
+    "first_transition_continuity_rejected": 495,
+    "first_command_jump_median_rad": 1.8891293508955405,
+    "episodes_with_opening_proxy": 494,
+    "opening_clearance_quantiles_m": [
+      0.0008644904604075548,
+      0.050041795169883795,
+      0.05905273404314419,
+      0.0699868682955379,
+      0.10971168700721307
+    ],
+    "opening_above_1cm": 493,
+    "opening_center_in_source_xy_window": 483,
+    "opening_speed_above_3cm_s": 494,
+    "contact_verified_release_count": null,
+    "full_supported_place_success_count": null
+  },
+  "foundation_scope": "Opening is a joint-angle proxy, not contact-verified release; no complete supported-place teacher is certified by this audit",
+  "reset_diagnosis": "495/500 initial transitions fail the existing continuity filter, but legacy inference starts from those reset observations; fixed home/open bootstrap changes the actual first command without state writes",
+  "bootstrap": {
+    "mode": "home-open-one-step",
+    "command_rad": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.35
+    ],
+    "steps": 1,
+    "policy_weights_unchanged": true,
+    "derived_controller": true
+  },
+  "paired_evaluation": {
+    "same_checkpoint_sha256": "fa9abf455aa28c4a8e4da9569fa8c1fc25b8ce3281b55f694911539b1649e773",
+    "same_task_contract_sha256": "3a525d2409861c94e14d6ce7c89b60eb08315d596cd5612a1d43ab5ce7ed3a8e",
+    "same_dataset_sha256": "f41e3bb0b6fc03f5ff8f899c05a38d24407407a130697dfdb6a802e4cb22beae",
+    "num_envs": 64,
+    "steps_including_bootstrap": 900,
+    "seed": 0,
+    "selected_contacts": [
+      1,
+      12,
+      30,
+      400,
+      412
+    ],
+    "baseline": {
+      "train_shard_reset": {
+        "episodes": 32,
+        "lift_8cm_0_2s": 1,
+        "source_stable_release": 1
+      },
+      "validation_shard_reset": {
+        "episodes": 32,
+        "lift_8cm_0_2s": 1,
+        "source_stable_release": 1
+      }
+    },
+    "bootstrap": {
+      "train_shard_reset": {
+        "episodes": 32,
+        "lift_8cm_0_2s": 1,
+        "source_stable_release": 1
+      },
+      "validation_shard_reset": {
+        "episodes": 32,
+        "lift_8cm_0_2s": 1,
+        "source_stable_release": 0
+      }
+    },
+    "contact_comparison": [
+      {
+        "episode": 1,
+        "baseline_first_failures": {
+          "loaded_hand_box_collision": 6,
+          "penetration_limit": 6
+        },
+        "bootstrap_first_failures": {},
+        "baseline_phase_steps": {
+          "near": 0,
+          "near_open": 0,
+          "bilateral": 0,
+          "opposing": 0,
+          "valid_grasp": 0,
+          "valid_lift": 0,
+          "penetration_unsafe": 2
+        },
+        "bootstrap_phase_steps": {
+          "near": 405,
+          "near_open": 405,
+          "bilateral": 0,
+          "opposing": 0,
+          "valid_grasp": 0,
+          "valid_lift": 0,
+          "penetration_unsafe": 0
+        }
+      },
+      {
+        "episode": 12,
+        "baseline_first_failures": {
+          "loaded_hand_box_collision": 29
+        },
+        "bootstrap_first_failures": {},
+        "baseline_phase_steps": {
+          "near": 0,
+          "near_open": 0,
+          "bilateral": 0,
+          "opposing": 0,
+          "valid_grasp": 0,
+          "valid_lift": 0,
+          "penetration_unsafe": 0
+        },
+        "bootstrap_phase_steps": {
+          "near": 137,
+          "near_open": 0,
+          "bilateral": 0,
+          "opposing": 0,
+          "valid_grasp": 0,
+          "valid_lift": 0,
+          "penetration_unsafe": 0
+        }
+      },
+      {
+        "episode": 30,
+        "baseline_first_failures": {
+          "penetration_limit": 8,
+          "loaded_hand_box_collision": 13,
+          "cube_pushed_before_grasp": 202
+        },
+        "bootstrap_first_failures": {
+          "cube_pushed_before_grasp": 484,
+          "penetration_limit": 507
+        },
+        "baseline_phase_steps": {
+          "near": 492,
+          "near_open": 309,
+          "bilateral": 351,
+          "opposing": 297,
+          "valid_grasp": 295,
+          "valid_lift": 100,
+          "penetration_unsafe": 5
+        },
+        "bootstrap_phase_steps": {
+          "near": 280,
+          "near_open": 280,
+          "bilateral": 0,
+          "opposing": 0,
+          "valid_grasp": 0,
+          "valid_lift": 0,
+          "penetration_unsafe": 2
+        }
+      },
+      {
+        "episode": 400,
+        "baseline_first_failures": {},
+        "bootstrap_first_failures": {
+          "cube_pushed_before_grasp": 253,
+          "penetration_limit": 382
+        },
+        "baseline_phase_steps": {
+          "near": 532,
+          "near_open": 532,
+          "bilateral": 0,
+          "opposing": 0,
+          "valid_grasp": 0,
+          "valid_lift": 0,
+          "penetration_unsafe": 0
+        },
+        "bootstrap_phase_steps": {
+          "near": 688,
+          "near_open": 226,
+          "bilateral": 459,
+          "opposing": 259,
+          "valid_grasp": 259,
+          "valid_lift": 0,
+          "penetration_unsafe": 2
+        }
+      },
+      {
+        "episode": 412,
+        "baseline_first_failures": {
+          "loaded_hand_box_collision": 7,
+          "penetration_limit": 33,
+          "cube_pushed_before_grasp": 183,
+          "grasp_lost_before_supported_placement": 535,
+          "unsupported_or_fast_release": 537
+        },
+        "bootstrap_first_failures": {},
+        "baseline_phase_steps": {
+          "near": 506,
+          "near_open": 48,
+          "bilateral": 237,
+          "opposing": 139,
+          "valid_grasp": 128,
+          "valid_lift": 52,
+          "penetration_unsafe": 14
+        },
+        "bootstrap_phase_steps": {
+          "near": 385,
+          "near_open": 385,
+          "bilateral": 0,
+          "opposing": 0,
+          "valid_grasp": 0,
+          "valid_lift": 0,
+          "penetration_unsafe": 0
+        }
+      }
+    ]
+  },
+  "bootstrap_lift_candidates": [
+    {
+      "episode": 17,
+      "phase_steps": {
+        "near": 551,
+        "near_open": 290,
+        "bilateral": 240,
+        "opposing": 176,
+        "valid_grasp": 175,
+        "valid_lift": 81,
+        "penetration_unsafe": 5
+      },
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 900,
+        "orientation_mode": "world_approach_axis",
+        "events": {
+          "open_approach_step": 64,
+          "grasp_step": 367,
+          "qualified_pick_step": 422
+        },
+        "failures": [
+          "cube_pushed_before_grasp",
+          "grasp_lost_before_supported_placement",
+          "penetration_limit",
+          "unsupported_or_fast_release"
+        ],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "first_failures": {
+        "penetration_limit": 319,
+        "cube_pushed_before_grasp": 325,
+        "grasp_lost_before_supported_placement": 595,
+        "unsupported_or_fast_release": 596
+      }
+    },
+    {
+      "episode": 400,
+      "phase_steps": {
+        "near": 688,
+        "near_open": 226,
+        "bilateral": 459,
+        "opposing": 259,
+        "valid_grasp": 259,
+        "valid_lift": 0,
+        "penetration_unsafe": 2
+      },
+      "sequence_gate": {
+        "schema": "so101_pick_rl.demo_box_sequence_result.v1",
+        "samples": 900,
+        "orientation_mode": "world_approach_axis",
+        "events": {
+          "open_approach_step": 146,
+          "grasp_step": 442,
+          "qualified_pick_step": 878
+        },
+        "failures": [
+          "cube_pushed_before_grasp",
+          "penetration_limit"
+        ],
+        "picked": true,
+        "released": false,
+        "stable_seconds": 0.0,
+        "normal_grasp_gate_pass": false,
+        "real_robot_validated": false
+      },
+      "first_failures": {
+        "cube_pushed_before_grasp": 253,
+        "penetration_limit": 382
+      }
+    }
+  ],
+  "verification": {
+    "all_reports_completed": true,
+    "all_selected_trace_hashes_and_900_rows_verified": true,
+    "bootstrap_trace_first_command_verified": true,
+    "all_64_metrics_identical_with_alternate_contact_selection": true,
+    "fresh_no_bootstrap_control_reproduces_previous_64_metrics": true,
+    "contract_validator": "passed",
+    "demo_tests": {
+      "passed": 94,
+      "failed": 0
+    },
+    "full_tests": {
+      "total": 253,
+      "passed": 252,
+      "failed": 1,
+      "existing_failure": "test_parallel_video.ParallelVideoTests.test_camera_starts_full_then_smoothly_reaches_detail - exact float equality"
+    }
+  },
+  "independent_code_review": {
+    "role": "code-reviewer",
+    "verdict": "comment_no_blocking_code_findings",
+    "files_reviewed": 10,
+    "blocking_findings": 0,
+    "limitation": "LSP and pyright unavailable; syntax, tests, source review and execution artifacts verified instead"
+  },
+  "decisions": {
+    "new_training_updates": 0,
+    "ppo_updates": 0,
+    "full_task_solved": false,
+    "real_robot_motion": false,
+    "default_controller_changed": false,
+    "bootstrap_status": "diagnostic option, not a demonstrated full-task remedy",
+    "rnn_status": "researched_not_implemented",
+    "next_gate": "collision-free supported placement/open/retreat reference in the unchanged scene; then contact-verified teacher phase coverage and single-demo closed-loop policy reproduction before scaling"
+  },
+  "limitations": [
+    "Development cases, not an independent policy holdout",
+    "Recorded source shards do not establish original demonstration lineage independence",
+    "Existing full-sequence contact, penetration and release thresholds unchanged",
+    "Runs retain pre-existing dirty grasp_audit source snapshots; not clean-commit portfolio evidence",
+    "No camera model, ACT, VLA, SDK dependency change, or object attachment"
+  ],
+  "research": [
+    {
+      "topic": "Upstream low-dimensional seq10 LSTM400x2 recipe; reference, not reproduced SO101 success",
+      "url": "https://github.com/isaac-sim/IsaacLab/blob/v2.1.1/source/isaaclab_tasks/isaaclab_tasks/manager_based/manipulation/stack/config/franka/agents/robomimic/bc_rnn_low_dim.json"
+    },
+    {
+      "topic": "Joint-target conversion is supported; changing to EEF actions is not required to repair reset",
+      "url": "https://github.com/LightwheelAI/leisaac/blob/main/scripts/mimic/eef_action_process.py"
+    },
+    {
+      "topic": "IsaacLab2.1.1 robomimic v0.4 dependency limited to Linux; no Windows SDK global install performed",
+      "url": "https://github.com/isaac-sim/IsaacLab/blob/v2.1.1/source/isaaclab_mimic/setup.py"
+    }
+  ]
+}

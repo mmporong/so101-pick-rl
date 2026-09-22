@@ -15,6 +15,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "isaaclab"))
 from so101_pick_rl.demo_bc import build_policy, file_sha256, load_contract
+from so101_pick_rl.demo_reset_bootstrap import controller_action, reset_bootstrap_metadata
 
 
 def diagnostic_flags(observation, initial_z):
@@ -41,6 +42,7 @@ def main():
     parser.add_argument("--training-report", type=Path, required=True)
     parser.add_argument("--contract", type=Path, default=ROOT / "common/demo_box_spec.json")
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--reset-bootstrap", choices=("none", "home-open-one-step"), default="none")
     from isaaclab.app import AppLauncher
     AppLauncher.add_app_launcher_args(parser)
     args = parser.parse_args()
@@ -73,11 +75,13 @@ def main():
         "source_indices": sources, "training": False, "ppo_updates": 0,
         "full_sequence_audit": "not_run", "hardware_validated": False,
         "independent_heldout_evaluation": "not_available_original_demo_lineage_unknown",
+        "reset_bootstrap": reset_bootstrap_metadata(args.reset_bootstrap),
         "metric_scope": "8cm lift held0.2s and source box release held0.5s; no contact validity certificate",
         "git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
         "git_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True)),
         "code_sha256": {p: file_sha256(ROOT / p) for p in
-                        ("isaaclab/scripts/evaluate_demo_bc.py", "isaaclab/so101_pick_rl/demo_bc.py", "isaaclab/so101_pick_rl/demo_box_runtime.py")},
+                        ("isaaclab/scripts/evaluate_demo_bc.py", "isaaclab/so101_pick_rl/demo_bc.py", "isaaclab/so101_pick_rl/demo_box_runtime.py",
+                         "isaaclab/so101_pick_rl/demo_reset_bootstrap.py")},
     }
     if contract["policy"].get("variant") == "previous_target_residual":
         report["code_sha256"]["isaaclab/so101_pick_rl/demo_bc_residual.py"] = file_sha256(ROOT / "isaaclab/so101_pick_rl/demo_bc_residual.py")
@@ -113,10 +117,14 @@ def main():
         torch.cuda.reset_peak_memory_stats()
         started = time.perf_counter()
         with torch.inference_mode():
-            for _ in range(steps):
+            for step in range(steps):
                 normalized = (obs - mean) / std
                 max_normalized_obs = torch.maximum(max_normalized_obs, normalized.abs().max(dim=1).values)
-                obs = runtime.step(policy(normalized))
+                action = controller_action(
+                    args.reset_bootstrap, step, obs, mean, std, policy,
+                    contract["action"]["lower_rad"], contract["action"]["upper_rad"],
+                )
+                obs = runtime.step(action)
                 lift, release = diagnostic_flags(obs, start_z)
                 peak_lift = torch.maximum(peak_lift, lift)
                 lift_run = torch.where(lift >= .08, lift_run + 1, 0)
