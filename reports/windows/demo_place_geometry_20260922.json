@@ -1,0 +1,195 @@
+{
+  "schema": "so101_pick_rl.demo_place_geometry_status.v1",
+  "date": "2026-09-22",
+  "status": "no_verified_collision_free_placement_reference",
+  "training_updates": 0,
+  "full_task_success": false,
+  "scene_and_gate_changed": false,
+  "artifacts": {
+    "pose_56": {
+      "path": "artifacts/demo_warmstart_20260922/pose_collision_56/report.json",
+      "sha256": "3db8b816ecc68a1a3b54bf194d4e8917a6705cb9ae1d1afde1b5bb94ee0e3ca5"
+    },
+    "pose_58": {
+      "path": "artifacts/demo_warmstart_20260922/pose_collision_58/report.json",
+      "sha256": "a1509999e9b2c57c42aa9b47d98a545c6a5a772cd94d7629013d1b60842d791b"
+    },
+    "pose_59": {
+      "path": "artifacts/demo_warmstart_20260922/pose_collision_59/report.json",
+      "sha256": "bb3625af852e7f82336ee25c079de849a00d943fe701a1e3b992a123f7f3e8d0"
+    },
+    "pose_61": {
+      "path": "artifacts/demo_warmstart_20260922/pose_collision_61/report.json",
+      "sha256": "84ff90d20ef2ac00fea4792931dfb42ba1d86a7a0fb140c5f473098d2950d232"
+    },
+    "pose_64": {
+      "path": "artifacts/demo_warmstart_20260922/pose_collision_64/report.json",
+      "sha256": "77bd96b3b9d7bedffa89cc7e15a250dc04e2b637027af92f56cefda38158a40a"
+    },
+    "search_57": {
+      "path": "artifacts/demo_warmstart_20260922/geometry_search_57.json",
+      "sha256": "f2ff70d6b692ce4f667697e320be7d3a6888899fa8e7991814e198db5a4bd3c2",
+      "candidate_count": 1,
+      "classification": "sampled_geometry_only"
+    },
+    "search_60": {
+      "path": "artifacts/demo_warmstart_20260922/geometry_search_60.json",
+      "sha256": "c098ac78bb2d9a21de63a7ef6dc69ac8722056ce88e3bba8beff8af084f7da4a",
+      "candidate_count": 1,
+      "classification": "sampled_geometry_only"
+    },
+    "search_63": {
+      "path": "artifacts/demo_warmstart_20260922/geometry_search_63.json",
+      "sha256": "7a6523e09c19afe545d9f9434837bfce202bac5018aa7d872bfa6fd9458e7e7b",
+      "candidate_count": 0,
+      "classification": "convex_geometry_only"
+    },
+    "search_62_interrupted": {
+      "path": "artifacts/demo_warmstart_20260922/geometry_search_62_interrupted.json",
+      "sha256": "384c3b9747ac8644ecb58fb45a60b1de9a8311d51eb2afff1c77587a16611770"
+    },
+    "pose_66": {
+      "path": "artifacts/demo_warmstart_20260922/pose_collision_66/report.json",
+      "sha256": "ecce05267cb18843c1a67c51f5f62566dc78cd0f28880ed21053d0daa094481a"
+    },
+    "search_65": {
+      "path": "artifacts/demo_warmstart_20260922/geometry_search_65.json",
+      "sha256": "baca08121d799f113f385594ee33d0cfb5aba206c7c0f542542d4eca1da0f455",
+      "candidate_count": 0,
+      "classification": "convex_geometry_only"
+    }
+  },
+  "pose_results": [
+    {
+      "run": 56,
+      "name": "center",
+      "first_failure_step": {
+        "gripper/box/loaded_contact": 1,
+        "gripper/box/penetration": 1
+      },
+      "maximum_combined_hand_box_force_n": 128.5595133304596,
+      "gripper_box_minimum_separation_m": -0.009571567177772522,
+      "jaw_box_minimum_separation_m": 0.0010479539632797241,
+      "trace_sha256": "27b6d72a49300d16e2bbece1727fff1d2ce5410f537e7d5538a6f72b17126a2d",
+      "steps": 570,
+      "final_hypothetical_aperture_sufficient": null
+    },
+    {
+      "run": 56,
+      "name": "near_inside",
+      "first_failure_step": {
+        "gripper/box/loaded_contact": 1,
+        "gripper/box/penetration": 1,
+        "jaw/box/loaded_contact": 1,
+        "jaw/box/penetration": 3
+      },
+      "maximum_combined_hand_box_force_n": 3917.153794005397,
+      "gripper_box_minimum_separation_m": -0.019352920353412628,
+      "jaw_box_minimum_separation_m": -0.010016960091888905,
+      "trace_sha256": "39b3db6fe61be0dd5050c13c1e4549fa421ce80e0f9db9b210b3abb50b75d432",
+      "steps": 570,
+      "final_hypothetical_aperture_sufficient": null
+    },
+    {
+      "run": 58,
+      "name": "geometry_07",
+      "first_failure_step": {
+        "gripper/box/loaded_contact": 2,
+        "jaw/box/loaded_contact": 249
+      },
+      "maximum_combined_hand_box_force_n": 9.301362216472626,
+      "gripper_box_minimum_separation_m": -0.00011008118599420413,
+      "jaw_box_minimum_separation_m": -0.00010963554086629301,
+      "trace_sha256": "634b5f22f711c2bcda3330c46623c1f24dfc26c2928d04fdedf597bf0c51dfcd",
+      "steps": 570,
+      "final_hypothetical_aperture_sufficient": null
+    },
+    {
+      "run": 59,
+      "name": "geometry_07",
+      "first_failure_step": {
+        "gripper/box/loaded_contact": 3,
+        "jaw/box/loaded_contact": 252
+      },
+      "maximum_combined_hand_box_force_n": 5.875670313835144,
+      "gripper_box_minimum_separation_m": -0.00004978704600944184,
+      "jaw_box_minimum_separation_m": -0.0000018636719687492587,
+      "trace_sha256": "1c360e834e9c02f0352971df9ea72b5fc47acf9ed16874d762edce3a7bf11916",
+      "steps": 570,
+      "final_hypothetical_aperture_sufficient": null
+    },
+    {
+      "run": 61,
+      "name": "geometry_00",
+      "first_failure_step": {
+        "gripper/box/loaded_contact": 1,
+        "gripper/box/penetration": 1
+      },
+      "maximum_combined_hand_box_force_n": 1.3603851795196533,
+      "gripper_box_minimum_separation_m": -0.0018702211091294885,
+      "jaw_box_minimum_separation_m": 0.0013213258935138583,
+      "trace_sha256": "3dd400a5ff2b92530edfd1cbae7f3c82d6795fd60225cad3c0aeffa3bd90c59f",
+      "steps": 570,
+      "final_hypothetical_aperture_sufficient": null
+    },
+    {
+      "run": 64,
+      "name": "geometry_01",
+      "first_failure_step": {
+        "jaw/box/loaded_contact": 1,
+        "combined_hand/box/loaded_contact": 1,
+        "gripper/box/loaded_contact": 31
+      },
+      "maximum_combined_hand_box_force_n": 2.732687294483185,
+      "gripper_box_minimum_separation_m": -0.00007589867163915187,
+      "jaw_box_minimum_separation_m": -0.0009030147921293974,
+      "trace_sha256": "62303bcb06811297da12adc6b8ed953d3a9fe441b5e3e2c8555a4d59cd47db9f",
+      "steps": 570,
+      "final_hypothetical_aperture_sufficient": true
+    },
+    {
+      "run": 66,
+      "name": "geometry_00",
+      "first_failure_step": {
+        "jaw/box/loaded_contact": 1,
+        "jaw/box/penetration": 1,
+        "combined_hand/box/loaded_contact": 1,
+        "gripper/box/loaded_contact": 74
+      },
+      "maximum_combined_hand_box_force_n": 2.7080379724502563,
+      "gripper_box_minimum_separation_m": -0.000044965738197788596,
+      "jaw_box_minimum_separation_m": -0.0010077496990561485,
+      "trace_sha256": "7061f45aa4a09b20218869983560cfb6bb1e59bfa7aed5a82c091eadae177e56",
+      "steps": 570,
+      "final_hypothetical_aperture_sufficient": true
+    }
+  ],
+  "validation": {
+    "contract": "PASS",
+    "new_unit_tests_passed": 8,
+    "full_suite_total": 261,
+    "full_suite_passed": 260,
+    "existing_failure": "test_parallel_video.test_camera_starts_full_then_smoothly_reaches_detail exact float mismatch 15.839191898578662 vs 15.839191898578665",
+    "trace_hashes_and_570_step_lengths_verified": true,
+    "no_64_env_or_training_after_failed_pose_probe": true,
+    "review": "independent code-reviewer: no scoped findings after fixes; LSP/type check unavailable"
+  },
+  "limitations": [
+    "Reset-assisted empty-hand probes are not approach/grasp/carry/release/retreat successes",
+    "Authored convex-hull screening is conservative and not identical to cooked PhysX collision geometry",
+    "No candidates in a bounded search does not prove infeasibility",
+    "Upright cube transform/aperture is a geometric assumption, not validated contact or transported orientation",
+    "Existing unrelated dirty grasp_audit.py was executed and snapshot-hashed; not clean-commit portfolio evidence"
+  ],
+  "next_policy_comparison": {
+    "baseline": "current 34D state MLP BC",
+    "first_candidate": "state BC-RNN LSTM with GMM head, not implemented",
+    "second_candidate": "state Diffusion Policy, dependency/runner integration not implemented",
+    "online_learning": "demonstration initialization plus parallel PPO remains a separate training stage",
+    "condition": "same source split, reset protocol, contact gate and held-out closed-loop episodes; no selection solely on offline loss",
+    "sources": [
+      "https://github.com/isaac-sim/IsaacLab/blob/v2.1.1/source/isaaclab_tasks/isaaclab_tasks/manager_based/manipulation/stack/config/franka/agents/robomimic/bc_rnn_low_dim.json",
+      "https://github.com/real-stanford/diffusion_policy"
+    ]
+  }
+}
