@@ -274,7 +274,21 @@ LeIsaac은 joint target 변환도 지원함을 확인했다. 따라서 관절 �
 - [IsaacLab 저차원 BC-RNN 설정](https://github.com/isaac-sim/IsaacLab/blob/v2.1.1/source/isaaclab_tasks/isaaclab_tasks/manager_based/manipulation/stack/config/franka/agents/robomimic/bc_rnn_low_dim.json)
 - [LeIsaac EEF/joint 변환](https://github.com/LightwheelAI/leisaac/blob/main/scripts/mimic/eef_action_process.py)
 
-다음 선행 조건은 원래 장면에서 충돌 없이 지지 후 놓기·열기·후퇴가 가능한
+추가로 원본 USD의 순기구학을 기록된 7개 gripper pose와 대조했다. 최대 위치
+오차는 4.21e-7m, 최대 회전 오차는 1.40e-6rad였다. 고정 파지점 근사
+`cube_in_gripper=[0.008, 0, -0.089]m` 아래에서 상자 중심 `(0.58,-0.35,0.0645)`과
+팔 쪽 내부 `(0.55,-0.38,0.0645)` 모두 관절 한계 안의 목표점 도달 후보를 찾았다.
+검증한 후보의 하향축 기울기는 각각 약 32.07도와 15.22도다. 이 각도가 전역
+최소라는 뜻이나 완전 수직이 불가능하다는 증명은 아니다. 특히 자기충돌·벽
+충돌·열기·후퇴·동적 파지 유지는 아직 검사하지 않았다. 따라서 목표점이
+팔의 도달 범위 밖이라는 이유만으로 장면을 바꾸지는 않는다.
+
+`isaaclab/scripts/verify_demo_workspace_candidates.py`는 해당 두 후보와 기록된
+FK의 일치를 시뮬레이터 없이 재검증한다. `--robot`, `--dataset`, `--output`을
+받으며 보존한 SDK Python을 사용한다. 이 스크립트의 관절각은 실물 실행
+명령이 아니다. 수치·해시·가정은 `workspace_candidates_55.json` artifact에 있다.
+
+다음 선행 조건은 팔 쪽 내부 후보부터 원래 장면에서 충돌 없이 지지 후 놓기·열기·후퇴가 가능한
 기준 궤적이다. 이 구간을 접촉으로 검증한 다음 단일 시연 폐루프 재현, 여러
 초기 상태의 BC, 병렬 PPO 순서로 확장한다. 상자 벽 제거, 판정 완화, 원본
 상태와 수정된 행동의 임의 결합으로 성공 데이터를 만들지 않는다.

@@ -338,8 +338,78 @@
     "role": "code-reviewer",
     "verdict": "comment_no_blocking_code_findings",
     "files_reviewed": 10,
+    "followup_workspace_files_reviewed": 3,
+    "followup_workspace_verdict": "comment_no_blocking_code_findings",
     "blocking_findings": 0,
     "limitation": "LSP and pyright unavailable; syntax, tests, source review and execution artifacts verified instead"
+  },
+  "workspace_kinematics": {
+    "artifact": {
+      "path": "artifacts/demo_warmstart_20260922/workspace_candidates_55.json",
+      "sha256": "7c7c295c44cb425f837176f5df1ca49cdb986757c973c791b71d8ae4e8f45179"
+    },
+    "status": "verified_point_kinematics_only",
+    "maximum_fk_position_error_m": 4.2089626189375624e-7,
+    "maximum_fk_rotation_error_rad": 0.0000013946022460442827,
+    "assumed_cube_center_in_gripper_m": [
+      0.008,
+      0,
+      -0.089
+    ],
+    "candidates": [
+      {
+        "name": "center",
+        "target_world_m": [
+          0.58,
+          -0.35,
+          0.0645
+        ],
+        "joint_position_rad": [
+          0.753753476,
+          1.213741643,
+          -1.288484974,
+          1.085882659,
+          -0.000549714
+        ],
+        "point_error_m": 6.254173377675591e-8,
+        "approach_axis_world": [
+          0.3633347869346632,
+          0.3870982246207868,
+          -0.8474330634914925
+        ],
+        "tilt_from_world_down_deg": 32.066436759477305,
+        "within_joint_limits": true
+      },
+      {
+        "name": "near_inside",
+        "target_world_m": [
+          0.55,
+          -0.38,
+          0.0645
+        ],
+        "joint_position_rad": [
+          0.749607513,
+          1.133964793,
+          -1.288485053,
+          1.45972495,
+          -0.000554168
+        ],
+        "point_error_m": 6.244434559741322e-8,
+        "approach_axis_world": [
+          0.1788437879015237,
+          0.19213213501783236,
+          -0.9649353046824033
+        ],
+        "tilt_from_world_down_deg": 15.217732175186846,
+        "within_joint_limits": true
+      }
+    ],
+    "limitations": [
+      "Fixed grasp-point approximation, not certified grasp/contact geometry",
+      "No collision, path, support, opening, retreat, dynamics, or physical-robot validation",
+      "Does not prove that vertical placement is impossible or these tilts are global minima",
+      "Candidate joint angles are offline data, not commands for a real robot"
+    ]
   },
   "decisions": {
     "new_training_updates": 0,
